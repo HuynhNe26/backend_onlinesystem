@@ -7,11 +7,11 @@ def get_db_connection():
         if os.environ.get('RENDER') == "true":
             # MySQL trên Render
             conn = mysql.connector.connect(
-                host=os.getenv("DB_HOST"),
-                user=os.getenv("DB_USER"),
-                password=os.getenv("DB_PASS"),
-                database=os.getenv("DB_NAME"),
-                port=os.getenv("DB_PORT", 3306)  # mặc định port 3306
+                host=os.environ("DB_HOST"),
+                user=os.environ("DB_USER"),
+                password=os.environ("DB_PASS"),
+                database=os.environ("DB_NAME"),
+                port=os.environ("DB_PORT", 3306)  # mặc định port 3306
             )
         else:
             # Local MySQL
