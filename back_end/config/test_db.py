@@ -1,4 +1,4 @@
-from config.db_config import get_db_connection
+from ..config.db_config import get_db_connection
 
 conn = get_db_connection()
 if conn:
@@ -8,5 +8,3 @@ if conn:
     for x in cursor.fetchall():
         print(x)
     conn.close()
-
-# Lệnh tets: python test_db.py
