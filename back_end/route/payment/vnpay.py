@@ -5,7 +5,7 @@ import hashlib
 import urllib.parse
 import datetime
 import logging
-from src.back_end.config.db_config import get_db_connection
+from ...config.db_config import get_db_connection
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
