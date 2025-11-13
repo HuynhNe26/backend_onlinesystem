@@ -14,19 +14,6 @@ def get_current_user_id():
     except (ValueError, TypeError):
         return identity
 
-@exam_bp.route('/categories', methods=['GET'])
-def get_categories():
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    try:
-        cursor.execute("SELECT id_category, name_category FROM categories")
-        categories = cursor.fetchall()
-        return jsonify({"success": True, "categories": categories}), 200
-    except Exception as e:
-        return jsonify({"success": False, "message": str(e)}), 500
-    finally:
-        cursor.close()
-        conn.close()
 
 @exam_bp.route('/difficulty', methods=['GET'])
 def get_difficulty():
