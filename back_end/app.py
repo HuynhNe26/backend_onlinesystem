@@ -3,13 +3,13 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 
 # users
-from src.back_end.route.users.auth import users_bp
-from src.back_end.route.admin.dashboard import admin_bp
-from src.back_end.route.admin.login import login_bp
-from src.back_end.route.admin.logout import logout_bp
-from src.back_end.route.admin.fullAdmin import admin_users_bp
-from src.back_end.route.payment.payment_api import payment_bp
-from src.back_end.route.users.exam import exam_bp
+from back_end.route.users.auth import users_bp
+from back_end.route.admin.dashboard import admin_bp
+from back_end.route.admin.login import login_bp
+from back_end.route.admin.logout import logout_bp
+from back_end.route.admin.fullAdmin import admin_users_bp
+from back_end.route.payment.payment_api import payment_bp
+from back_end.route.users.exam import exam_bp
 
 app = Flask(__name__)
 
