@@ -35,4 +35,10 @@ app.register_blueprint(payment_bp, url_prefix='/api/payment')
 app.register_blueprint(exam_bp, url_prefix='/api/exam')
 
 if __name__ == '__main__':
-    app.run(port=5000, debug=True)
+    # Lấy PORT từ environment variable (Render sẽ cung cấp)
+    import os
+
+    port = int(os.environ.get('PORT', 5000))
+
+    # QUAN TRỌNG: phải bind vào 0.0.0.0
+    app.run(host='0.0.0.0', port=port, debug=False)
