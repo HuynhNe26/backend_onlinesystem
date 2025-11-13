@@ -34,7 +34,7 @@ app.register_blueprint(login_bp, url_prefix='/api/login')
 app.register_blueprint(logout_bp, url_prefix='/api/logout')
 app.register_blueprint(payment_bp, url_prefix='/api/payment')
 app.register_blueprint(exam_bp, url_prefix='/api/exam')
-app.register_blueprint(exam_bp, url_prefix='/api/categories')
+app.register_blueprint(category_bp, url_prefix='/api/categories')
 
 
 if __name__ == '__main__':
