@@ -3,7 +3,7 @@ import mysql.connector
 db = mysql.connector.connect(
     host="localhost",
     user="root",
-    passwd="Minhvu1710^^"
+    passwd="Huynh@2608"
 )
 cursor = db.cursor()
 cursor.execute("DROP DATABASE IF EXISTS online_testing")
@@ -223,15 +223,15 @@ INSERT INTO questions (id_category, ques_text, ans_a, ans_b, ans_c, ans_d, corre
 CREATE TABLE IF NOT EXISTS exam (
     id_ex INT PRIMARY KEY AUTO_INCREMENT,
     total_ques INT NOT NULL,
-    duration INT NOT NULL,
+    duration INT NOT NULL,  -- Số phút
     name_ex VARCHAR(50),
     id_user INT NOT NULL,
     FOREIGN KEY (id_user) REFERENCES users(id_user)
 );
 
 INSERT INTO exam (total_ques, duration, name_ex, id_user) VALUES
-(10, '01:00:00', 'Kiểm tra giữa kỳ Toán', 2),
-(15, '01:30:00', 'Kiểm tra cuối kỳ Vật lý', 2);
+(10, 60, 'Kiểm tra giữa kỳ Toán', 2),     
+(15, 90, 'Kiểm tra cuối kỳ Vật lý', 2);  
 
 -- 9. Exam_Question
 CREATE TABLE IF NOT EXISTS exam_question (
