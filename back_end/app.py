@@ -10,6 +10,7 @@ from back_end.route.admin.logout import logout_bp
 from back_end.route.admin.fullAdmin import admin_users_bp
 from back_end.route.payment.payment_api import payment_bp
 from back_end.route.users.exam import exam_bp
+from back_end.route.users.category import category_bp
 
 app = Flask(__name__)
 
@@ -33,6 +34,8 @@ app.register_blueprint(login_bp, url_prefix='/api/login')
 app.register_blueprint(logout_bp, url_prefix='/api/logout')
 app.register_blueprint(payment_bp, url_prefix='/api/payment')
 app.register_blueprint(exam_bp, url_prefix='/api/exam')
+app.register_blueprint(exam_bp, url_prefix='/api/categories')
+
 
 if __name__ == '__main__':
     # Lấy PORT từ environment variable (Render sẽ cung cấp)
