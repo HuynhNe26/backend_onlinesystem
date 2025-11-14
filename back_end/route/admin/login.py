@@ -5,11 +5,12 @@ from ...config.db_config import get_db_connection
 
 login_bp = Blueprint('login', __name__)
 
-@login_bp.route('/admin', methods=['POST'])
+@login_bp.route('/login', methods=['POST'])
 def login_admin():
     data = request.get_json()
     email = data.get("email")
     password = data.get("password")
+    print(email, password)
 
     if not email or not password:
         return jsonify({"msg": "Thiếu thông tin!"}), 400
