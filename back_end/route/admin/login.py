@@ -5,12 +5,16 @@ from ...config.db_config import get_db_connection
 
 login_bp = Blueprint('login', __name__)
 
-@login_bp.route('/login', methods=['POST'])
+
+@login_bp.route('/login', methods=['POST', 'OPTIONS'])
 def login_admin():
+    if request.method == 'OPTIONS':
+        return '', 204
+
     data = request.get_json()
     email = data.get("email")
     password = data.get("password")
-    print(email, password)
+    print(f"Login attempt - Email: {email}")
 
     if not email or not password:
         return jsonify({"msg": "Thiếu thông tin!"}), 400
@@ -32,7 +36,7 @@ def login_admin():
         if password != user["password"]:
             return jsonify({"msg": "Sai email hoặc mật khẩu!"}), 401
 
-        if user["level"] not in (1):
+        if user["level"] not in (1,):
             return jsonify({"msg": "Không có quyền truy cập!"}), 403
 
         cursor.execute(
@@ -49,7 +53,7 @@ def login_admin():
 
         return jsonify({
             "msg": "Đăng nhập thành công!",
-            "accessToken": access_token,
+            "token": access_token,
             "user": {
                 "id": user["id_user"],
                 "name": user["fullName"],
@@ -63,5 +67,7 @@ def login_admin():
         return jsonify({"msg": "Lỗi server"}), 500
 
     finally:
-        cursor.close()
-        db.close()
+        if cursor:
+            cursor.close()
+        if db:
+            db.close()
