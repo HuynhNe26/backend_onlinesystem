@@ -36,7 +36,7 @@ def login_admin():
         if password != user["password"]:
             return jsonify({"msg": "Sai email hoặc mật khẩu!"}), 401
 
-        if user["level"] not in (1,):
+        if user["level"] not in (2, 3):
             return jsonify({"msg": "Không có quyền truy cập!"}), 403
 
         cursor.execute(
