@@ -1,19 +1,11 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token
 from datetime import timedelta
-import mysql.connector
+from ...config.db_config import get_db_connection
 
 login_bp = Blueprint('login', __name__)
 
-def get_db():
-    return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="Anhkiet3307*",
-        database="online_testing"
-    )
-
-@login_bp.route('', methods=['POST'])
+@login_bp.route('/admin', methods=['POST'])
 def login_admin():
     data = request.get_json()
     email = data.get("email")
@@ -23,43 +15,40 @@ def login_admin():
         return jsonify({"msg": "Thiếu thông tin!"}), 400
 
     try:
-        db = get_db()
+        db = get_db_connection()
         cursor = db.cursor(dictionary=True)
 
-        # Kiểm tra user
-        query = """
-            SELECT id_user, username, password, fullName, role, level
+        cursor.execute("""
+            SELECT id_user, fullName, role, level, password
             FROM users
-            WHERE email = %s AND password = %s
-        """
-        cursor.execute(query, (email, password))
+            WHERE email = %s
+        """, (email,))
         user = cursor.fetchone()
 
         if not user:
-            return jsonify({"msg": "Sai tài khoản hoặc mật khẩu!"}), 401
+            return jsonify({"msg": "Sai email hoặc mật khẩu!"}), 401
 
-        level = int(user["level"])
-        if level not in (2, 3):
-            return jsonify({"msg": "Mày biến !!!"}), 403
+        if password != user["password"]:
+            return jsonify({"msg": "Sai email hoặc mật khẩu!"}), 401
 
-        # Update login_time ngay khi login thành công
-        update_login = """
-            UPDATE users
-            SET login_time = NOW()
-            WHERE id_user = %s
-        """
-        cursor.execute(update_login, (user["id_user"],))
-        db.commit()  # quan trọng: commit để DB update
+        if user["level"] not in (1):
+            return jsonify({"msg": "Không có quyền truy cập!"}), 403
 
-        # Tạo token JWT
+        cursor.execute(
+            "UPDATE users SET login_time = NOW() WHERE id_user = %s",
+            (user["id_user"],)
+        )
+        db.commit()
+
         access_token = create_access_token(
-            identity=str(user["id_user"]),  # chỉ id_user
-            additional_claims={"role": user["role"], "level": user["level"]}
+            identity=str(user["id_user"]),
+            additional_claims={"role": user["role"], "level": user["level"]},
+            expires_delta=timedelta(hours=3)
         )
 
         return jsonify({
             "msg": "Đăng nhập thành công!",
-            "token": access_token,
+            "accessToken": access_token,
             "user": {
                 "id": user["id_user"],
                 "name": user["fullName"],

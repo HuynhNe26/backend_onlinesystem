@@ -6,7 +6,6 @@ from flask_jwt_extended import JWTManager
 from back_end.route.users.auth import users_bp
 from back_end.route.admin.dashboard import admin_bp
 from back_end.route.admin.login import login_bp
-from back_end.route.admin.logout import logout_bp
 from back_end.route.admin.fullAdmin import admin_users_bp
 from back_end.route.payment.payment_api import payment_bp
 from back_end.route.users.exam import exam_bp
@@ -31,7 +30,6 @@ app.register_blueprint(admin_users_bp, url_prefix="/api/admin/users")
 app.register_blueprint(users_bp, url_prefix='/api/users')
 app.register_blueprint(admin_bp, url_prefix='/api/admin')
 app.register_blueprint(login_bp, url_prefix='/api/login')
-app.register_blueprint(logout_bp, url_prefix='/api/logout')
 app.register_blueprint(payment_bp, url_prefix='/api/payment')
 app.register_blueprint(exam_bp, url_prefix='/api/exam')
 app.register_blueprint(category_bp, url_prefix='/api/categories')
