@@ -20,12 +20,12 @@ def get_current_user_id():
         return identity
 
 
+# ================= REGISTER ====================
 @users_bp.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
     required_fields = ["fullName", "username", "email", "password", "gender"]
 
-    # Kiểm tra thiếu trường
     if not data or not all(field in data for field in required_fields):
         return jsonify({"success": False, "message": "Thiếu dữ liệu bắt buộc."}), 400
 
@@ -35,18 +35,16 @@ def register():
     password = data["password"]
     gender = data["gender"]
     avatar = data.get("avatar")
-    birth_date = data.get("birth_date")
+    dateOfBirth = data.get("dateOfBirth")   # đúng field DB
 
     # Validate email format
     email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
     if not re.match(email_regex, email):
         return jsonify({"success": False, "message": "Email không hợp lệ."}), 400
 
-    # Validate password length
     if len(password) < 6:
         return jsonify({"success": False, "message": "Mật khẩu phải có ít nhất 6 ký tự."}), 400
 
-    # Kiểm tra trùng email và username
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     try:
@@ -58,24 +56,20 @@ def register():
         if cursor.fetchone():
             return jsonify({"success": False, "message": "Tên người dùng đã tồn tại."}), 400
 
-        # Hash mật khẩu
         hashed_password = generate_password_hash(password)
 
-        # Insert người dùng mới
+        # CHỈ insert field có thật trong bảng
         cursor.execute(
             """
             INSERT INTO users 
-            (fullName, username, email, password, gender, avatar, birth_date, role, status, level, created_at, updated_at)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, 'user', 'active', 1, NOW(), NOW())
+            (fullName, username, email, password, gender, avatar, dateOfBirth, role, status, level, create_at)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, 'user', 'active', 1, NOW())
             """,
-            (fullName, username, email, hashed_password, gender, avatar, birth_date)
+            (fullName, username, email, hashed_password, gender, avatar, dateOfBirth)
         )
         conn.commit()
 
-        return jsonify({
-            "success": True,
-            "message": "Đăng ký thành công!"
-        }), 201
+        return jsonify({"success": True, "message": "Đăng ký thành công!"}), 201
 
     except Exception as e:
         conn.rollback()
@@ -84,6 +78,8 @@ def register():
         cursor.close()
         conn.close()
 
+
+# ================= LOGIN ====================
 @users_bp.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
@@ -99,21 +95,15 @@ def login():
         cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
         user = cursor.fetchone()
 
-        if not user:
+        if not user or not check_password_hash(user['password'], password):
             return jsonify({"success": False, "message": "Email hoặc mật khẩu không đúng."}), 401
 
-        # Kiểm tra mật khẩu
-        if not check_password_hash(user['password'], password):
-            return jsonify({"success": False, "message": "Email hoặc mật khẩu không đúng."}), 401
-
-        # Tạo token (dùng id_user làm identity)
         access_token = create_access_token(identity=str(user['id_user']))
 
         return jsonify({
             "success": True,
             "token": access_token,
             "user": {
-                "id": user['id_user'],
                 "id_user": user['id_user'],
                 "fullName": user['fullName'],
                 "username": user['username'],
@@ -122,8 +112,9 @@ def login():
                 "status": user['status'],
                 "gender": user['gender'],
                 "level": user['level'],
-                "package_id": user.get('package_id'),
-                "package_expiry_date": user.get('package_expiry_date').isoformat() if user.get('package_expiry_date') else None
+                "id_package": user.get('id_package'),
+                "start_package": user.get('start_package').isoformat() if user.get('start_package') else None,
+                "end_package": user.get('end_package').isoformat() if user.get('end_package') else None
             }
         }), 200
 
@@ -133,15 +124,17 @@ def login():
         cursor.close()
         conn.close()
 
+
+# ================= UPDATE PACKAGE ====================
 @users_bp.route('/update_package', methods=['POST'])
 @jwt_required()
 def update_package():
     user_id = get_current_user_id()
     data = request.get_json()
-    package_id = data.get('package_id')
+    id_package = data.get('id_package')  # đúng tên field
 
-    if not package_id:
-        return jsonify({"success": False, "message": "Thiếu package_id."}), 400
+    if not id_package:
+        return jsonify({"success": False, "message": "Thiếu id_package."}), 400
 
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -149,20 +142,24 @@ def update_package():
         cursor.execute(
             """
             UPDATE users
-            SET package_id = %s, updated_at = NOW()
+            SET id_package = %s
             WHERE id_user = %s
             """,
-            (package_id, user_id)
+            (id_package, user_id)
         )
         conn.commit()
+
         return jsonify({"success": True, "message": "Cập nhật gói dịch vụ thành công!"})
+
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
+
     finally:
         cursor.close()
         conn.close()
 
 
+# ================= PROFILE ====================
 @users_bp.route('/profile', methods=['GET'])
 @jwt_required()
 def get_profile():
@@ -180,7 +177,7 @@ def get_profile():
         return jsonify({
             "success": True,
             "user": {
-                "id": user['id_user'],
+                "id_user": user['id_user'],
                 "fullName": user['fullName'],
                 "username": user['username'],
                 "email": user['email'],
@@ -188,14 +185,15 @@ def get_profile():
                 "status": user['status'],
                 "gender": user['gender'],
                 "level": user['level'],
-                "package_id": user.get('package_id'),
-                "package_expiry_date": user.get('package_expiry_date').isoformat() if user.get(
-                    'package_expiry_date') else None
+                "id_package": user.get('id_package'),
+                "start_package": user.get('start_package').isoformat() if user.get('start_package') else None,
+                "end_package": user.get('end_package').isoformat() if user.get('end_package') else None
             }
         }), 200
+
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
+
     finally:
         cursor.close()
         conn.close()
-
