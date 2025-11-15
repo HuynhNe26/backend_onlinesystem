@@ -21,11 +21,13 @@ def get_current_user_id():
 
 
 def validate_email(email):
+    """Validate email format"""
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     return re.match(pattern, email) is not None
 
 
 def validate_password(password):
+    """Validate password strength"""
     if len(password) < 8:
         return False, "Mật khẩu phải có ít nhất 8 ký tự."
     if not re.search(r"[A-Z]", password):
@@ -36,33 +38,42 @@ def validate_password(password):
 
 
 def create_user(fullName, username, email, password, gender, avatar=None, birth_date=None):
+    """Create a new user in database"""
     conn = None
     cursor = None
 
     try:
+        # Validate email format
         if not validate_email(email):
             return False, "Định dạng email không hợp lệ."
 
+        # Validate password strength
         is_valid, error_msg = validate_password(password)
         if not is_valid:
             return False, error_msg
 
+        # Connect to database
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
+        # Check if email already exists
         cursor.execute("SELECT id_user FROM users WHERE email = %s", (email,))
         if cursor.fetchone():
             return False, "Email đã được sử dụng."
 
+        # Check if username already exists
         cursor.execute("SELECT id_user FROM users WHERE username = %s", (username,))
         if cursor.fetchone():
             return False, "Tên đăng nhập đã tồn tại."
 
+        # Hash password
         hashed_password = generate_password_hash(password)
 
+        # Set default avatar if not provided
         if not avatar:
             avatar = "src/assets/Avt/nam.png" if gender == "Nam" else "src/assets/Avt/nu.png"
 
+        # Insert new user
         insert_query = """
             INSERT INTO users (fullName, username, email, password, gender, avatar, birth_date, 
                              role, status, level, created_at, updated_at)
@@ -109,6 +120,7 @@ def register():
             "message": f"Thiếu dữ liệu: {', '.join(missing_fields)}"
         }), 400
 
+    # Create user
     success, message = create_user(
         data["fullName"],
         data["username"],
@@ -140,6 +152,7 @@ def login():
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
+        # Get user by email
         cursor.execute("SELECT * FROM users WHERE email = %s", (data["email"],))
         user = cursor.fetchone()
 
@@ -149,18 +162,42 @@ def login():
                 "message": "Email hoặc mật khẩu không đúng."
             }), 401
 
-        if not check_password_hash(user['password'], data["password"]):
+        # Check password (support both hashed and plain text for migration)
+        password_valid = False
+
+        # Try hashed password first
+        if user['password'].startswith('pbkdf2:') or user['password'].startswith('scrypt:'):
+            password_valid = check_password_hash(user['password'], data["password"])
+        else:
+            # Fallback to plain text (for old accounts)
+            password_valid = (user['password'] == data["password"])
+
+            # Auto-upgrade to hashed password
+            if password_valid:
+                try:
+                    hashed = generate_password_hash(data["password"])
+                    cursor.execute(
+                        "UPDATE users SET password = %s WHERE id_user = %s",
+                        (hashed, user['id_user'])
+                    )
+                    conn.commit()
+                except Exception as e:
+                    print(f"Failed to upgrade password: {e}")
+
+        if not password_valid:
             return jsonify({
                 "success": False,
                 "message": "Email hoặc mật khẩu không đúng."
             }), 401
 
+        # Check if account is active
         if user.get('status') != 'active':
             return jsonify({
                 "success": False,
                 "message": "Tài khoản đã bị khóa. Vui lòng liên hệ quản trị viên."
             }), 403
 
+        # Create access token
         access_token = create_access_token(identity=str(user['id_user']))
 
         return jsonify({
