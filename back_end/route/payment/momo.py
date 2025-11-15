@@ -154,12 +154,10 @@ def momo_payment():
 
         logging.debug(f"MoMo params: {json.dumps(params, indent=2)}")
 
-        # Generate signature
         signature = generate_momo_signature(params, MOMO_CONFIG["secretKey"])
 
         logging.debug(f"Generated signature: {signature}")
 
-        # Tạo payload gửi tới MoMo
         payload = {
             **params,
             "signature": signature,

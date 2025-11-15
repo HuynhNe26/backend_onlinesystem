@@ -14,13 +14,7 @@ from back_end.route.users.package import package_bp
 
 app = Flask(__name__)
 
-frontend_origins = [
-    "http://localhost:3000",
-    "http://localhost:5173",
-    "http://127.0.0.1:3000",
-    "http://127.0.0.1:5173",
-    "https://frontend-admin-onlinesystem-eugd.onrender.com"
-]
+frontend_origins = "https://frontend-admin-onlinesystem-eugd.onrender.com"
 
 CORS(app,
      origins=frontend_origins,
@@ -32,7 +26,6 @@ CORS(app,
 app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY", "online_testing@123")
 jwt = JWTManager(app)
 
-# Register blueprints
 app.register_blueprint(admin_users_bp, url_prefix="/api/admin/users")
 app.register_blueprint(users_bp, url_prefix='/api/users')
 app.register_blueprint(admin_bp, url_prefix='/api/admin')

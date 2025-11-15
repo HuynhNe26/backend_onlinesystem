@@ -11,7 +11,6 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %
 
 vnpay_bp = Blueprint("vnpay_bp", __name__)
 
-# VNPay Configuration
 VNPAY_CONFIG = {
     "vnp_TmnCode": "4FZ1N3EZ",
     "vnp_HashSecret": "G0S15BZBGXV9CO47K7FSJEIO2NAS544V",
@@ -64,7 +63,6 @@ def vnpay_payment():
         package_id = data.get("id_package")
         order_info = data.get("name_package", f"Thanh toán gói {package_id}")
 
-        # Connect to database
         conn = get_db_connection()
         if not conn:
             logging.error("Failed to connect to database")
@@ -75,7 +73,6 @@ def vnpay_payment():
 
         cursor = conn.cursor(dictionary=True)
 
-        # Verify package exists
         cursor.execute(
             "SELECT id, name, price FROM packages WHERE id = %s",
             (package_id,)
@@ -88,21 +85,17 @@ def vnpay_payment():
                 "message": "Gói dịch vụ không tồn tại."
             }), 404
 
-        # Verify amount matches package price
         if amount != package['price']:
             return jsonify({
                 "success": False,
                 "message": "Số tiền không khớp với giá gói."
             }), 400
 
-        # Generate transaction reference
         vnp_TxnRef = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
         vnp_CreateDate = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
 
-        # VNPay requires amount in smallest unit (VND * 100)
         vnp_Amount = amount * 100
 
-        # Build VNPay parameters
         vnp_params = {
             "vnp_Version": "2.1.0",
             "vnp_Command": "pay",
@@ -118,7 +111,6 @@ def vnpay_payment():
             "vnp_Locale": "vn"
         }
 
-        # Save transaction to database
         try:
             cursor.execute(
                 """
@@ -146,7 +138,6 @@ def vnpay_payment():
                 "message": "Lỗi lưu giao dịch vào cơ sở dữ liệu."
             }), 500
 
-        # Generate secure hash
         sorted_keys = sorted(vnp_params.keys())
         query_string = "&".join([
             f"{key}={urllib.parse.quote(str(vnp_params[key]))}"
@@ -159,7 +150,6 @@ def vnpay_payment():
             hashlib.sha512
         ).hexdigest()
 
-        # Build payment URL
         pay_url = f"{VNPAY_CONFIG['vnp_Url']}?{query_string}&vnp_SecureHash={hash_value}"
 
         logging.debug(f"VNPay payment URL generated for order: {vnp_TxnRef}")
@@ -188,17 +178,14 @@ def vnpay_payment():
 
 @vnpay_bp.route("/vnpay/ipn", methods=["GET"])
 def vnpay_ipn():
-    """Handle VNPay IPN (Return URL callback)"""
     conn = None
     cursor = None
 
     try:
-        # Get all parameters from query string
         vnp_params = request.args.to_dict()
 
         logging.debug(f"VNPay IPN received: {vnp_params}")
 
-        # Extract and remove secure hash
         vnp_SecureHash = vnp_params.pop('vnp_SecureHash', None)
 
         if not vnp_SecureHash:
@@ -208,7 +195,6 @@ def vnpay_ipn():
                 "message": "Thiếu chữ ký bảo mật."
             }), 400
 
-        # Verify signature
         sorted_keys = sorted(vnp_params.keys())
         query_string = "&".join([
             f"{key}={urllib.parse.quote(str(vnp_params[key]))}"
@@ -228,7 +214,6 @@ def vnpay_ipn():
                 "message": "Chữ ký không hợp lệ."
             }), 403
 
-        # Extract transaction info
         vnp_TxnRef = vnp_params.get('vnp_TxnRef')
         vnp_ResponseCode = vnp_params.get('vnp_ResponseCode')
         vnp_TransactionNo = vnp_params.get('vnp_TransactionNo')
@@ -241,7 +226,6 @@ def vnpay_ipn():
                 "message": "Thiếu mã giao dịch."
             }), 400
 
-        # Connect to database
         conn = get_db_connection()
         if not conn:
             logging.error("IPN: Failed to connect to database")
