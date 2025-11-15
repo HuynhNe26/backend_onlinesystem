@@ -19,8 +19,6 @@ def get_current_user_id():
     except (ValueError, TypeError):
         return identity
 
-
-# ================= REGISTER ====================
 @users_bp.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
@@ -35,9 +33,8 @@ def register():
     password = data["password"]
     gender = data["gender"]
     avatar = data.get("avatar")
-    dateOfBirth = data.get("dateOfBirth")   # đúng field DB
+    dateOfBirth = data.get("dateOfBirth")
 
-    # Validate email format
     email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
     if not re.match(email_regex, email):
         return jsonify({"success": False, "message": "Email không hợp lệ."}), 400
@@ -58,7 +55,6 @@ def register():
 
         hashed_password = generate_password_hash(password)
 
-        # CHỈ insert field có thật trong bảng
         cursor.execute(
             """
             INSERT INTO users 
@@ -78,8 +74,6 @@ def register():
         cursor.close()
         conn.close()
 
-
-# ================= LOGIN ====================
 @users_bp.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
@@ -124,8 +118,6 @@ def login():
         cursor.close()
         conn.close()
 
-
-# ================= UPDATE PACKAGE ====================
 @users_bp.route('/update_package', methods=['POST'])
 @jwt_required()
 def update_package():
@@ -158,8 +150,6 @@ def update_package():
         cursor.close()
         conn.close()
 
-
-# ================= PROFILE ====================
 @users_bp.route('/profile', methods=['GET'])
 @jwt_required()
 def get_profile():
