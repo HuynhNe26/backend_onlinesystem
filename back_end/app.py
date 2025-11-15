@@ -3,7 +3,6 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 import os
 
-# Import blueprints
 from back_end.route.users.auth import users_bp
 from back_end.route.admin.dashboard import admin_bp
 from back_end.route.admin.login import login_bp
