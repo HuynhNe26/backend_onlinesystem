@@ -1,3 +1,5 @@
+import logging
+
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 import hmac
@@ -15,8 +17,8 @@ MOMO_CONFIG = {
     "partnerCode": "MOMO",
     "accessKey": "F8BBA842ECF85",
     "secretKey": "K951B6PE1waDMi640xX08PD3vg6EkVlz",
-    "redirectUrl": "https://127.0.0.1:5000/payment-success",
-    "ipnUrl": "https://127.0.0.1:5000/api/payment/momo/ipn"
+    "redirectUrl": "https://frontend-admin-onlinesystem-eugd.onrender.com/payment-success",
+    "ipnUrl": "https://backend-onlinesystem.onrender.com/api/payment/momo/ipn"
 }
 
 

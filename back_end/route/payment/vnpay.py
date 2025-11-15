@@ -16,8 +16,8 @@ VNPAY_CONFIG = {
     "vnp_TmnCode": "4FZ1N3EZ",
     "vnp_HashSecret": "G0S15BZBGXV9CO47K7FSJEIO2NAS544V",
     "vnp_Url": "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html",
-    "vnp_Returnurl": "https://127.0.0.1:5000/payment-success",
-    "vnp_IpnUrl": "https://127.0.0.1:5000/api/payment/vnpay/ipn"
+    "vnp_Returnurl": "https://frontend-admin-onlinesystem-eugd.onrender.com/payment-success",
+    "vnp_IpnUrl": "https://backend-onlinesystem.onrender.com/api/payment/vnpay/ipn"
 }
 
 
