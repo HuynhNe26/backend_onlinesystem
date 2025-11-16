@@ -9,12 +9,10 @@ manage_users_bp = Blueprint('manage_users_bp', __name__)
 
 
 def is_admin():
-    """Kiểm tra quyền admin dựa trên JWT claims"""
     claims = get_jwt()
-    return int(claims.get("level", 1)) >= 2  # chỉ admin level >=2
+    return int(claims.get("level", 1)) >= 2
 
 
-# ===== READ - Lấy danh sách user =====
 @manage_users_bp.route('/all', methods=['GET'])
 @jwt_required()
 def list_users():
@@ -85,8 +83,6 @@ def update_user(user_id):
         cursor.close()
         conn.close()
 
-
-# ===== DELETE - Xóa user =====
 @manage_users_bp.route('/delete/<int:user_id>', methods=['DELETE'])
 @jwt_required()
 def delete_user(user_id):
