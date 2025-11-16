@@ -22,13 +22,12 @@ def get_current_user_id():
 @users_bp.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
-    required_fields = ["fullName", "username", "email", "password", "gender"]
+    required_fields = ["fullName", "email", "password", "gender"]
 
     if not data or not all(field in data for field in required_fields):
         return jsonify({"success": False, "message": "Thiếu dữ liệu bắt buộc."}), 400
 
     fullName = data["fullName"].strip()
-    username = data["username"].strip()
     email = data["email"].strip().lower()
     password = data["password"]
     gender = data["gender"]
@@ -39,20 +38,12 @@ def register():
     if not re.match(email_regex, email):
         return jsonify({"success": False, "message": "Email không hợp lệ."}), 400
 
-    if len(password) < 6:
-        return jsonify({"success": False, "message": "Mật khẩu phải có ít nhất 6 ký tự."}), 400
-
-
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     try:
         cursor.execute("SELECT id_user FROM users WHERE email = %s", (email,))
         if cursor.fetchone():
             return jsonify({"success": False, "message": "Email đã được sử dụng."}), 400
-
-        cursor.execute("SELECT id_user FROM users WHERE username = %s", (username,))
-        if cursor.fetchone():
-            return jsonify({"success": False, "message": "Tên người dùng đã tồn tại."}), 400
 
         hashed_password = generate_password_hash(password)
 
@@ -101,7 +92,6 @@ def login():
             "user": {
                 "id_user": user['id_user'],
                 "fullName": user['fullName'],
-                "username": user['username'],
                 "email": user['email'],
                 "role": user['role'],
                 "status": user['status'],
@@ -170,7 +160,6 @@ def get_profile():
             "user": {
                 "id_user": user['id_user'],
                 "fullName": user['fullName'],
-                "username": user['username'],
                 "email": user['email'],
                 "role": user['role'],
                 "status": user['status'],
