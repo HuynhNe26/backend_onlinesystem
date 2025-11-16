@@ -1,30 +1,31 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, request, jsonify
 from ...config.db_config import get_db_connection
 
 exam_bp = Blueprint('exam_bp', __name__)
 
-# --- 1. Tạo đề thi ---
+# --- 1. Tạo đề thi (Draft) ---
 @exam_bp.route('/admin/exam', methods=['POST'])
 def create_exam():
     """
-    Admin tạo đề thi mới
+    Admin tạo đề thi mới (draft)
     """
-    from flask import request
     db = None
     cursor = None
     try:
         data = request.get_json()
-        # Nhận dữ liệu từ frontend
         name_ex = data['name_ex']
         total_ques = data['total_ques']
-        duration = data['duration']   # phút
-        id_user = data['id_user']     # admin tạo đề
+        duration = data['duration']
+        id_user = data['id_user']
+        id_category = data['id_category']
+        id_classroom = data['id_classroom']
+        exam_cat = data.get('exam_cat', 'draft')  # draft mặc định
 
         db = get_db_connection()
         cursor = db.cursor()
-
-        sql = "INSERT INTO exam (name_ex, total_ques, duration, id_user) VALUES (%s, %s, %s, %s)"
-        cursor.execute(sql, (name_ex, total_ques, duration, id_user))
+        sql = """INSERT INTO exam (name_ex, total_ques, duration, id_user, id_category, id_classroom, exam_cat)
+                 VALUES (%s,%s,%s,%s,%s,%s,%s)"""
+        cursor.execute(sql, (name_ex, total_ques, duration, id_user, id_category, id_classroom, exam_cat))
         db.commit()
 
         exam_id = cursor.lastrowid
@@ -35,18 +36,16 @@ def create_exam():
         return jsonify({"msg": "Lỗi server"}), 500
 
     finally:
-        if cursor:
-            cursor.close()
-        if db:
-            db.close()
+        if cursor: cursor.close()
+        if db: db.close()
 
-# --- 2. Thêm câu hỏi ---
+
+# --- 2. Thêm câu hỏi mới ---
 @exam_bp.route('/admin/question', methods=['POST'])
 def add_question():
     """
     Admin thêm câu hỏi mới
     """
-    from flask import request
     db = None
     cursor = None
     try:
@@ -65,7 +64,6 @@ def add_question():
 
         db = get_db_connection()
         cursor = db.cursor()
-
         sql = """INSERT INTO questions (id_category, ques_text, ans_a, ans_b, ans_c, ans_d, correct_ans, point, explanation, id_diff, id_user)
                  VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
         cursor.execute(sql, (id_category, ques_text, ans_a, ans_b, ans_c, ans_d, correct_ans, point, explanation, id_diff, id_user))
@@ -79,10 +77,9 @@ def add_question():
         return jsonify({"msg": "Lỗi server"}), 500
 
     finally:
-        if cursor:
-            cursor.close()
-        if db:
-            db.close()
+        if cursor: cursor.close()
+        if db: db.close()
+
 
 # --- 3. Chọn câu hỏi vào đề ---
 @exam_bp.route('/admin/exam/<int:exam_id>/questions', methods=['POST'])
@@ -90,45 +87,38 @@ def add_questions_to_exam(exam_id):
     """
     Admin tick chọn các câu hỏi cho đề thi
     """
-    from flask import request
     db = None
     cursor = None
     try:
         data = request.get_json()
-        question_ids = data['question_ids']  # list of question IDs
+        question_ids = data['question_ids']
 
         db = get_db_connection()
         cursor = db.cursor()
-
         for qid in question_ids:
             sql = "INSERT INTO exam_question (id_ex, id_ques) VALUES (%s, %s)"
             cursor.execute(sql, (exam_id, qid))
         db.commit()
 
-        return jsonify({"msg": "Thêm câu hỏi vào đề thành công"}), 201
+        return jsonify({"msg": "Cập nhật câu hỏi vào đề thành công"}), 201
 
     except Exception as e:
         print("Lỗi thêm câu vào đề:", e)
         return jsonify({"msg": "Lỗi server"}), 500
 
     finally:
-        if cursor:
-            cursor.close()
-        if db:
-            db.close()
+        if cursor: cursor.close()
+        if db: db.close()
+
 
 # --- 4. Lấy danh sách câu hỏi trong đề ---
 @exam_bp.route('/admin/exam/<int:exam_id>/questions', methods=['GET'])
 def get_exam_questions(exam_id):
-    """
-    Lấy danh sách câu hỏi của đề thi
-    """
     db = None
     cursor = None
     try:
         db = get_db_connection()
         cursor = db.cursor(dictionary=True)
-
         sql = """SELECT q.* 
                  FROM questions q
                  JOIN exam_question eq ON q.id_ques = eq.id_ques
@@ -143,7 +133,27 @@ def get_exam_questions(exam_id):
         return jsonify({"msg": "Lỗi server"}), 500
 
     finally:
-        if cursor:
-            cursor.close()
-        if db:
-            db.close()
+        if cursor: cursor.close()
+        if db: db.close()
+
+
+# --- 5. Publish đề ---
+@exam_bp.route('/admin/exam/<int:exam_id>/publish', methods=['PATCH'])
+def publish_exam(exam_id):
+    db = None
+    cursor = None
+    try:
+        db = get_db_connection()
+        cursor = db.cursor()
+        sql = "UPDATE exam SET exam_cat = 'published' WHERE id_ex = %s"
+        cursor.execute(sql, (exam_id,))
+        db.commit()
+        return jsonify({"msg": "Đề thi đã được publish"}), 200
+
+    except Exception as e:
+        print("Lỗi publish đề:", e)
+        return jsonify({"msg": "Lỗi server"}), 500
+
+    finally:
+        if cursor: cursor.close()
+        if db: db.close()
