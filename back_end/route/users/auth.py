@@ -42,6 +42,7 @@ def register():
     if len(password) < 6:
         return jsonify({"success": False, "message": "Mật khẩu phải có ít nhất 6 ký tự."}), 400
 
+
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     try:
