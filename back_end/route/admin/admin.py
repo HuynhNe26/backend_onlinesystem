@@ -17,7 +17,7 @@ def getAdllAdmin():
         if not admins:
             return jsonify({"msg": "Không có dữ liệu quản trị viên"}), 404
 
-        return jsonify({"data": admins}), 200
+        return jsonify({"success": True, "data": admins}), 200
 
     except Exception as e:
         print("Lỗi lấy dữ liệu:", e)
