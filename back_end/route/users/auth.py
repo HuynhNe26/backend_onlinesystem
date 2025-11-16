@@ -50,10 +50,10 @@ def register():
         cursor.execute(
             """
             INSERT INTO users 
-            (fullName, username, email, password, gender, avatar, dateOfBirth, role, status, level, create_at)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, 'user', 'active', 1, NOW())
+            (fullName, email, password, gender, avatar, dateOfBirth, role, status, level, create_at)
+            VALUES (%s, %s, %s, %s, %s, %s, 'user', 'active', 1, NOW())
             """,
-            (fullName, username, email, hashed_password, gender, avatar, dateOfBirth)
+            (fullName, email, hashed_password, gender, avatar, dateOfBirth)
         )
         conn.commit()
 
