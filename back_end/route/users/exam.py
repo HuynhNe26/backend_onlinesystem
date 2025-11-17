@@ -177,7 +177,7 @@ def exam_history():
     try:
         cursor.execute("""
             SELECT er.id_result, e.name_ex AS exam_name, er.score, er.total_correct, er.total_questions, er.created_at
-            FROM exam_result er
+            FROM result er
             JOIN exam e ON e.id_ex = er.exam_id
             WHERE er.user_id = %s
             ORDER BY er.created_at DESC
