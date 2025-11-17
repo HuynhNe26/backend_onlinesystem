@@ -136,7 +136,7 @@ def submit_exam(exam_id):
         now = datetime.now()
 
         cursor.execute("""
-            INSERT INTO exam_result 
+            INSERT INTO result 
             (user_id, exam_id, score, total_correct, total_questions, start_time, end_time, created_at)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         """, (user_id, exam_id, score, total_correct, total_questions, start_time, now, now))
