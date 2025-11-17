@@ -22,13 +22,12 @@ def get_current_user_id():
 @users_bp.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
-    required_fields = ["fullName", "username", "email", "password", "gender"]
+    required_fields = ["fullName", "email", "password", "gender"]
 
     if not data or not all(field in data for field in required_fields):
         return jsonify({"success": False, "message": "Thiếu dữ liệu bắt buộc."}), 400
 
     fullName = data["fullName"].strip()
-    username = data["username"].strip()
     email = data["email"].strip().lower()
     password = data["password"]
     gender = data["gender"]
@@ -39,10 +38,6 @@ def register():
     if not re.match(email_regex, email):
         return jsonify({"success": False, "message": "Email không hợp lệ."}), 400
 
-    if len(password) < 6:
-        return jsonify({"success": False, "message": "Mật khẩu phải có ít nhất 6 ký tự."}), 400
-
-
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     try:
@@ -50,19 +45,15 @@ def register():
         if cursor.fetchone():
             return jsonify({"success": False, "message": "Email đã được sử dụng."}), 400
 
-        cursor.execute("SELECT id_user FROM users WHERE username = %s", (username,))
-        if cursor.fetchone():
-            return jsonify({"success": False, "message": "Tên người dùng đã tồn tại."}), 400
-
         hashed_password = generate_password_hash(password)
 
         cursor.execute(
             """
             INSERT INTO users 
-            (fullName, username, email, password, gender, avatar, dateOfBirth, role, status, level, create_at)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, 'user', 'active', 1, NOW())
+            (fullName, email, password, gender, avatar, dateOfBirth, role, status, level, create_at)
+            VALUES (%s, %s, %s, %s, %s, %s, 'user', 'active', 1, NOW())
             """,
-            (fullName, username, email, hashed_password, gender, avatar, dateOfBirth)
+            (fullName, email, hashed_password, gender, avatar, dateOfBirth)
         )
         conn.commit()
 
@@ -101,7 +92,6 @@ def login():
             "user": {
                 "id_user": user['id_user'],
                 "fullName": user['fullName'],
-                "username": user['username'],
                 "email": user['email'],
                 "role": user['role'],
                 "status": user['status'],
@@ -143,44 +133,6 @@ def update_package():
         conn.commit()
 
         return jsonify({"success": True, "message": "Cập nhật gói dịch vụ thành công!"})
-
-    except Exception as e:
-        return jsonify({"success": False, "message": str(e)}), 500
-
-    finally:
-        cursor.close()
-        conn.close()
-
-@users_bp.route('/profile', methods=['GET'])
-@jwt_required()
-def get_profile():
-    user_id = get_current_user_id()
-
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    try:
-        cursor.execute("SELECT * FROM users WHERE id_user = %s", (user_id,))
-        user = cursor.fetchone()
-
-        if not user:
-            return jsonify({"success": False, "message": "Không tìm thấy người dùng."}), 404
-
-        return jsonify({
-            "success": True,
-            "user": {
-                "id_user": user['id_user'],
-                "fullName": user['fullName'],
-                "username": user['username'],
-                "email": user['email'],
-                "role": user['role'],
-                "status": user['status'],
-                "gender": user['gender'],
-                "level": user['level'],
-                "id_package": user.get('id_package'),
-                "start_package": user.get('start_package').isoformat() if user.get('start_package') else None,
-                "end_package": user.get('end_package').isoformat() if user.get('end_package') else None
-            }
-        }), 200
 
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500

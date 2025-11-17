@@ -223,15 +223,23 @@ INSERT INTO questions (id_category, ques_text, ans_a, ans_b, ans_c, ans_d, corre
 CREATE TABLE IF NOT EXISTS exam (
     id_ex INT PRIMARY KEY AUTO_INCREMENT,
     total_ques INT NOT NULL,
-    duration INT NOT NULL,  -- Số phút
+    duration INT NOT NULL,       -- Số phút
     name_ex VARCHAR(50),
     id_user INT NOT NULL,
-    FOREIGN KEY (id_user) REFERENCES users(id_user)
+    id_category INT,             -- Liên kết môn học
+    id_class INT,                -- Liên kết lớp
+    exam_cat VARCHAR(50) DEFAULT 'draft', -- draft/published
+    start_time DATETIME,
+    end_time DATETIME,
+    FOREIGN KEY (id_user) REFERENCES users(id_user),
+    FOREIGN KEY (id_category) REFERENCES categories(id_category),
+    FOREIGN KEY (id_class) REFERENCES classroom(id_class)
 );
 
-INSERT INTO exam (total_ques, duration, name_ex, id_user) VALUES
-(10, 60, 'Kiểm tra giữa kỳ Toán', 2),     
-(15, 90, 'Kiểm tra cuối kỳ Vật lý', 2);  
+
+INSERT INTO exam (total_ques, duration, name_ex, id_user, id_category, id_class, exam_cat, start_time, end_time) VALUES
+(10, 60, 'Kiểm tra giữa kỳ Toán', 2, 1, 1, 'published', '2025-10-05 08:00:00', '2025-10-05 09:00:00'),
+(15, 90, 'Kiểm tra cuối kỳ Vật lý', 2, 2, 2, 'published', '2025-10-06 08:00:00', '2025-10-06 09:30:00');
 
 -- 9. Exam_Question
 CREATE TABLE IF NOT EXISTS exam_question (

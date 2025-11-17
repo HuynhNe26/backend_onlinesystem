@@ -15,10 +15,10 @@ def get_db_connection():
             port=int(os.getenv("DB_PORT", 3306)),
             unix_socket=None
         )
-        print("✅ Kết nối MySQL thành công!")
+        print("Kết nối MySQL thành công!")
         return conn
     except Error as e:
-        print(f"❌ Lỗi kết nối MySQL: {e}")
+        print(f"Lỗi kết nối MySQL: {e}")
         return None
 
 

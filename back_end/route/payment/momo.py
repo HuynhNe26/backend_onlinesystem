@@ -123,7 +123,6 @@ def momo_payment():
 
         conn = get_db_connection()
         if not conn:
-            logging.error("Failed to connect to database")
             return jsonify({
                 "success": False,
                 "message": "Không thể kết nối cơ sở dữ liệu."
@@ -152,11 +151,7 @@ def momo_payment():
             "requestType": "captureWallet"
         }
 
-        logging.debug(f"MoMo params: {json.dumps(params, indent=2)}")
-
         signature = generate_momo_signature(params, MOMO_CONFIG["secretKey"])
-
-        logging.debug(f"Generated signature: {signature}")
 
         payload = {
             **params,
@@ -164,37 +159,32 @@ def momo_payment():
             "lang": "vi"
         }
 
-        logging.debug(f"MoMo payload: {json.dumps(payload, indent=2)}")
+        try:
+            cursor.execute(
+                """
+                INSERT INTO payment
+                (id_user, id_package, id_order, amount, duration, status, payment, code, created_at)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW())
+                """,
+                (
+                    id_user,
+                    id_package,
+                    order_id,
+                    price_month,
+                    None,
+                    "Đang giao dịch",
+                    "momo",
+                    None
+                )
+            )
+            conn.commit()
+        except Exception as e:
+            conn.rollback()
+            return jsonify({
+                "success": False,
+                "message": "Lỗi lưu giao dịch vào cơ sở dữ liệu."
+            }), 500
 
-        # Save transaction to database (optional - uncomment nếu cần)
-        # try:
-        #     cursor.execute(
-        #         """
-        #         INSERT INTO transactions
-        #         (user_id, package_id, order_id, request_id, amount, payment_method, status, created_at)
-        #         VALUES (%s, %s, %s, %s, %s, %s, %s, NOW())
-        #         """,
-        #         (
-        #             id_user,
-        #             id_package,
-        #             order_id,
-        #             request_id,
-        #             price_month,
-        #             "momo",
-        #             "pending"
-        #         )
-        #     )
-        #     conn.commit()
-        #     logging.debug(f"Transaction saved: order_id={order_id}, user_id={id_user}")
-        # except Exception as e:
-        #     conn.rollback()
-        #     logging.error(f"Error saving transaction: {str(e)}")
-        #     return jsonify({
-        #         "success": False,
-        #         "message": "Lỗi lưu giao dịch vào cơ sở dữ liệu."
-        #     }), 500
-
-        # Call MoMo API
         try:
             response = requests.post(
                 MOMO_CONFIG["endpoint"],
@@ -202,9 +192,6 @@ def momo_payment():
                 timeout=10,
                 headers={"Content-Type": "application/json"}
             )
-
-            logging.debug(f"MoMo response status: {response.status_code}")
-            logging.debug(f"MoMo response body: {response.text}")
 
             if response.status_code != 200:
                 return jsonify({
@@ -215,8 +202,6 @@ def momo_payment():
             result = response.json()
             result_code = result.get("resultCode")
 
-            logging.debug(f"MoMo resultCode: {result_code}")
-
             if result_code == 0 and result.get("payUrl"):
                 return jsonify({
                     "success": True,
@@ -226,7 +211,6 @@ def momo_payment():
                 }), 200
             else:
                 error_message = result.get("message", "Không thể tạo link thanh toán.")
-                logging.error(f"MoMo error: {error_message}, resultCode: {result_code}")
 
                 return jsonify({
                     "success": False,
@@ -235,26 +219,22 @@ def momo_payment():
                 }), 400
 
         except requests.exceptions.Timeout:
-            logging.error("MoMo API timeout")
             return jsonify({
                 "success": False,
                 "message": "Timeout khi kết nối với MoMo."
             }), 504
         except requests.exceptions.RequestException as e:
-            logging.error(f"MoMo API request error: {str(e)}")
             return jsonify({
                 "success": False,
                 "message": "Lỗi kết nối với cổng thanh toán."
             }), 500
         except ValueError as e:
-            logging.error(f"MoMo API returned invalid JSON: {response.text}")
             return jsonify({
                 "success": False,
                 "message": "Phản hồi từ MoMo không hợp lệ."
             }), 500
 
     except Exception as e:
-        logging.error(f"Unexpected error in momo_payment: {str(e)}", exc_info=True)
         if conn:
             conn.rollback()
         return jsonify({
@@ -275,145 +255,99 @@ def momo_ipn():
 
     try:
         data = request.json
-
         if not data:
-            logging.error("IPN: No data received")
-            return jsonify({
-                "success": False,
-                "message": "Không có dữ liệu IPN."
-            }), 400
-
-        logging.debug(f"MoMo IPN received: {json.dumps(data, indent=2)}")
+            return jsonify({"success": False, "message": "Không có dữ liệu IPN."}), 400
 
         if not verify_momo_signature(data, MOMO_CONFIG["secretKey"]):
-            logging.error("IPN: Invalid signature")
-            return jsonify({
-                "success": False,
-                "message": "Chữ ký không hợp lệ."
-            }), 403
+            return jsonify({"success": False, "message": "Chữ ký không hợp lệ."}), 403
 
         order_id = data.get("orderId")
         result_code = data.get("resultCode")
         trans_id = data.get("transId")
-        amount = data.get("amount")
 
         if not order_id:
-            logging.error("IPN: Missing orderId")
-            return jsonify({
-                "success": False,
-                "message": "Thiếu orderId."
-            }), 400
+            return jsonify({"success": False, "message": "Thiếu orderId."}), 400
 
-        # Connect to database
         conn = get_db_connection()
-        if not conn:
-            logging.error("IPN: Failed to connect to database")
-            return jsonify({
-                "success": False,
-                "message": "Không thể kết nối cơ sở dữ liệu."
-            }), 500
-
         cursor = conn.cursor(dictionary=True)
 
-        cursor.execute(
-            """
-            SELECT t.*, p.duration_days, p.name as package_name
-            FROM transactions t
-            LEFT JOIN packages p ON t.package_id = p.id
-            WHERE t.order_id = %s
-            """,
-            (order_id,)
-        )
-        transaction = cursor.fetchone()
+        cursor.execute("""
+            SELECT *
+            FROM payment
+            WHERE id_order = %s
+        """, (order_id,))
 
-        if not transaction:
-            logging.error(f"IPN: Transaction not found for order_id: {order_id}")
-            return jsonify({
-                "success": False,
-                "message": "Giao dịch không tồn tại."
-            }), 404
+        tx = cursor.fetchone()
 
+        if not tx:
+            return jsonify({"success": False, "message": "Giao dịch không tồn tại."}), 404
 
-        if transaction['status'] in ['success', 'failed']:
-            logging.warning(f"IPN: Transaction already processed: {order_id}")
-            return jsonify({
-                "success": True,
-                "message": "IPN đã được xử lý trước đó."
-            }), 200
+        if tx["status"] in ["success", "failed"]:
+            return jsonify({"success": True, "message": "IPN đã xử lý trước đó."}), 200
 
-        # Determine status
         status = "success" if result_code == 0 else "failed"
 
-        try:
-            # Update transaction
-            cursor.execute(
-                """
-                UPDATE transactions
-                SET status = %s, 
-                    trans_id = %s,
-                    result_code = %s,
-                    updated_at = NOW()
-                WHERE order_id = %s
-                """,
-                (status, trans_id, result_code, order_id)
-            )
+        cursor.execute("""
+            UPDATE payment
+            SET status = %s,
+                code = %s,             
+                updated_at = NOW()
+            WHERE id_order = %s
+        """, (status, trans_id, order_id))
 
-            # If payment successful, update user package
-            if status == "success":
-                user_id = transaction['user_id']
-                package_id = transaction['package_id']
-                duration_days = transaction['duration_days']
+        if status == "success":
 
-                # Update user's package and expiry date
-                cursor.execute(
-                    """
-                    UPDATE users
-                    SET package_id = %s,
-                        package_expiry_date = DATE_ADD(
-                            COALESCE(
-                                CASE 
-                                    WHEN package_expiry_date > NOW() THEN package_expiry_date
-                                    ELSE NOW()
-                                END,
-                                NOW()
-                            ),
-                            INTERVAL %s DAY
-                        ),
-                        updated_at = NOW()
-                    WHERE id_user = %s
-                    """,
-                    (package_id, duration_days, user_id)
-                )
+            id_user = tx["id_user"]
+            id_package = tx["id_package"]
 
-                logging.info(f"IPN: User {user_id} updated with package {package_id}")
+            cursor.execute("""
+                SELECT *
+                FROM package
+                WHERE id_package = %s
+            """, (id_package,))
+            pkg = cursor.fetchone()
 
-            conn.commit()
+            if not pkg:
+                conn.rollback()
+                return jsonify({"success": False, "message": "Không tìm thấy gói."}), 404
 
-            logging.info(f"IPN: Transaction {order_id} updated to {status}")
+            if id_package == 1:
+                duration = 0
+                quantity = 1
+            elif id_package == 2:
+                duration = 30
+                quantity = 10
+            elif id_package == 3:
+                duration = 30
+                quantity = 20
+            else:
+                duration = 0
+                quantity = 1
 
-            return jsonify({
-                "success": True,
-                "message": "IPN processed successfully.",
-                "orderId": order_id,
-                "status": status
-            }), 200
+            cursor.execute("""
+                UPDATE users
+                SET 
+                    id_package = %s,
+                    start_package = NOW(),
+                    end_package = DATE_ADD(NOW(), INTERVAL %s DAY),
+                    quantity_exam = %s
+                WHERE id_user = %s
+            """, (id_package, duration, quantity, id_user))
 
-        except Exception as e:
-            conn.rollback()
-            logging.error(f"IPN: Error updating database: {str(e)}")
-            return jsonify({
-                "success": False,
-                "message": "Lỗi cập nhật dữ liệu."
-            }), 500
+        conn.commit()
+
+        return jsonify({
+            "success": True,
+            "message": "IPN xử lý thành công",
+            "orderId": order_id,
+            "status": status
+        }), 200
 
     except Exception as e:
-        logging.error(f"IPN: Unexpected error: {str(e)}", exc_info=True)
         if conn:
             conn.rollback()
-        return jsonify({
-            "success": False,
-            "message": "Lỗi xử lý IPN."
-        }), 500
+        return jsonify({"success": False, "message": f"Lỗi xử lý IPN: {str(e)}"}), 500
+
     finally:
         if cursor:
             cursor.close()
@@ -424,7 +358,6 @@ def momo_ipn():
 @momo_bp.route("/momo/check-status/<order_id>", methods=["GET"])
 @jwt_required()
 def check_payment_status(order_id):
-    """Check payment status"""
     conn = None
     cursor = None
 
@@ -433,49 +366,39 @@ def check_payment_status(order_id):
 
         conn = get_db_connection()
         if not conn:
-            return jsonify({
-                "success": False,
-                "message": "Không thể kết nối cơ sở dữ liệu."
-            }), 500
+            return jsonify({"success": False, "message": "Không thể kết nối cơ sở dữ liệu."}), 500
 
         cursor = conn.cursor(dictionary=True)
 
-        cursor.execute(
-            """
-            SELECT t.*, p.name as package_name
-            FROM transactions t
-            LEFT JOIN packages p ON t.package_id = p.id
-            WHERE t.order_id = %s AND t.user_id = %s
-            """,
-            (order_id, user_id)
-        )
+        cursor.execute("""
+            SELECT p.*, pkg.name_package
+            FROM payment p
+            LEFT JOIN package pkg ON p.id_package = pkg.id_package
+            WHERE p.id_order = %s AND p.id_user = %s
+        """, (order_id, user_id))
 
         transaction = cursor.fetchone()
 
         if not transaction:
-            return jsonify({
-                "success": False,
-                "message": "Không tìm thấy giao dịch."
-            }), 404
+            return jsonify({"success": False, "message": "Không tìm thấy giao dịch."}), 404
 
-        return jsonify({
-            "success": True,
-            "transaction": {
-                "orderId": transaction['order_id'],
-                "amount": transaction['amount'],
-                "status": transaction['status'],
-                "packageName": transaction['package_name'],
-                "createdAt": transaction['created_at'].isoformat() if transaction['created_at'] else None,
-                "updatedAt": transaction['updated_at'].isoformat() if transaction['updated_at'] else None
-            }
-        }), 200
+        result = {
+            "orderId": transaction['id_order'],
+            "amount": transaction['amount'],
+            "status": transaction['status'],
+            "paymentMethod": transaction['payment'],
+            "packageName": transaction['name_package'],
+            "duration": transaction['duration'],
+            "createdAt": transaction['created_at'].isoformat() if transaction['created_at'] else None,
+            "updatedAt": transaction['updated_at'].isoformat() if transaction['updated_at'] else None,
+            "code": transaction['code']
+        }
+
+        return jsonify({"success": True, "transaction": result}), 200
 
     except Exception as e:
-        logging.error(f"Error checking payment status: {str(e)}")
-        return jsonify({
-            "success": False,
-            "message": "Lỗi kiểm tra trạng thái thanh toán."
-        }), 500
+        return jsonify({"success": False, "message": f"Lỗi kiểm tra trạng thái: {str(e)}"}), 500
+
     finally:
         if cursor:
             cursor.close()
