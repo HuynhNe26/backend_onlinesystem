@@ -136,7 +136,7 @@ def submit_exam(exam_id):
         now = datetime.now()
 
         cursor.execute("""
-            INSERT INTO result 
+            INSERT INTO results
             (user_id, exam_id, score, total_correct, total_questions, start_time, end_time, created_at)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         """, (user_id, exam_id, score, total_correct, total_questions, start_time, now, now))
@@ -177,7 +177,7 @@ def exam_history():
     try:
         cursor.execute("""
             SELECT er.id_result, e.name_ex AS exam_name, er.score, er.total_correct, er.total_questions, er.created_at
-            FROM result er
+            FROM results er
             JOIN exam e ON e.id_ex = er.exam_id
             WHERE er.user_id = %s
             ORDER BY er.created_at DESC
