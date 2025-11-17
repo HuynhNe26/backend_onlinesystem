@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
 import re
 
 from ...config.db_config import get_db_connection
@@ -85,10 +86,11 @@ def login():
             return jsonify({"success": False, "message": "Email hoặc mật khẩu không đúng."}), 401
 
         access_token = create_access_token(identity=str(user['id_user']))
-
+        login_time = datetime.now().isoformat()
         return jsonify({
             "success": True,
             "token": access_token,
+            "login_time": login_time,
             "user": {
                 "id_user": user['id_user'],
                 "fullName": user['fullName'],
