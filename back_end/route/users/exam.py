@@ -137,7 +137,7 @@ def submit_exam(exam_id):
 
         cursor.execute("""
             INSERT INTO results
-            (user_id, exam_id, score, total_correct, total_questions, start_time, end_time, created_at)
+            (id_user, exam_id, score, total_correct, total_questions, start_time, end_time, created_at)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         """, (user_id, exam_id, score, total_correct, total_questions, start_time, now, now))
         result_id = cursor.lastrowid
@@ -179,7 +179,7 @@ def exam_history():
             SELECT er.id_result, e.name_ex AS exam_name, er.score, er.total_correct, er.total_questions, er.created_at
             FROM results er
             JOIN exam e ON e.id_ex = er.exam_id
-            WHERE er.user_id = %s
+            WHERE er.id_user = %s
             ORDER BY er.created_at DESC
         """, (user_id,))
         results = cursor.fetchall()
