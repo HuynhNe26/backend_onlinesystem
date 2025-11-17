@@ -47,10 +47,6 @@ def get_classes(dept_id):
         cursor.close()
         conn.close()
 
-
-# ----------------------------------------------------------
-# LẤY DANH SÁCH ĐỀ THEO LỚP
-# ----------------------------------------------------------
 @exam_bp.route("/classes/<int:class_id>/exams", methods=["GET"])
 def get_exams_by_class(class_id):
     conn = get_db_connection()
@@ -219,6 +215,71 @@ def exam_history():
         return jsonify({
             "success": True,
             "history": cursor.fetchall()
+        }), 200
+
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+@exam_bp.route("/result/<int:result_id>/detail", methods=["GET"])
+@jwt_required()
+def get_result_detail(result_id):
+    user_id = get_current_user_id()
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        cursor.execute("""
+            SELECT r.id_result, r.score, r.total_correct, r.start_time, 
+                   r.completed_time, e.name_ex AS exam_name, e.total_ques
+            FROM results r
+            JOIN exam e ON e.id_ex = r.id_ex
+            WHERE r.id_result = %s AND r.id_user = %s
+        """, (result_id, user_id))
+
+        result_info = cursor.fetchone()
+
+        if not result_info:
+            return jsonify({"success": False, "message": "Không tìm thấy kết quả hoặc không thuộc về bạn"}), 404
+
+        cursor.execute("""
+            SELECT 
+                a.id_ques,
+                q.ques_text,
+                q.ans_a,
+                q.ans_b,
+                q.ans_c,
+                q.ans_d,
+                q.correct_ans,
+                q.explanation,
+                a.answer,
+                a.is_correct,
+                a.id_inter
+            FROM answer a
+            JOIN questions q ON q.id_ques = a.id_ques
+            WHERE a.id_user = %s AND a.id_ex = (
+                SELECT id_ex FROM results WHERE id_result = %s
+            )
+            ORDER BY a.id_inter ASC
+        """, (user_id, result_id))
+
+        answers = cursor.fetchall()
+
+        return jsonify({
+            "success": True,
+            "result": {
+                "id_result": result_info["id_result"],
+                "exam_cat": result_info["exam_name"],
+                "score": result_info["score"],
+                "total_correct": result_info["total_correct"],
+                "total_questions": result_info["total_ques"],
+                "start_time": result_info["start_time"],
+                "completed_time": result_info["completed_time"]
+            },
+            "answers": answers
         }), 200
 
     except Exception as e:
