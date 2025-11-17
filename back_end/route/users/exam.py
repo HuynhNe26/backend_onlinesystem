@@ -61,7 +61,7 @@ def get_exams_by_class(class_id):
         cursor.execute("""
             SELECT id_ex, name_ex, total_ques, duration
             FROM exam
-            WHERE id_class = %s AND exam_cat != 'draft'
+            WHERE id_class = %s
             ORDER BY id_ex DESC
         """, (class_id,))
         data = cursor.fetchall()
@@ -79,7 +79,6 @@ def get_exam_detail(exam_id):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     try:
-        # Thông tin đề thi
         cursor.execute("SELECT id_ex, name_ex, total_ques, duration FROM exam WHERE id_ex=%s", (exam_id,))
         exam_info = cursor.fetchone()
         if not exam_info:
