@@ -149,8 +149,8 @@ def submit_exam(exam_id):
 
         cursor.execute("""
             INSERT INTO results
-            (id_user, id_ex, score, total_correct, start_time, completed_time, status)
-            VALUES (%s, %s, %s, %s, %s, %s, 'completed')
+            (id_user, id_ex, score, total_correct, start_time, completed_time)
+            VALUES (%s, %s, %s, %s, %s, %s)
         """, (
             user_id, exam_id, score, total_correct, start_time, now
         ))
