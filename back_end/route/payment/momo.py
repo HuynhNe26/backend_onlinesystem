@@ -390,7 +390,6 @@ def check_payment_status(order_id):
             "packageName": transaction['name_package'],
             "duration": transaction['duration'],
             "createdAt": transaction['created_at'].isoformat() if transaction['created_at'] else None,
-            "updatedAt": transaction['updated_at'].isoformat() if transaction['updated_at'] else None,
             "code": transaction['code']
         }
 
