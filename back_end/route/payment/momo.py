@@ -311,8 +311,8 @@ def momo_ipn():
         conn.commit()
 
         return jsonify({
-            "success": True,
-            "message": "Giao dịch thành công!",
+            "resultCode": 0,
+            "message": "Giao dịch thành công",
             "orderId": order_id,
             "status": status
         }), 200
@@ -330,7 +330,6 @@ def momo_ipn():
 
 
 @momo_bp.route("/momo/check-status/<order_id>", methods=["GET"])
-@jwt_required()
 def check_payment_status(order_id):
     conn = None
     cursor = None
