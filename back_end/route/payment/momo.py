@@ -391,6 +391,7 @@ def check_payment_status(order_id):
             "duration": transaction['duration'],
             "createdAt": transaction['created_at'].isoformat() if transaction['created_at'] else None,
             "code": transaction['code']
+
         }
 
         return jsonify({"success": True, "transaction": result}), 200
