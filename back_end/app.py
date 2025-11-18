@@ -30,8 +30,8 @@ app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY", "online_testing@
 jwt = JWTManager(app)
 
 app.register_blueprint(users_bp, url_prefix='/api/users')
-app.register_blueprint(momo_bp, url_prefix="/api/payment/momo")
-app.register_blueprint(vnpay_bp, url_prefix="/api/payment/vnpay")
+app.register_blueprint(momo_bp, url_prefix="/api/payment")
+app.register_blueprint(vnpay_bp, url_prefix="/api/payment")
 app.register_blueprint(exam_bp, url_prefix='/api/exam')
 app.register_blueprint(category_bp, url_prefix='/api/categories')
 app.register_blueprint(package_bp, url_prefix='/api')
