@@ -255,10 +255,10 @@ def momo_ipn():
 
     try:
         data = request.json
+        print(data)
         if not data:
             return jsonify({"success": False, "message": "Không có dữ liệu IPN."}), 400
 
-        # Verify signature
         if not verify_momo_signature(data, MOMO_CONFIG["secretKey"]):
             return jsonify({"success": False, "message": "Chữ ký không hợp lệ."}), 403
 
@@ -272,38 +272,46 @@ def momo_ipn():
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
-        # Lấy giao dịch
-        cursor.execute("SELECT * FROM payment WHERE id_order = %s", (order_id,))
+        cursor.execute("""
+            SELECT *
+            FROM payment
+            WHERE id_order = %s
+        """, (order_id,))
+
         tx = cursor.fetchone()
 
         if not tx:
             return jsonify({"success": False, "message": "Giao dịch không tồn tại."}), 404
 
-        # Xác định trạng thái mới
+        if tx["status"] in ["success", "failed"]:
+            return jsonify({"success": True, "message": "IPN đã xử lý trước đó."}), 200
+
         status = "success" if result_code == 0 else "failed"
 
-        # Cập nhật payment
         cursor.execute("""
             UPDATE payment
             SET status = %s,
-                code = %s
+                code = %s,             
+                updated_at = NOW()
             WHERE id_order = %s
         """, (status, trans_id, order_id))
 
-        # Nếu thanh toán thành công, update thông tin user
         if status == "success":
+
             id_user = tx["id_user"]
             id_package = tx["id_package"]
 
-            # Lấy thông tin package
-            cursor.execute("SELECT * FROM package WHERE id_package = %s", (id_package,))
+            cursor.execute("""
+                SELECT *
+                FROM package
+                WHERE id_package = %s
+            """, (id_package,))
             pkg = cursor.fetchone()
 
             if not pkg:
                 conn.rollback()
                 return jsonify({"success": False, "message": "Không tìm thấy gói."}), 404
 
-            # Logic duration & quantity
             if id_package == 1:
                 duration = 0
                 quantity = 1
@@ -317,7 +325,6 @@ def momo_ipn():
                 duration = 0
                 quantity = 1
 
-            # Cập nhật user
             cursor.execute("""
                 UPDATE users
                 SET 
@@ -330,7 +337,6 @@ def momo_ipn():
 
         conn.commit()
 
-        # Trả kết quả
         return jsonify({
             "success": True,
             "message": "IPN xử lý thành công",
@@ -341,7 +347,6 @@ def momo_ipn():
     except Exception as e:
         if conn:
             conn.rollback()
-        logging.error(f"IPN processing error: {e}")
         return jsonify({"success": False, "message": f"Lỗi xử lý IPN: {str(e)}"}), 500
 
     finally:
@@ -350,15 +355,15 @@ def momo_ipn():
         if conn:
             conn.close()
 
+
 @momo_bp.route("/momo/check-status/<order_id>", methods=["GET"])
+@jwt_required()
 def check_payment_status(order_id):
     conn = None
     cursor = None
 
     try:
-        user_id = request.args.get("user_id")
-        if not user_id:
-            return jsonify({"success": False, "message": "Thiếu user_id"}), 400
+        user_id = get_current_user_id()
 
         conn = get_db_connection()
         if not conn:
@@ -387,6 +392,7 @@ def check_payment_status(order_id):
             "duration": transaction['duration'],
             "createdAt": transaction['created_at'].isoformat() if transaction['created_at'] else None,
             "code": transaction['code']
+
         }
 
         return jsonify({"success": True, "transaction": result}), 200
