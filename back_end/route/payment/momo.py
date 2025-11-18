@@ -1,5 +1,3 @@
-import logging
-
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 import hmac
@@ -37,22 +35,24 @@ def get_current_user_id():
 def generate_momo_signature(params, secret_key):
     raw_signature = (
         f"accessKey={params['accessKey']}"
-        f"&amount={params['amount']}" 
+        f"&amount={params['amount']}"
         f"&extraData={params['extraData']}"
         f"&ipnUrl={params['ipnUrl']}"
         f"&orderId={params['orderId']}"
-        f"&orderInfo={params['orderInfo']}"  
+        f"&orderInfo={params['orderInfo']}"
         f"&partnerCode={params['partnerCode']}"
         f"&redirectUrl={params['redirectUrl']}"
         f"&requestId={params['requestId']}"
         f"&requestType={params['requestType']}"
     )
+
     signature = hmac.new(
-        secret_key.encode('utf-8'),
-        raw_signature.encode('utf-8'),
+        secret_key.encode("utf-8"),
+        raw_signature.encode("utf-8"),
         hashlib.sha256
     ).hexdigest()
     return signature
+
 
 
 def verify_momo_signature(data, secret_key):
