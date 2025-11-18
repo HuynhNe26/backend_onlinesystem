@@ -185,54 +185,37 @@ def momo_payment():
                 "message": "Lỗi lưu giao dịch vào cơ sở dữ liệu."
             }), 500
 
-        try:
-            response = requests.post(
-                MOMO_CONFIG["endpoint"],
-                json=payload,
-                timeout=10,
-                headers={"Content-Type": "application/json"}
-            )
+        response = requests.post(
+            MOMO_CONFIG["endpoint"],
+            json=payload,
+            timeout=10
+        )
 
-            if response.status_code != 200:
-                return jsonify({
-                    "success": False,
-                    "message": f"Không thể kết nối với cổng thanh toán MoMo. Status: {response.status_code}"
-                }), 500
+        if response.status_code != 200:
+            return jsonify({
+                "success": False,
+                "message": f"Không thể kết nối với cổng thanh toán MoMo. Status: {response.status_code}"
+            }), 500
 
-            result = response.json()
-            result_code = result.get("resultCode")
+        result = response.json()
+        result_code = result.get("resultCode")
 
-            if result_code == 0 and result.get("payUrl"):
-                return jsonify({
-                    "success": True,
-                    "payUrl": result["payUrl"],
-                    "orderId": order_id,
-                    "message": "Tạo link thanh toán thành công."
-                }), 200
-            else:
-                error_message = result.get("message", "Không thể tạo link thanh toán.")
+        if result_code == 0 and result.get("payUrl"):
+            return jsonify({
+                "success": True,
+                "payUrl": result["payUrl"],
+                "orderId": order_id,
+                "message": "Tạo link thanh toán thành công."
+            }), 200
+        else:
+            error_message = result.get("message", "Không thể tạo link thanh toán.")
 
-                return jsonify({
-                    "success": False,
-                    "message": error_message,
-                    "resultCode": result_code
+            return jsonify({
+                "success": False,
+                "message": error_message,
+                "resultCode": result_code
                 }), 400
 
-        except requests.exceptions.Timeout:
-            return jsonify({
-                "success": False,
-                "message": "Timeout khi kết nối với MoMo."
-            }), 504
-        except requests.exceptions.RequestException as e:
-            return jsonify({
-                "success": False,
-                "message": "Lỗi kết nối với cổng thanh toán."
-            }), 500
-        except ValueError as e:
-            return jsonify({
-                "success": False,
-                "message": "Phản hồi từ MoMo không hợp lệ."
-            }), 500
 
     except Exception as e:
         if conn:
