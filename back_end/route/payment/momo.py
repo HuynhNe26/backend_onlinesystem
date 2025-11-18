@@ -15,8 +15,8 @@ MOMO_CONFIG = {
     "partnerCode": "MOMO",
     "accessKey": "F8BBA842ECF85",
     "secretKey": "K951B6PE1waDMi640xX08PD3vg6EkVlz",
-    "redirectUrl": "https://frontend-admin-onlinesystem-eugd.onrender.com/payment-success/",
-    "ipnUrl": "https://backend-onlinesystem.onrender.com/api/payment/momo/ipn"
+    "redirectUrl": "https://frontend-admin-onlinesystem-eugd.onrender.com/payment-success",
+    "ipnUrl": "https://backend-onlinesystem.onrender.com/api/payment"
 }
 
 
