@@ -288,8 +288,7 @@ def momo_ipn():
         cursor.execute("""
             UPDATE payment
             SET status = %s,
-                code = %s,
-                updated_at = NOW()             
+                code = %s           
             WHERE id_order = %s
         """, ("Giao dịch thành công!", trans_id, order_id))
 
