@@ -240,11 +240,7 @@ def momo_ipn():
             return jsonify({"success": False, "message": "Không có dữ liệu IPN."}), 400
 
         if not verify_momo_signature(data, MOMO_CONFIG["secretKey"]):
-            return jsonify({
-                "resultCode": 0,
-                "message": "Đã nhận IPN nhưng chữ ký không hợp lệ.",
-                "orderId": data.get("orderId")
-            }), 200
+            return jsonify({"success": False, "message": "Chữ ký không hợp lệ."}), 403
 
         order_id = data.get("orderId")
         result_code = data.get("resultCode")
