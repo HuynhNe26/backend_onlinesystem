@@ -247,6 +247,8 @@ def momo_ipn():
             return jsonify({"success": False, "message": "Thiếu orderId."}), 400
 
         conn = get_db_connection()
+        if not conn:
+            return jsonify({"success": False, "message": "Không thể kết nối cơ sở dữ liệu."}), 500
         cursor = conn.cursor(dictionary=True)
 
         cursor.execute("""
