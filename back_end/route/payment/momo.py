@@ -37,11 +37,11 @@ def get_current_user_id():
 def generate_momo_signature(params, secret_key):
     raw_signature = (
         f"accessKey={params['accessKey']}"
-        f"&amount={params['amount']}"
+        f"&amount={params['amount']}" 
         f"&extraData={params['extraData']}"
         f"&ipnUrl={params['ipnUrl']}"
         f"&orderId={params['orderId']}"
-        f"&orderInfo={params['orderInfo']}"
+        f"&orderInfo={params['orderInfo']}"  
         f"&partnerCode={params['partnerCode']}"
         f"&redirectUrl={params['redirectUrl']}"
         f"&requestId={params['requestId']}"
@@ -172,7 +172,7 @@ def momo_payment():
                     order_id,
                     price_month,
                     None,
-                    "pending",  # ✅ THAY ĐỔI: Dùng "pending" thay vì "Đang giao dịch"
+                    "Đang giao dịch",
                     "momo",
                     None
                 )
@@ -255,14 +255,11 @@ def momo_ipn():
 
     try:
         data = request.json
-        logging.info(f"📥 MoMo IPN received: {json.dumps(data, indent=2)}")
-
         if not data:
             return jsonify({"success": False, "message": "Không có dữ liệu IPN."}), 400
 
         # Verify signature
         if not verify_momo_signature(data, MOMO_CONFIG["secretKey"]):
-            logging.error("❌ Invalid signature")
             return jsonify({"success": False, "message": "Chữ ký không hợp lệ."}), 403
 
         order_id = data.get("orderId")
@@ -280,62 +277,44 @@ def momo_ipn():
         tx = cursor.fetchone()
 
         if not tx:
-            logging.error(f"❌ Transaction not found: {order_id}")
             return jsonify({"success": False, "message": "Giao dịch không tồn tại."}), 404
 
         # Xác định trạng thái mới
         status = "success" if result_code == 0 else "failed"
 
-        id_user = tx["id_user"]
-        id_package = tx["id_package"]
-
-        # ✅ TÍM DURATION DỰA TRÊN PACKAGE
-        duration = None
-        if status == "success":
-            cursor.execute("SELECT * FROM package WHERE id_package = %s", (id_package,))
-            pkg = cursor.fetchone()
-
-            if pkg:
-                # Logic duration theo package
-                if id_package == 1:
-                    duration = 0
-                elif id_package == 2:
-                    duration = 30
-                elif id_package == 3:
-                    duration = 30
-                else:
-                    duration = 0
-
-        # ✅ CẬP NHẬT PAYMENT VỚI DURATION
+        # Cập nhật payment
         cursor.execute("""
             UPDATE payment
             SET status = %s,
-                code = %s,
-                duration = %s
+                code = %s
             WHERE id_order = %s
-        """, (status, trans_id, duration, order_id))
-
-        logging.info(f"✅ Payment updated: {order_id} -> status={status}, duration={duration}")
+        """, (status, trans_id, order_id))
 
         # Nếu thanh toán thành công, update thông tin user
         if status == "success":
+            id_user = tx["id_user"]
+            id_package = tx["id_package"]
+
             # Lấy thông tin package
             cursor.execute("SELECT * FROM package WHERE id_package = %s", (id_package,))
             pkg = cursor.fetchone()
 
             if not pkg:
                 conn.rollback()
-                logging.error(f"❌ Package not found: {id_package}")
                 return jsonify({"success": False, "message": "Không tìm thấy gói."}), 404
 
-            # Logic quantity
+            # Logic duration & quantity
             if id_package == 1:
+                duration = 0
                 quantity = 1
             elif id_package == 2:
+                duration = 30
                 quantity = 10
             elif id_package == 3:
+                duration = 30
                 quantity = 20
             else:
+                duration = 0
                 quantity = 1
 
             # Cập nhật user
@@ -349,12 +328,9 @@ def momo_ipn():
                 WHERE id_user = %s
             """, (id_package, duration, quantity, id_user))
 
-            logging.info(
-                f"✅ User updated: user_id={id_user}, package={id_package}, duration={duration}, quantity={quantity}")
-
         conn.commit()
 
-        # Trả kết quả cho MoMo
+        # Trả kết quả
         return jsonify({
             "success": True,
             "message": "IPN xử lý thành công",
@@ -365,7 +341,7 @@ def momo_ipn():
     except Exception as e:
         if conn:
             conn.rollback()
-        logging.error(f"❌ IPN processing error: {e}", exc_info=True)
+        logging.error(f"IPN processing error: {e}")
         return jsonify({"success": False, "message": f"Lỗi xử lý IPN: {str(e)}"}), 500
 
     finally:
@@ -373,7 +349,6 @@ def momo_ipn():
             cursor.close()
         if conn:
             conn.close()
-
 
 @momo_bp.route("/momo/check-status/<order_id>", methods=["GET"])
 def check_payment_status(order_id):
@@ -406,7 +381,7 @@ def check_payment_status(order_id):
         result = {
             "orderId": transaction['id_order'],
             "amount": transaction['amount'],
-            "status": transaction['status'],  # ✅ Trả về "success" hoặc "pending" hoặc "failed"
+            "status": transaction['status'],
             "paymentMethod": transaction['payment'],
             "packageName": transaction['name_package'],
             "duration": transaction['duration'],
@@ -414,12 +389,9 @@ def check_payment_status(order_id):
             "code": transaction['code']
         }
 
-        logging.info(f"📊 Check status: {order_id} -> {result}")
-
         return jsonify({"success": True, "transaction": result}), 200
 
     except Exception as e:
-        logging.error(f"❌ Check status error: {e}")
         return jsonify({"success": False, "message": f"Lỗi kiểm tra trạng thái: {str(e)}"}), 500
 
     finally:
