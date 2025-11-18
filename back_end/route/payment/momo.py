@@ -255,6 +255,7 @@ def momo_ipn():
 
     try:
         data = request.json
+        print(data)
         if not data:
             return jsonify({"success": False, "message": "Không có dữ liệu IPN."}), 400
 
@@ -356,13 +357,14 @@ def momo_ipn():
 
 
 @momo_bp.route("/momo/check-status/<order_id>", methods=["GET"])
-@jwt_required()
 def check_payment_status(order_id):
     conn = None
     cursor = None
 
     try:
-        user_id = get_current_user_id()
+        user_id = request.args.get("user_id")
+        if not user_id:
+            return jsonify({"success": False, "message": "Thiếu user_id"}), 400
 
         conn = get_db_connection()
         if not conn:
@@ -391,7 +393,6 @@ def check_payment_status(order_id):
             "duration": transaction['duration'],
             "createdAt": transaction['created_at'].isoformat() if transaction['created_at'] else None,
             "code": transaction['code']
-
         }
 
         return jsonify({"success": True, "transaction": result}), 200
