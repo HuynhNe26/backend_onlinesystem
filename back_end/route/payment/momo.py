@@ -34,16 +34,16 @@ def get_current_user_id():
 
 def generate_momo_signature(params, secret_key):
     raw_signature = (
-        f"accessKey={params['accessKey']}"
-        f"&amount={params['amount']}"
-        f"&extraData={params['extraData']}"
-        f"&ipnUrl={params['ipnUrl']}"
-        f"&orderId={params['orderId']}"
-        f"&orderInfo={params['orderInfo']}"
-        f"&partnerCode={params['partnerCode']}"
-        f"&redirectUrl={params['redirectUrl']}"
-        f"&requestId={params['requestId']}"
-        f"&requestType={params['requestType']}"
+        f"accessKey={params.get('accessKey','')}"
+        f"&amount={params.get('amount','')}"
+        f"&extraData={params.get('extraData','')}"
+        f"&ipnUrl={params.get('ipnUrl','')}"
+        f"&orderId={params.get('orderId','')}"
+        f"&orderInfo={params.get('orderInfo','')}"
+        f"&partnerCode={params.get('partnerCode','')}"
+        f"&redirectUrl={params.get('redirectUrl','')}"
+        f"&requestId={params.get('requestId','')}"
+        f"&requestType={params.get('requestType','')}"
     )
 
     signature = hmac.new(
@@ -52,7 +52,6 @@ def generate_momo_signature(params, secret_key):
         hashlib.sha256
     ).hexdigest()
     return signature
-
 
 
 def verify_momo_signature(data, secret_key):
