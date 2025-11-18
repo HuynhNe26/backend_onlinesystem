@@ -17,8 +17,8 @@ MOMO_CONFIG = {
     "partnerCode": "MOMO",
     "accessKey": "F8BBA842ECF85",
     "secretKey": "K951B6PE1waDMi640xX08PD3vg6EkVlz",
-    "redirectUrl": "https://google.com",
-    "ipnUrl": "https://backend-onlinesystem.onrender.com/api/payment/momo/ipn"
+    "redirectUrl": "https://backend-onlinesystem-eugd.onrender.com/payment-success",
+    "ipnUrl": "https://frontend-admin-onlinesystem-eugd.onrender.com/api/payment/momo/ipn"
 }
 
 
@@ -58,20 +58,20 @@ def generate_momo_signature(params, secret_key):
 def verify_momo_signature(data, secret_key):
     received_signature = data.get("signature", "")
     raw_data = (
-        f"accessKey={data.get('accessKey')}"
-        f"&amount={data.get('amount')}"
-        f"&extraData={data.get('extraData')}"
-        f"&message={data.get('message')}"
-        f"&orderId={data.get('orderId')}"
-        f"&orderInfo={data.get('orderInfo')}"
-        f"&partnerCode={data.get('partnerCode')}"
-        f"&payType={data.get('payType')}"
-        f"&requestId={data.get('requestId')}"
-        f"&responseTime={data.get('responseTime')}"
-        f"&resultCode={data.get('resultCode')}"
-        f"&transId={data.get('transId')}"
+        f"accessKey={data.get('accessKey', '')}"
+        f"&amount={data.get('amount', '')}"
+        f"&extraData={data.get('extraData', '')}"
+        f"&message={data.get('message', '')}"
+        f"&orderId={data.get('orderId', '')}"
+        f"&orderInfo={data.get('orderInfo', '')}"
+        f"&orderType={data.get('orderType', '')}"
+        f"&partnerCode={data.get('partnerCode', '')}"
+        f"&payType={data.get('payType', '')}"
+        f"&requestId={data.get('requestId', '')}"
+        f"&responseTime={data.get('responseTime', '')}"
+        f"&resultCode={data.get('resultCode', '')}"
+        f"&transId={data.get('transId', '')}"
     )
-
     expected_signature = hmac.new(
         secret_key.encode('utf-8'),
         raw_data.encode('utf-8'),
