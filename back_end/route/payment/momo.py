@@ -146,54 +146,90 @@ def momo_payment():
 def momo_ipn():
     conn = cursor = None
     try:
-        data = request.get_json(silent=True) or {}
-        if not data: return jsonify({"success": False, "message": "Không có dữ liệu IPN"}), 400
+        data = request.get_json(silent=True)
+        if not data:
+            return jsonify({"success": False, "message": "No IPN data"}), 400
 
+        # 1) Kiểm tra chữ ký
+        if not verify_momo_signature(data, MOMO_CONFIG["secretKey"]):
+            return jsonify({"success": False, "message": "Invalid signature"}), 403
+
+        # 2) Lấy dữ liệu
         order_id = data.get("orderId")
-        result_code = str(data.get("resultCode"))
+        result_code = data.get("resultCode")
         trans_id = data.get("transId")
 
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
+
         cursor.execute("SELECT * FROM payment WHERE id_order=%s", (order_id,))
         tx = cursor.fetchone()
-        if not tx: return jsonify({"success": False, "message": "Giao dịch không tồn tại"}), 404
 
-        status = "success" if result_code in ("0",0) else "failed"
-        status_msg = "Giao dịch thành công" if status=="success" else "Giao dịch thất bại"
-        cursor.execute("UPDATE payment SET status=%s, code=%s WHERE id_order=%s", (status_msg, trans_id, order_id))
+        if not tx:
+            return jsonify({"success": False, "message": "Order not found"}), 404
 
-        if status=="success":
+        # 3) Update status
+        status = "success" if str(result_code) == "0" else "failed"
+        status_msg = "Giao dịch thành công" if status == "success" else "Giao dịch thất bại"
+
+        cursor.execute("""
+            UPDATE payment 
+            SET status=%s, code=%s 
+            WHERE id_order=%s
+        """, (status_msg, trans_id, order_id))
+
+        # 4) Nếu success -> update user
+        if status == "success":
             id_user = tx["id_user"]
             id_package = tx["id_package"]
+
+            # Load package
             cursor.execute("SELECT * FROM package WHERE id_package=%s", (id_package,))
             pkg = cursor.fetchone()
             if not pkg:
                 conn.rollback()
-                return jsonify({"success": False, "message": "Không tìm thấy gói"}), 404
+                return jsonify({"success": False, "message": "Package not found"}), 404
 
-            # Duration & quantity
-            if id_package==1: duration=0; quantity=1
-            elif id_package==2: duration=30; quantity=10
-            elif id_package==3: duration=30; quantity=20
-            else: duration=0; quantity=1
+            # Set duration & quantity
+            if id_package == 1:
+                duration = 0
+                quantity = 1
+            elif id_package == 2:
+                duration = 30
+                quantity = 10
+            elif id_package == 3:
+                duration = 30
+                quantity = 20
+            else:
+                duration = 0
+                quantity = 1
 
             cursor.execute("""
                 UPDATE users
-                SET id_package=%s, start_package=NOW(), end_package=DATE_ADD(NOW(), INTERVAL %s DAY),
+                SET id_package=%s,
+                    start_package=NOW(),
+                    end_package=DATE_ADD(NOW(), INTERVAL %s DAY),
                     quantity_exam=%s
                 WHERE id_user=%s
             """, (id_package, duration, quantity, id_user))
 
         conn.commit()
-        return jsonify({"resultCode":0,"message":"Giao dịch thành công","orderId":order_id,"status":status}), 200
+
+        return jsonify({
+            "resultCode": 0,
+            "message": "IPN handled successfully",
+            "orderId": order_id,
+            "status": status
+        }), 200
 
     except Exception as e:
         if conn: conn.rollback()
-        return jsonify({"success": False, "message": f"Lỗi xử lý IPN: {str(e)}"}), 500
+        return jsonify({"success": False, "message": f"IPN error: {str(e)}"}), 500
+
     finally:
         if cursor: cursor.close() if cursor else None
         if conn: conn.close()
+
 
 # Check trạng thái
 @momo_bp.route("/momo/check-status/<order_id>", methods=["GET"])
