@@ -200,12 +200,7 @@ def momo_payment():
         result_code = result.get("resultCode")
 
         if result_code == 0 and result.get("payUrl"):
-            return jsonify({
-                "success": True,
-                "payUrl": result["payUrl"],
-                "orderId": order_id,
-                "message": "Tạo link thanh toán thành công."
-            }), 200
+            return jsonify({"data": result}), 200
         else:
             error_message = result.get("message", "Không thể tạo link thanh toán.")
 
