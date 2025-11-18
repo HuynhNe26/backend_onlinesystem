@@ -261,13 +261,14 @@ def momo_ipn():
             return jsonify({"success": False, "message": "Giao dịch không tồn tại."}), 404
 
         status = "success" if result_code == 0 else "failed"
+        status_message = "Giao dịch thành công!" if status == "success" else "Giao dịch thất bại"
 
         cursor.execute("""
-            UPDATE payment
-            SET status = %s,
-                code = %s           
-            WHERE id_order = %s
-        """, ("Giao dịch thành công!", trans_id, order_id))
+                    UPDATE payment
+                    SET status = %s,
+                        code = %s           
+                    WHERE id_order = %s
+                """, (status_message, trans_id, order_id))
 
         if status == "success":
 
