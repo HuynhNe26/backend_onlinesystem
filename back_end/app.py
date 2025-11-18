@@ -17,7 +17,11 @@ from back_end.route.users.package import package_bp
 
 app = Flask(__name__)
 
-frontend_origins = ["https://frontend-admin-onlinesystem-eugd.onrender.com", "http://localhost:3000"]
+frontend_origins = [
+    "https://frontend-admin-onlinesystem-eugd.onrender.com",
+    "http://localhost:3000",
+    "https://a1b2c3d4e5f6.ngrok-free.app"
+]
 
 CORS(app,
      origins=frontend_origins,
