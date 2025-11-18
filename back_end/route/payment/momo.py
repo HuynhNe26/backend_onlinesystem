@@ -254,8 +254,11 @@ def momo_ipn():
     cursor = None
 
     try:
-        data = request.json
-        print(data)
+        data = request.get_json(silent=True)
+
+        if not data:
+            data = request.form.to_dict()
+
         if not data:
             return jsonify({"success": False, "message": "Không có dữ liệu IPN."}), 400
 
