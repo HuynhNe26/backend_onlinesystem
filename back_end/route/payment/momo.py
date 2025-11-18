@@ -149,14 +149,8 @@ def momo_ipn():
         data = request.get_json(silent=True) or {}
         if not data: return jsonify({"success": False, "message": "Không có dữ liệu IPN"}), 400
 
-        print("IPN data received:", data)
-
-        if not verify_momo_signature(data, MOMO_CONFIG["secretKey"]):
-            print("Signature invalid")
-            return jsonify({"success": False, "message": "Chữ ký không hợp lệ"}), 403
-
         order_id = data.get("orderId")
-        result_code = data.get("errorCode")
+        result_code = str(data.get("resultCode"))
         trans_id = data.get("transId")
 
         conn = get_db_connection()
