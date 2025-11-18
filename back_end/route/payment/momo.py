@@ -58,19 +58,19 @@ def generate_momo_signature(params, secret_key):
 def verify_momo_signature(data, secret_key):
     received_signature = data.get("signature", "")
     raw_data = (
-        f"accessKey={data.get('accessKey', '')}"
-        f"&amount={data.get('amount', '')}"
-        f"&extraData={data.get('extraData', '')}"
-        f"&message={data.get('message', '')}"
-        f"&orderId={data.get('orderId', '')}"
-        f"&orderInfo={data.get('orderInfo', '')}"
-        f"&orderType={data.get('orderType', '')}"
-        f"&partnerCode={data.get('partnerCode', '')}"
-        f"&payType={data.get('payType', '')}"
-        f"&requestId={data.get('requestId', '')}"
-        f"&responseTime={data.get('responseTime', '')}"
-        f"&resultCode={data.get('resultCode', '')}"
-        f"&transId={data.get('transId', '')}"
+        f"accessKey={data.get('accessKey')}"
+        f"&amount={data.get('amount')}"
+        f"&extraData={data.get('extraData')}"
+        f"&message={data.get('message')}"
+        f"&orderId={data.get('orderId')}"
+        f"&orderInfo={data.get('orderInfo')}"
+        f"&orderType={data.get('orderType')}"
+        f"&partnerCode={data.get('partnerCode')}"
+        f"&payType={data.get('payType')}"
+        f"&requestId={data.get('requestId')}"
+        f"&responseTime={data.get('responseTime')}"
+        f"&resultCode={data.get('resultCode')}"
+        f"&transId={data.get('transId')}"
     )
     expected_signature = hmac.new(
         secret_key.encode('utf-8'),
@@ -254,10 +254,7 @@ def momo_ipn():
     cursor = None
 
     try:
-        data = request.get_json(silent=True)
-
-        if not data:
-            data = request.form.to_dict()
+        data = request.get_json() or request.form.to_dict()
 
         if not data:
             return jsonify({"success": False, "message": "Không có dữ liệu IPN."}), 400
@@ -286,18 +283,15 @@ def momo_ipn():
         if not tx:
             return jsonify({"success": False, "message": "Giao dịch không tồn tại."}), 404
 
-        if tx["status"] in ["success", "failed"]:
-            return jsonify({"success": True, "message": "IPN đã xử lý trước đó."}), 200
-
         status = "success" if result_code == 0 else "failed"
 
         cursor.execute("""
             UPDATE payment
             SET status = %s,
-                code = %s,             
-                updated_at = NOW()
+                code = %s,
+                updated_at = NOW()             
             WHERE id_order = %s
-        """, (status, trans_id, order_id))
+        """, ("Giao dịch thành công!", trans_id, order_id))
 
         if status == "success":
 
@@ -342,7 +336,7 @@ def momo_ipn():
 
         return jsonify({
             "success": True,
-            "message": "IPN xử lý thành công",
+            "message": "Giao dịch thành công!",
             "orderId": order_id,
             "status": status
         }), 200
