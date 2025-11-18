@@ -20,7 +20,7 @@ app = Flask(__name__)
 frontend_origins = [
     "https://frontend-admin-onlinesystem-eugd.onrender.com",
     "http://localhost:3000",
-    "https://a1b2c3d4e5f6.ngrok-free.app"
+    "https://uninclined-overhonestly-jone.ngrok-free.dev"
 ]
 
 CORS(app,

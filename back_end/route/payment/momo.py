@@ -45,30 +45,31 @@ def generate_momo_signature(params, secret_key):
     )
     return hmac.new(secret_key.encode('utf-8'), raw_signature.encode('utf-8'), hashlib.sha256).hexdigest()
 
-# Verify chữ ký IPN
 def verify_momo_signature(data, secret_key):
     raw_data = (
-        f"partnerCode={data.get('partnerCode','')}"
-        f"&accessKey={data.get('accessKey','')}"
-        f"&requestId={data.get('requestId','')}"
+        f"accessKey={data.get('accessKey','')}"
         f"&amount={data.get('amount','')}"
+        f"&extraData={data.get('extraData','')}"
+        f"&message={data.get('message','')}"
         f"&orderId={data.get('orderId','')}"
         f"&orderInfo={data.get('orderInfo','')}"
         f"&orderType={data.get('orderType','')}"
-        f"&transId={data.get('transId','')}"
-        f"&message={data.get('message','')}"
-        f"&localMessage={data.get('localMessage','')}"
-        f"&responseTime={data.get('responseTime','')}"
-        f"&errorCode={data.get('errorCode','')}"
+        f"&partnerCode={data.get('partnerCode','')}"
         f"&payType={data.get('payType','')}"
-        f"&extraData={data.get('extraData','')}"
+        f"&requestId={data.get('requestId','')}"
+        f"&responseTime={data.get('responseTime','')}"
+        f"&resultCode={data.get('resultCode','')}"
+        f"&transId={data.get('transId','')}"
     )
-    expected_signature = hmac.new(secret_key.encode('utf-8'), raw_data.encode('utf-8'), hashlib.sha256).hexdigest()
-    received_signature = data.get('signature','')
-    print("Raw data for signature:", raw_data)
-    print("Expected signature:", expected_signature)
-    print("Received signature:", received_signature)
-    return hmac.compare_digest(received_signature, expected_signature)
+
+    expected_signature = hmac.new(
+        secret_key.encode("utf-8"),
+        raw_data.encode("utf-8"),
+        hashlib.sha256
+    ).hexdigest()
+
+    return expected_signature == data.get("signature","")
+
 
 # Tạo payment
 @momo_bp.route("/momo", methods=["POST"])
@@ -147,16 +148,19 @@ def momo_ipn():
     conn = cursor = None
     try:
         data = request.get_json(silent=True)
+
         if not data:
             return jsonify({"success": False, "message": "No IPN data"}), 400
 
-        # 1) Kiểm tra chữ ký
+        print("📥 IPN RECEIVED:", data)
+
+        # 1) Verify signature
         if not verify_momo_signature(data, MOMO_CONFIG["secretKey"]):
+            print("❌ Signature invalid")
             return jsonify({"success": False, "message": "Invalid signature"}), 403
 
-        # 2) Lấy dữ liệu
-        order_id = data.get("orderId")
-        result_code = data.get("resultCode")
+        order_id = data["orderId"]
+        result_code = data["resultCode"]
         trans_id = data.get("transId")
 
         conn = get_db_connection()
@@ -168,29 +172,27 @@ def momo_ipn():
         if not tx:
             return jsonify({"success": False, "message": "Order not found"}), 404
 
-        # 3) Update status
         status = "success" if str(result_code) == "0" else "failed"
         status_msg = "Giao dịch thành công" if status == "success" else "Giao dịch thất bại"
 
         cursor.execute("""
-            UPDATE payment 
-            SET status=%s, code=%s 
+            UPDATE payment
+            SET status=%s, code=%s
             WHERE id_order=%s
         """, (status_msg, trans_id, order_id))
 
-        # 4) Nếu success -> update user
+        # Update user if success
         if status == "success":
             id_user = tx["id_user"]
             id_package = tx["id_package"]
 
-            # Load package
             cursor.execute("SELECT * FROM package WHERE id_package=%s", (id_package,))
             pkg = cursor.fetchone()
+
             if not pkg:
                 conn.rollback()
                 return jsonify({"success": False, "message": "Package not found"}), 404
 
-            # Set duration & quantity
             if id_package == 1:
                 duration = 0
                 quantity = 1
@@ -218,17 +220,21 @@ def momo_ipn():
         return jsonify({
             "resultCode": 0,
             "message": "IPN handled successfully",
-            "orderId": order_id,
-            "status": status
+            "orderId": order_id
         }), 200
 
     except Exception as e:
+        import traceback
+        print("🔥 IPN ERROR:", str(e))
+        print(traceback.format_exc())
+
         if conn: conn.rollback()
-        return jsonify({"success": False, "message": f"IPN error: {str(e)}"}), 500
+        return jsonify({"success": False, "message": f"IPN Error: {str(e)}"}), 500
 
     finally:
         if cursor: cursor.close() if cursor else None
         if conn: conn.close()
+
 
 
 # Check trạng thái
