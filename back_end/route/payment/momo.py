@@ -37,10 +37,13 @@ def generate_momo_signature(params, secret_key):
         f"accessKey={params.get('accessKey','')}"
         f"&amount={params.get('amount','')}"
         f"&extraData={params.get('extraData','')}"
+        f"&message={params.get('message')}"
         f"&ipnUrl={params.get('ipnUrl','')}"
         f"&orderId={params.get('orderId','')}"
         f"&orderInfo={params.get('orderInfo','')}"
+        f"&orderType={params.get('orderType','')}"
         f"&partnerCode={params.get('partnerCode','')}"
+        f"&payType={params.get('payType')}"
         f"&redirectUrl={params.get('redirectUrl','')}"
         f"&requestId={params.get('requestId','')}"
         f"&requestType={params.get('requestType','')}"
@@ -237,7 +240,11 @@ def momo_ipn():
             return jsonify({"success": False, "message": "Không có dữ liệu IPN."}), 400
 
         if not verify_momo_signature(data, MOMO_CONFIG["secretKey"]):
-            return jsonify({"success": False, "message": "Chữ ký không hợp lệ."}), 403
+            return jsonify({
+                "resultCode": 0,
+                "message": "Đã nhận IPN nhưng chữ ký không hợp lệ.",
+                "orderId": data.get("orderId")
+            }), 200
 
         order_id = data.get("orderId")
         result_code = data.get("resultCode")
