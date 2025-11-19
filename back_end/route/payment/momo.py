@@ -172,8 +172,8 @@ def momo_payment():
             SELECT 
                 name_package,
                 price_month,
-                duration,        -- ĐIỀU CHỈNH TÊN CỘT NÀY THEO SCHEMA CỦA BẠN
-                quantity_exam    -- ĐIỀU CHỈNH TÊN CỘT NÀY THEO SCHEMA CỦA BẠN
+                duration,       
+                quantity_exam    
             FROM package 
             WHERE id_package = %s
             """,
@@ -224,7 +224,7 @@ def momo_payment():
             INSERT INTO payment (
                 id_user, id_package, id_order, amount, status, payment, code, created_at
             )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW())
+            VALUES (%s, %s, %s, %s, %s, %s, %s, NOW())
             """,
             (
                 id_user,
