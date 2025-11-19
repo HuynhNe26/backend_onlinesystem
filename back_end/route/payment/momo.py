@@ -45,8 +45,42 @@ def generate_momo_signature(params, secret_key):
     )
     return hmac.new(secret_key.encode('utf-8'), raw_signature.encode('utf-8'), hashlib.sha256).hexdigest()
 
+
+
 def verify_momo_signature(data, secret_key):
-    raw_data = (
+    """
+    MoMo có nhiều format RAW khác nhau cho IPN.
+    Hàm này thử nhiều format chuẩn của MoMo và chọn format nào khớp chữ ký.
+    Nếu khớp → True, không khớp → False.
+    """
+
+    def hmac_sha256(msg):
+        return hmac.new(secret_key.encode("utf-8"), msg.encode("utf-8"), hashlib.sha256).hexdigest()
+
+    received_sig = data.get("signature", "")
+    if not received_sig:
+        print(" IPN không có signature.")
+        return False
+
+    candidates = []
+
+    # Format IPN CHUẨN NHẤT của MoMo (tài liệu chính thức)
+    candidates.append(
+        f"partnerCode={data.get('partnerCode','')}"
+        f"&accessKey={data.get('accessKey','')}"
+        f"&requestId={data.get('requestId','')}"
+        f"&amount={data.get('amount','')}"
+        f"&orderId={data.get('orderId','')}"
+        f"&orderInfo={data.get('orderInfo','')}"
+        f"&orderType={data.get('orderType','')}"
+        f"&transId={data.get('transId','')}"
+        f"&message={data.get('message','')}"
+        f"&responseTime={data.get('responseTime','')}"
+        f"&resultCode={data.get('resultCode','')}"
+    )
+
+    # Format IPN phổ biến thứ 2 (có extraData + payType)
+    candidates.append(
         f"accessKey={data.get('accessKey','')}"
         f"&amount={data.get('amount','')}"
         f"&extraData={data.get('extraData','')}"
@@ -62,13 +96,47 @@ def verify_momo_signature(data, secret_key):
         f"&transId={data.get('transId','')}"
     )
 
-    expected_signature = hmac.new(
-        secret_key.encode("utf-8"),
-        raw_data.encode("utf-8"),
-        hashlib.sha256
-    ).hexdigest()
+    # Format của yêu cầu create payment (để dự phòng)
+    candidates.append(
+        f"accessKey={data.get('accessKey','')}"
+        f"&amount={data.get('amount','')}"
+        f"&extraData={data.get('extraData','')}"
+        f"&ipnUrl={data.get('ipnUrl','')}"
+        f"&orderId={data.get('orderId','')}"
+        f"&orderInfo={data.get('orderInfo','')}"
+        f"&partnerCode={data.get('partnerCode','')}"
+        f"&redirectUrl={data.get('redirectUrl','')}"
+        f"&requestId={data.get('requestId','')}"
+        f"&requestType={data.get('requestType','')}"
+    )
 
-    return expected_signature == data.get("signature","")
+    # Fallback: build raw theo các key IPN thường gặp
+    fallback_keys = [
+        "partnerCode", "accessKey", "requestId", "amount",
+        "orderId", "orderInfo", "orderType", "transId",
+        "message", "responseTime", "resultCode"
+    ]
+    fallback_raw = "&".join([f"{k}={data.get(k,'')}" for k in fallback_keys if k in data])
+    candidates.append(fallback_raw)
+
+    # Check từng kiểu raw xem có match không
+    for raw in candidates:
+        if not raw:
+            continue
+        computed = hmac_sha256(raw)
+        if computed == received_sig:
+            print(" MoMo signature verified.")
+            return True
+
+    # Log giúp debug khi sai
+    print(" Sai chữ ký MoMo IPN — không format nào khớp.")
+    print("Signature nhận được:", received_sig)
+    for i, raw in enumerate(candidates):
+        print(f"\n---- RAW CANDIDATE {i+1} ----")
+        print(raw)
+        print("Computed:", hmac_sha256(raw))
+
+    return False
 
 
 # Tạo payment
@@ -118,14 +186,12 @@ def momo_payment():
         signature = generate_momo_signature(params, MOMO_CONFIG["secretKey"])
         payload = {**params, "signature": signature, "lang": "vi"}
 
-        # Lưu DB
         cursor.execute("""
             INSERT INTO payment (id_user, id_package, id_order, amount, duration, status, payment, code, created_at)
             VALUES (%s,%s,%s,%s,%s,%s,%s,%s,NOW())
         """, (id_user, id_package, order_id, price, None, "Đang giao dịch", "momo", None))
         conn.commit()
 
-        # Gửi request MoMo
         resp = requests.post(MOMO_CONFIG["endpoint"], json=payload, timeout=10)
         if resp.status_code != 200:
             return jsonify({"success": False, "message": f"Cổng thanh toán lỗi {resp.status_code}"}), 500
@@ -139,7 +205,7 @@ def momo_payment():
         if conn: conn.rollback()
         return jsonify({"success": False, "message": f"Lỗi hệ thống: {str(e)}"}), 500
     finally:
-        if cursor: cursor.close() if cursor else None
+        if cursor: cursor.close()
         if conn: conn.close()
 
 # IPN MoMo
@@ -152,6 +218,7 @@ def momo_ipn():
         if not data:
             return jsonify({"success": False, "message": "No IPN data"}), 400
 
+        # VERIFY SIGNATURE
         if not verify_momo_signature(data, MOMO_CONFIG["secretKey"]):
             return jsonify({"success": False, "message": "Invalid signature"}), 403
 
@@ -188,6 +255,7 @@ def momo_ipn():
                 conn.rollback()
                 return jsonify({"success": False, "message": "Package not found"}), 404
 
+            # Gán gói
             if id_package == 1:
                 duration = 0
                 quantity = 1
@@ -220,16 +288,15 @@ def momo_ipn():
 
     except Exception as e:
         import traceback
-        print("🔥 IPN ERROR:", str(e))
+        print(" IPN ERROR:", str(e))
         print(traceback.format_exc())
 
         if conn: conn.rollback()
         return jsonify({"success": False, "message": f"IPN Error: {str(e)}"}), 500
 
     finally:
-        if cursor: cursor.close() if cursor else None
+        if cursor: cursor.close()
         if conn: conn.close()
-
 
 
 # Check trạng thái
@@ -263,5 +330,5 @@ def check_payment_status(order_id):
     except Exception as e:
         return jsonify({"success": False, "message": f"Lỗi kiểm tra trạng thái: {str(e)}"}), 500
     finally:
-        if cursor: cursor.close() if cursor else None
+        if cursor: cursor.close()
         if conn: conn.close()
