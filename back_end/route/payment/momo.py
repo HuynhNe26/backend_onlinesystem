@@ -222,7 +222,7 @@ def momo_payment():
         cursor.execute(
             """
             INSERT INTO payment (
-                id_user, id_package, id_order, amount, duration, status, payment, code, created_at
+                id_user, id_package, id_order, amount, status, payment, code, created_at
             )
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW())
             """,
@@ -231,7 +231,6 @@ def momo_payment():
                 id_package,
                 order_id,
                 price,
-                pkg.get("duration"),  # nếu không có cột duration trong payment có thể để None
                 "Đang giao dịch",
                 "momo",
                 None
