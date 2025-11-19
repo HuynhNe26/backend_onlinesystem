@@ -147,16 +147,12 @@ def momo_payment():
 def momo_ipn():
     conn = cursor = None
     try:
-        data = request.get_json(silent=True)
+        data = request.get_json()
 
         if not data:
             return jsonify({"success": False, "message": "No IPN data"}), 400
 
-        print("📥 IPN RECEIVED:", data)
-
-        # 1) Verify signature
         if not verify_momo_signature(data, MOMO_CONFIG["secretKey"]):
-            print("❌ Signature invalid")
             return jsonify({"success": False, "message": "Invalid signature"}), 403
 
         order_id = data["orderId"]
