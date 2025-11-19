@@ -15,7 +15,7 @@ MOMO_CONFIG = {
     "partnerCode": "MOMO",
     "accessKey": "F8BBA842ECF85",
     "secretKey": "K951B6PE1waDMi640xX08PD3vg6EkVlz",
-    "redirectUrl": "https://frontend-admin-onlinesystem-eugd.onrender.com/payment-success",
+    "redirectUrl": "https://uninclined-overhonestly-jone.ngrok-free.dev/payment-success",
     "ipnUrl": "https://uninclined-overhonestly-jone.ngrok-free.dev/api/payment/momo/ipn"
 }
 
