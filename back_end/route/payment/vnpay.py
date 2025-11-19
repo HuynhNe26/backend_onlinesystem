@@ -48,7 +48,7 @@ def vnpay_payment():
 
         # Validate amount
         try:
-            amount = int(data.get("amount"))
+            amount = int(data.get("price_month"))
             if amount <= 0:
                 return jsonify({
                     "success": False,
