@@ -16,7 +16,7 @@ VNPAY_CONFIG = {
     "vnp_HashSecret": "G0S15BZBGXV9CO47K7FSJEIO2NAS544V",
     "vnp_Url": "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html",
     "vnp_Returnurl": "https://frontend-admin-onlinesystem-eugd.onrender.com/payment-success",
-    "vnp_IpnUrl": "https://backend-onlinesystem.onrender.com/api/payment/vnpay/ipn"
+    "vnp_IpnUrl": "https://uninclined-overhonestly-jone.ngrok-free.dev/api/payment/vnpay/ipn"
 }
 
 

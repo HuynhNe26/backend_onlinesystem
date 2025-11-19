@@ -177,7 +177,6 @@ def momo_ipn():
             WHERE id_order=%s
         """, (status_msg, trans_id, order_id))
 
-        # Update user if success
         if status == "success":
             id_user = tx["id_user"]
             id_package = tx["id_package"]
