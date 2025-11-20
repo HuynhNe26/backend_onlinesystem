@@ -128,8 +128,13 @@ def momo_payment():
             return jsonify({"success": False, "message": f"Cổng thanh toán lỗi {resp.status_code}"}), 500
 
         result = resp.json()
-        if result.get("resultCode")==0 and result.get("payUrl"):
-            return jsonify({"data": result}), 200
+        if result.get("resultCode") == 0 and result.get("payUrl"):
+            return jsonify({
+                "success": True,
+                "payUrl": result["payUrl"],
+                "orderId": order_id
+            }), 200
+
         return jsonify({"success": False, "message": result.get("message","Lỗi tạo link"), "resultCode": result.get("resultCode")}), 400
 
     except Exception as e:
