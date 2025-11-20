@@ -118,10 +118,9 @@ def momo_payment():
 
         # Lưu DB
         cursor.execute("""
-            INSERT INTO payment (id_user, id_package, id_order, amount, duration, status, payment, code, created_at)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,NOW())
-        """, (id_user, id_package, order_id, price, None, "Đang giao dịch", "momo", None))
-        conn.commit()
+            INSERT INTO payment (id_user, id_package, id_order, amount, status, payment, code, created_at)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,NOW())
+        """, (id_user, id_package, order_id, price, "Đang giao dịch", "momo", None))
 
         # Gửi request MoMo
         resp = requests.post(MOMO_CONFIG["endpoint"], json=payload, timeout=10)
