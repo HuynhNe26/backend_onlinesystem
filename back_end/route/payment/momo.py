@@ -13,9 +13,12 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %
 
 momo_bp = Blueprint("momo_bp", __name__)
 
+# Thông tin test chính thức của MoMo
 MOMO_CONFIG = {
     "endpoint": "https://test-payment.momo.vn/v2/gateway/api/create",
     "partnerCode": "MOMO",
+    "partnerName": "Test",
+    "storeId": "MomoTestStore",
     "accessKey": "F8BBA842ECF85",
     "secretKey": "K951B6PE1waDMi640xX08PD3vg6EkVlz",
     "redirectUrl": "https://frontend-admin-onlinesystem-eugd.onrender.com/payment-success",
@@ -34,46 +37,58 @@ def get_current_user_id():
 
 
 def generate_momo_signature(params, secret_key):
-    """Tạo chữ ký theo chuẩn MoMo - KHÔNG có dấu & ở đầu"""
-    raw_signature = (
-        f"accessKey={params['accessKey']}&"
-        f"amount={params['amount']}&"
-        f"extraData={params['extraData']}&"
-        f"ipnUrl={params['ipnUrl']}&"
-        f"orderId={params['orderId']}&"
-        f"orderInfo={params['orderInfo']}&"
-        f"partnerCode={params['partnerCode']}&"
-        f"redirectUrl={params['redirectUrl']}&"
-        f"requestId={params['requestId']}&"
-        f"requestType={params['requestType']}"
+    """Tạo chữ ký theo đúng format MoMo"""
+    rawSignature = (
+            "accessKey=" + params['accessKey'] +
+            "&amount=" + params['amount'] +
+            "&extraData=" + params['extraData'] +
+            "&ipnUrl=" + params['ipnUrl'] +
+            "&orderId=" + params['orderId'] +
+            "&orderInfo=" + params['orderInfo'] +
+            "&partnerCode=" + params['partnerCode'] +
+            "&redirectUrl=" + params['redirectUrl'] +
+            "&requestId=" + params['requestId'] +
+            "&requestType=" + params['requestType']
     )
-    logging.debug(f"Raw signature string: {raw_signature}")
-    signature = hmac.new(secret_key.encode('utf-8'), raw_signature.encode('utf-8'), hashlib.sha256).hexdigest()
-    logging.debug(f"Generated signature: {signature}")
+
+    logging.debug(f"--------------------RAW SIGNATURE----------------")
+    logging.debug(rawSignature)
+
+    h = hmac.new(bytes(secret_key, 'ascii'), bytes(rawSignature, 'ascii'), hashlib.sha256)
+    signature = h.hexdigest()
+
+    logging.debug(f"--------------------SIGNATURE----------------")
+    logging.debug(signature)
+
     return signature
 
 
 def verify_momo_ipn_signature(data, secret_key):
-    """Xác thực chữ ký IPN theo đúng chuẩn MoMo"""
-    raw_signature = (
-        f"accessKey={data.get('accessKey', '')}&"
-        f"amount={data.get('amount', '')}&"
-        f"extraData={data.get('extraData', '')}&"
-        f"message={data.get('message', '')}&"
-        f"orderId={data.get('orderId', '')}&"
-        f"orderInfo={data.get('orderInfo', '')}&"
-        f"orderType={data.get('orderType', '')}&"
-        f"partnerCode={data.get('partnerCode', '')}&"
-        f"payType={data.get('payType', '')}&"
-        f"requestId={data.get('requestId', '')}&"
-        f"responseTime={data.get('responseTime', '')}&"
-        f"resultCode={data.get('resultCode', '')}&"
-        f"transId={data.get('transId', '')}"
+    """Xác thực chữ ký IPN"""
+    rawSignature = (
+            "accessKey=" + data.get('accessKey', '') +
+            "&amount=" + str(data.get('amount', '')) +
+            "&extraData=" + data.get('extraData', '') +
+            "&message=" + data.get('message', '') +
+            "&orderId=" + data.get('orderId', '') +
+            "&orderInfo=" + data.get('orderInfo', '') +
+            "&orderType=" + data.get('orderType', '') +
+            "&partnerCode=" + data.get('partnerCode', '') +
+            "&payType=" + data.get('payType', '') +
+            "&requestId=" + data.get('requestId', '') +
+            "&responseTime=" + str(data.get('responseTime', '')) +
+            "&resultCode=" + str(data.get('resultCode', '')) +
+            "&transId=" + str(data.get('transId', ''))
     )
-    logging.debug(f"IPN Raw signature string: {raw_signature}")
-    expected_signature = hmac.new(secret_key.encode('utf-8'), raw_signature.encode('utf-8'), hashlib.sha256).hexdigest()
+
+    logging.debug(f"IPN Raw signature: {rawSignature}")
+
+    h = hmac.new(bytes(secret_key, 'ascii'), bytes(rawSignature, 'ascii'), hashlib.sha256)
+    expected_signature = h.hexdigest()
     received_signature = data.get("signature", "")
+
     logging.debug(f"Expected: {expected_signature}, Received: {received_signature}")
+
     return expected_signature == received_signature
 
 
@@ -107,48 +122,77 @@ def momo_payment():
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
-        # Tạo requestId và orderId theo chuẩn
+        # Tạo orderId và requestId bằng UUID như example
+        order_id = str(uuid.uuid4())
         request_id = str(uuid.uuid4())
-        order_id = f"{int(time.time())}"
 
-        # extraData phải là chuỗi rỗng hoặc base64
-        extra_data = ""  # MoMo yêu cầu để trống nếu không dùng
+        # extraData để trống
+        extra_data = ""
 
-        # Lưu thông tin vào extraData dưới dạng JSON string
-        extra_info = json.dumps({"id_package": id_package, "id_user": id_user})
-
+        # Tạo params theo đúng thứ tự để tạo signature
         params = {
-            "partnerCode": MOMO_CONFIG["partnerCode"],
-            "accessKey": MOMO_CONFIG["accessKey"],
-            "requestId": request_id,
-            "amount": str(price),
-            "orderId": order_id,
-            "orderInfo": name_package,
-            "redirectUrl": MOMO_CONFIG["redirectUrl"],
-            "ipnUrl": MOMO_CONFIG["ipnUrl"],
-            "requestType": "captureWallet",
-            "extraData": extra_data,
-            "lang": "vi"
+            'accessKey': MOMO_CONFIG["accessKey"],
+            'amount': str(price),
+            'extraData': extra_data,
+            'ipnUrl': MOMO_CONFIG["ipnUrl"],
+            'orderId': order_id,
+            'orderInfo': name_package,
+            'partnerCode': MOMO_CONFIG["partnerCode"],
+            'redirectUrl': MOMO_CONFIG["redirectUrl"],
+            'requestId': request_id,
+            'requestType': "captureWallet"
         }
 
         # Tạo chữ ký
         signature = generate_momo_signature(params, MOMO_CONFIG["secretKey"])
-        params["signature"] = signature
 
-        # Lưu vào database với extra_info
+        # Tạo JSON data gửi đến MoMo (thêm các field bổ sung)
+        payload = {
+            'partnerCode': MOMO_CONFIG["partnerCode"],
+            'partnerName': MOMO_CONFIG["partnerName"],
+            'storeId': MOMO_CONFIG["storeId"],
+            'requestId': request_id,
+            'amount': str(price),
+            'orderId': order_id,
+            'orderInfo': name_package,
+            'redirectUrl': MOMO_CONFIG["redirectUrl"],
+            'ipnUrl': MOMO_CONFIG["ipnUrl"],
+            'lang': "vi",
+            'extraData': extra_data,
+            'requestType': "captureWallet",
+            'signature': signature
+        }
+
+        logging.info(f"--------------------JSON REQUEST----------------")
+        logging.info(json.dumps(payload, indent=2))
+
+        # Lưu vào database
+        extra_info = json.dumps({"id_package": id_package, "id_user": id_user})
         cursor.execute("""
             INSERT INTO payment (id_user, id_package, id_order, amount, status, payment, code, created_at)
             VALUES (%s, %s, %s, %s, %s, %s, %s, NOW())
         """, (id_user, id_package, order_id, price, "Đang giao dịch", "momo", extra_info))
         conn.commit()
 
-        logging.info(f"Sending to MoMo: {json.dumps(params, indent=2)}")
-
         # Gửi request đến MoMo
-        resp = requests.post(MOMO_CONFIG["endpoint"], json=params, timeout=10)
-        result = resp.json()
+        payload_json = json.dumps(payload)
+        headers = {
+            'Content-Type': 'application/json',
+            'Content-Length': str(len(payload_json))
+        }
 
-        logging.info(f"MoMo Response: {json.dumps(result, indent=2)}")
+        resp = requests.post(
+            MOMO_CONFIG["endpoint"],
+            data=payload_json,
+            headers=headers,
+            timeout=10
+        )
+
+        logging.info(f"--------------------JSON RESPONSE----------------")
+        logging.info(f"Status Code: {resp.status_code}")
+        logging.info(f"Response: {resp.text}")
+
+        result = resp.json()
 
         if result.get("resultCode") == 0 and result.get("payUrl"):
             return jsonify({
@@ -162,13 +206,14 @@ def momo_payment():
         return jsonify({
             "success": False,
             "message": result.get("message", "Lỗi tạo link thanh toán"),
-            "resultCode": result.get("resultCode")
+            "resultCode": result.get("resultCode"),
+            "details": result
         }), 400
 
     except Exception as e:
         if conn:
             conn.rollback()
-        logging.error(f"Error in momo_payment: {str(e)}")
+        logging.error(f"Error in momo_payment: {str(e)}", exc_info=True)
         return jsonify({"success": False, "message": f"Lỗi hệ thống: {str(e)}"}), 500
     finally:
         if cursor:
@@ -184,10 +229,10 @@ def momo_ipn():
     try:
         data = request.get_json()
         logging.info(f"=== IPN RECEIVED ===")
-        logging.info(f"IPN Data: {json.dumps(data, indent=2)}")
+        logging.info(json.dumps(data, indent=2))
 
         if not data:
-            return jsonify({"resultCode": 1, "message": "No IPN data"}), 400
+            return jsonify({"resultCode": 1, "message": "No IPN data"}), 200
 
         # Verify signature
         if not verify_momo_ipn_signature(data, MOMO_CONFIG["secretKey"]):
@@ -197,7 +242,6 @@ def momo_ipn():
         order_id = data.get("orderId")
         result_code = int(data.get("resultCode", -1))
         trans_id = data.get("transId")
-        amount = data.get("amount")
 
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
@@ -266,14 +310,13 @@ def momo_ipn():
 
         conn.commit()
 
-        # Trả về response theo chuẩn MoMo
         return jsonify({"resultCode": 0, "message": "Success"}), 200
 
     except Exception as e:
         if conn:
             conn.rollback()
-        logging.error(f"IPN Error: {str(e)}")
-        return jsonify({"resultCode": 1000, "message": f"System error"}), 200
+        logging.error(f"IPN Error: {str(e)}", exc_info=True)
+        return jsonify({"resultCode": 1000, "message": "System error"}), 200
 
     finally:
         if cursor:
