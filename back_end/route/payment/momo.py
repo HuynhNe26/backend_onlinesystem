@@ -4,10 +4,13 @@ import time
 import uuid
 import hmac
 import hashlib
+import logging
+import requests
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from ...config.db_config import get_db_connection
-import requests
+
+logging.basicConfig(level=logging.INFO)
 
 momo_bp = Blueprint("momo_bp", __name__)
 
@@ -29,8 +32,8 @@ def get_current_user_id():
     except:
         return identity
 
+# --- Tạo chữ ký MoMo ---
 def generate_momo_signature(params, secret_key):
-    # Chú ý: thứ tự fields phải đúng như MoMo yêu cầu
     raw_signature = (
         f"accessKey={params['accessKey']}"
         f"&amount={params['amount']}"
@@ -45,6 +48,27 @@ def generate_momo_signature(params, secret_key):
     )
     return hmac.new(secret_key.encode(), raw_signature.encode(), hashlib.sha256).hexdigest()
 
+# --- Kiểm tra chữ ký IPN ---
+def verify_momo_signature(data, secret_key):
+    raw_data = (
+        f"accessKey={data.get('accessKey','')}"
+        f"&amount={data.get('amount','')}"
+        f"&extraData={data.get('extraData','')}"
+        f"&message={data.get('message','')}"
+        f"&orderId={data.get('orderId','')}"
+        f"&orderInfo={data.get('orderInfo','')}"
+        f"&orderType={data.get('orderType','')}"
+        f"&partnerCode={data.get('partnerCode','')}"
+        f"&payType={data.get('payType','')}"
+        f"&requestId={data.get('requestId','')}"
+        f"&responseTime={data.get('responseTime','')}"
+        f"&resultCode={data.get('resultCode','')}"
+        f"&transId={data.get('transId','')}"
+    )
+    expected_signature = hmac.new(secret_key.encode(), raw_data.encode(), hashlib.sha256).hexdigest()
+    return expected_signature == data.get("signature","")
+
+# --- Tạo payment ---
 @momo_bp.route("/momo", methods=["POST"])
 @jwt_required()
 def momo_payment():
@@ -59,16 +83,11 @@ def momo_payment():
         if missing:
             return jsonify({"success": False, "message": f"Thiếu: {', '.join(missing)}"}), 400
 
-        price = str(int(data["price_month"]))  # MoMo muốn string
+        price = str(int(data["price_month"]))  # string theo MoMo
         id_package = data["id_package"]
         name_package = data.get("name_package", f"Thanh toán gói {id_package}")
 
-        # ExtraData phải base64 encode
-        extra_data_dict = {"id_package": id_package, "id_user": user_id}
-        extra_data = base64.b64encode(
-            json.dumps(extra_data_dict, separators=(',', ':')).encode()
-        ).decode()
-
+        extra_data = base64.b64encode(json.dumps({"id_package": id_package, "id_user": user_id}, separators=(',', ':')).encode()).decode()
         request_id = f"{MOMO_CONFIG['partnerCode']}_{int(time.time() * 1000)}"
         order_id = str(uuid.uuid4()).replace('-', '')[:12]
 
@@ -90,20 +109,14 @@ def momo_payment():
 
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-
         cursor.execute(
-            """
-            INSERT INTO payment (id_user, id_package, id_order, amount, status, payment, code, created_at)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, NOW())
-            """,
+            "INSERT INTO payment (id_user, id_package, id_order, amount, status, payment, code, created_at) VALUES (%s,%s,%s,%s,%s,%s,%s,NOW())",
             (user_id, id_package, order_id, price, "Đang giao dịch", "momo", None)
         )
         conn.commit()
 
-        # Gửi request MoMo
         resp = requests.post(MOMO_CONFIG["endpoint"], json=payload, timeout=10)
         result = resp.json()
-
         if result.get("resultCode") == 0 and result.get("payUrl"):
             return jsonify({"success": True, "payUrl": result["payUrl"], "orderId": order_id}), 200
         else:
@@ -111,13 +124,15 @@ def momo_payment():
 
     except Exception as e:
         if conn: conn.rollback()
+        logging.error(str(e))
         return jsonify({"success": False, "message": f"Lỗi hệ thống: {str(e)}"}), 500
     finally:
-        if cursor: cursor: cursor.close()
-        if conn: conn: conn.close()
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
-
-# ---- IPN MoMo ----
+# --- IPN MoMo ---
 @momo_bp.route("/momo/ipn", methods=["POST"])
 def momo_ipn():
     conn = cursor = None
@@ -125,8 +140,13 @@ def momo_ipn():
         data = request.get_json()
         if not data:
             return jsonify({"success": False, "message": "No IPN data"}), 400
+
         if not verify_momo_signature(data, MOMO_CONFIG["secretKey"]):
             return jsonify({"success": False, "message": "Invalid signature"}), 403
+
+        extra_data = json.loads(base64.b64decode(data.get("extraData","")).decode())
+        user_id = extra_data.get("id_user")
+        id_package = extra_data.get("id_package")
 
         order_id = data["orderId"]
         result_code = data["resultCode"]
@@ -145,12 +165,11 @@ def momo_ipn():
                        ("Giao dịch thành công" if status=="success" else "Giao dịch thất bại", trans_id, order_id))
 
         if status == "success":
-            id_user = tx["id_user"]
-            id_package = tx["id_package"]
-
             cursor.execute("SELECT * FROM package WHERE id_package=%s", (id_package,))
             pkg = cursor.fetchone()
-            if not pkg: conn.rollback(); return jsonify({"success": False, "message": "Package not found"}), 404
+            if not pkg:
+                conn.rollback()
+                return jsonify({"success": False, "message": "Package not found"}), 404
 
             if id_package == 1: duration=0; quantity=1
             elif id_package == 2: duration=30; quantity=10
@@ -164,7 +183,7 @@ def momo_ipn():
                     end_package=DATE_ADD(NOW(), INTERVAL %s DAY),
                     quantity_exam=%s
                 WHERE id_user=%s
-            """, (id_package, duration, quantity, id_user))
+            """, (id_package, duration, quantity, user_id))
 
         conn.commit()
         return jsonify({"resultCode": 0, "message": "IPN handled successfully", "orderId": order_id}), 200
@@ -174,10 +193,12 @@ def momo_ipn():
         logging.error(str(e))
         return jsonify({"success": False, "message": f"IPN Error: {str(e)}"}), 500
     finally:
-        if cursor: cursor: cursor.close()
-        if conn: conn: conn.close()
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
-# ---- Check status MoMo ----
+# --- Check trạng thái ---
 @momo_bp.route("/momo/check-status/<order_id>", methods=["GET"])
 @jwt_required()
 def check_payment_status(order_id):
@@ -193,7 +214,9 @@ def check_payment_status(order_id):
             WHERE p.id_order=%s AND p.id_user=%s
         """, (order_id, user_id))
         tx = cursor.fetchone()
-        if not tx: return jsonify({"success": False, "message": "Không tìm thấy giao dịch"}), 404
+        if not tx:
+            return jsonify({"success": False, "message": "Không tìm thấy giao dịch"}), 404
+
         result = {
             "orderId": tx["id_order"],
             "amount": tx["amount"],
@@ -205,8 +228,11 @@ def check_payment_status(order_id):
             "code": tx["code"]
         }
         return jsonify({"success": True, "transaction": result}), 200
+
     except Exception as e:
         return jsonify({"success": False, "message": f"Lỗi kiểm tra trạng thái: {str(e)}"}), 500
     finally:
-        if cursor: cursor: cursor.close()
-        if conn: conn: conn.close()
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
