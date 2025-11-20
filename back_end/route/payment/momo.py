@@ -13,7 +13,6 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %
 
 momo_bp = Blueprint("momo_bp", __name__)
 
-# Thông tin test chính thức của MoMo
 MOMO_CONFIG = {
     "endpoint": "https://test-payment.momo.vn/v2/gateway/api/create",
     "partnerCode": "MOMO",
