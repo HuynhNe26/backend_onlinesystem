@@ -56,6 +56,7 @@ def generate_momo_signature(params, secret_key):
     h = hmac.new(secret_key.encode('utf-8'), rawSignature.encode('utf-8'), hashlib.sha256)
     signature = h.hexdigest()
 
+
     logging.debug(f"--------------------SIGNATURE----------------")
     logging.debug(signature)
 
