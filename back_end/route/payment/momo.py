@@ -50,19 +50,18 @@ def generate_momo_signature(params, secret_key):
 
 def verify_momo_signature(data, secret_key):
     raw_data = (
-        f"accessKey={data.get('accessKey','')}"
-        f"&amount={data.get('amount','')}"
-        f"&extraData={data.get('extraData','')}"
-        f"&message={data.get('message','')}"
-        f"&orderId={data.get('orderId','')}"
-        f"&orderInfo={data.get('orderInfo','')}"
-        f"&orderType={data.get('orderType','')}"
-        f"&partnerCode={data.get('partnerCode','')}"
-        f"&payType={data.get('payType','')}"
-        f"&requestId={data.get('requestId','')}"
-        f"&responseTime={data.get('responseTime','')}"
-        f"&resultCode={data.get('resultCode','')}"
-        f"&transId={data.get('transId','')}"
+        f"amount={data.get('amount', '')}"
+        f"&extraData={data.get('extraData', '')}"
+        f"&message={data.get('message', '')}"
+        f"&orderId={data.get('orderId', '')}"
+        f"&orderInfo={data.get('orderInfo', '')}"
+        f"&orderType={data.get('orderType', '')}"
+        f"&partnerCode={data.get('partnerCode', '')}"
+        f"&payType={data.get('payType', '')}"
+        f"&requestId={data.get('requestId', '')}"
+        f"&responseTime={data.get('responseTime', '')}"
+        f"&resultCode={data.get('resultCode', '')}"
+        f"&transId={data.get('transId', '')}"
     )
     expected_signature = hmac.new(secret_key.encode('utf-8'), raw_data.encode('utf-8'), hashlib.sha256).hexdigest()
     return expected_signature == data.get("signature","")
@@ -139,9 +138,14 @@ def momo_ipn():
     conn = cursor = None
     try:
         data = request.get_json()
+        logging.info(f"IPN RECEIVED: {data}")
+
         if not data:
             return jsonify({"success": False, "message": "No IPN data"}), 400
+
+        # Verify signature
         if not verify_momo_signature(data, MOMO_CONFIG["secretKey"]):
+            logging.error("Invalid signature")
             return jsonify({"success": False, "message": "Invalid signature"}), 403
 
         order_id = data["orderId"]
@@ -153,25 +157,47 @@ def momo_ipn():
 
         cursor.execute("SELECT * FROM payment WHERE id_order=%s", (order_id,))
         tx = cursor.fetchone()
+
         if not tx:
+            logging.error("Order not found")
             return jsonify({"success": False, "message": "Order not found"}), 404
 
-        status = "success" if str(result_code) == "0" else "failed"
-        cursor.execute("UPDATE payment SET status=%s, code=%s WHERE id_order=%s",
-                       ("Giao dịch thành công" if status=="success" else "Giao dịch thất bại", trans_id, order_id))
+        if result_code == 0:
+            status_text = "Giao dịch thành công"
+        else:
+            status_text = "Giao dịch thất bại"
 
-        if status == "success":
+        cursor.execute("""
+            UPDATE payment 
+            SET status=%s, code=%s 
+            WHERE id_order=%s
+        """, (status_text, trans_id, order_id))
+
+        # Nếu thanh toán thành công → cập nhật user
+        if result_code == 0:
             id_user = tx["id_user"]
             id_package = tx["id_package"]
 
             cursor.execute("SELECT * FROM package WHERE id_package=%s", (id_package,))
             pkg = cursor.fetchone()
-            if not pkg: conn.rollback(); return jsonify({"success": False, "message": "Package not found"}), 404
 
-            if id_package == 1: duration=0; quantity=1
-            elif id_package == 2: duration=30; quantity=10
-            elif id_package == 3: duration=30; quantity=20
-            else: duration=0; quantity=1
+            if not pkg:
+                conn.rollback()
+                return jsonify({"success": False, "message": "Package not found"}), 404
+
+            # Your package logic
+            if id_package == 1:
+                duration = 0
+                quantity = 1
+            elif id_package == 2:
+                duration = 30
+                quantity = 10
+            elif id_package == 3:
+                duration = 30
+                quantity = 20
+            else:
+                duration = 0
+                quantity = 1
 
             cursor.execute("""
                 UPDATE users
@@ -183,15 +209,18 @@ def momo_ipn():
             """, (id_package, duration, quantity, id_user))
 
         conn.commit()
-        return jsonify({"resultCode": 0, "message": "IPN handled successfully", "orderId": order_id}), 200
+        return jsonify({"resultCode": 0, "message": "IPN handled successfully"}), 200
 
     except Exception as e:
-        if conn: conn.rollback()
+        if conn:
+            conn.rollback()
         logging.error(str(e))
         return jsonify({"success": False, "message": f"IPN Error: {str(e)}"}), 500
+
     finally:
-        if cursor: cursor: cursor.close()
-        if conn: conn: conn.close()
+        if cursor: cursor.close()
+        if conn: conn.close()
+
 
 # ---- Check status MoMo ----
 @momo_bp.route("/momo/check-status/<order_id>", methods=["GET"])
