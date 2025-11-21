@@ -26,7 +26,6 @@ MOMO_CONFIG = {
     "ipnUrl": "https://uninclined-overhonestly-jone.ngrok-free.dev/api/payment/momo/ipn"
 }
 
-
 def get_current_user_id():
     identity = get_jwt_identity()
     if isinstance(identity, dict):
