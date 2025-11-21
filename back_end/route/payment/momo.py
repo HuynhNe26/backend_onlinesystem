@@ -1,3 +1,5 @@
+import datetime
+
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 import hmac
@@ -224,105 +226,116 @@ def momo_payment():
 # ---- IPN MoMo ----
 @momo_bp.route("/momo/ipn", methods=["POST"])
 def momo_ipn():
-    conn = cursor = None
-    try:
-        data = request.get_json()
-        logging.info(f"=== IPN RECEIVED ===")
-        logging.info(json.dumps(data, indent=2))
+    logging.warning("=== IPN RECEIVED ===")
+    data = request.get_json()
+    logging.warning(data)
 
-        if not data:
-            return jsonify({"resultCode": 1, "message": "No IPN data"}), 200
+    # ======= 1. TẠO RAW SIGNATURE THEO ĐÚNG THỨ TỰ MOMO ======== #
+    raw = (
+        f"accessKey={data.get('accessKey','')}"
+        f"&amount={data.get('amount','')}"
+        f"&extraData={data.get('extraData','')}"
+        f"&message={data.get('message','')}"
+        f"&orderId={data.get('orderId','')}"
+        f"&orderInfo={data.get('orderInfo','')}"
+        f"&orderType={data.get('orderType','')}"
+        f"&partnerCode={data.get('partnerCode','')}"
+        f"&payType={data.get('payType','')}"
+        f"&requestId={data.get('requestId','')}"
+        f"&responseTime={data.get('responseTime','')}"
+        f"&resultCode={data.get('resultCode','')}"
+        f"&transId={data.get('transId','')}"
+    )
 
-        # Verify signature
-        if not verify_momo_ipn_signature(data, MOMO_CONFIG["secretKey"]):
-            logging.error("Invalid signature in IPN")
-            return jsonify({"resultCode": 97, "message": "Invalid signature"}), 200
+    logging.warning("RAW SIGNATURE >>> " + raw)
 
-        order_id = data.get("orderId")
-        result_code = int(data.get("resultCode", -1))
-        trans_id = data.get("transId")
+    # ======= 2. TÍNH CHỮ KÝ SERVER ======== #
+    h = hmac.new(
+        MOMO_CONFIG["secretKey"].encode(),
+        raw.encode(),
+        hashlib.sha256
+    )
+    expected_signature = h.hexdigest()
 
-        conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
+    logging.warning("EXPECTED SIGNATURE >>> " + expected_signature)
+    logging.warning("RECEIVED SIGNATURE >>> " + data.get("signature"))
 
-        cursor.execute("SELECT * FROM payment WHERE id_order=%s", (order_id,))
-        tx = cursor.fetchone()
+    if expected_signature != data.get("signature"):
+        logging.error("❌ INVALID SIGNATURE → IGNORE IPN")
+        return jsonify({'message': 'INVALID_SIGNATURE'}), 200
 
-        if not tx:
-            logging.error(f"Order not found: {order_id}")
-            return jsonify({"resultCode": 2, "message": "Order not found"}), 200
+    logging.warning("✔ SIGNATURE OK")
 
-        # Kiểm tra đã xử lý chưa
-        if tx["status"] not in ["Đang giao dịch"]:
-            logging.info(f"Order already processed: {order_id}")
-            return jsonify({"resultCode": 0, "message": "Already processed"}), 200
+    # ======= 3. KIỂM TRA ORDER ======== #
+    order_id = data.get("orderId")
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
 
-        # Cập nhật trạng thái thanh toán
-        if result_code == 0:
-            status_text = "Giao dịch thành công"
+    cursor.execute("SELECT * FROM payment WHERE id_order=%s", (order_id,))
+    tx = cursor.fetchone()
+
+    if not tx:
+        logging.error("❌ ORDER NOT FOUND IN DATABASE")
+        return jsonify({'message': 'ORDER_NOT_FOUND'}), 200
+
+    logging.warning("✔ ORDER FOUND")
+
+    # Nếu giao dịch đã xử lý → trả OK để MoMo không gửi lại
+    if tx["status"] == 1:
+        logging.warning("⚠ ORDER ALREADY PROCESSED → SKIP")
+        return jsonify({'message': 'ORDER_ALREADY_SUCCESS'}), 200
+
+    # ======= 4. NẾU THANH TOÁN THÀNH CÔNG ======== #
+    result_code = data.get("resultCode")
+
+    if result_code == 0:
+        logging.warning("✔ PAYMENT SUCCESS → UPDATE DB")
+
+        # Update trạng thái thanh toán
+        cursor.execute(
+            "UPDATE payment SET status=1 WHERE id_order=%s",
+            (order_id,)
+        )
+
+        # Update gói dịch vụ cho user
+        id_user = tx["id_user"]
+        package = tx["package"]
+        now = datetime.datetime.now()
+
+        if package == 1:
+            end = now + datetime.timedelta(days=31)
+        elif package == 2:
+            end = now + datetime.timedelta(days=93)
+        elif package == 3:
+            end = now + datetime.timedelta(days=186)
         else:
-            status_text = "Giao dịch thất bại"
+            end = now
 
-        cursor.execute("""
-            UPDATE payment 
-            SET status=%s, code=%s 
-            WHERE id_order=%s
-        """, (status_text, trans_id, order_id))
-
-        # Nếu thanh toán thành công → cập nhật user package
-        if result_code == 0:
-            id_user = tx["id_user"]
-            id_package = tx["id_package"]
-
-            cursor.execute("SELECT * FROM package WHERE id_package=%s", (id_package,))
-            pkg = cursor.fetchone()
-
-            if not pkg:
-                logging.error(f"Package not found: {id_package}")
-                conn.rollback()
-                return jsonify({"resultCode": 3, "message": "Package not found"}), 200
-
-            # Logic gói cước
-            if id_package == 1:
-                duration = 0
-                quantity = 1
-            elif id_package == 2:
-                duration = 30
-                quantity = 10
-            elif id_package == 3:
-                duration = 30
-                quantity = 20
-            else:
-                duration = 0
-                quantity = 1
-
-            cursor.execute("""
-                UPDATE users
-                SET id_package=%s,
-                    start_package=NOW(),
-                    end_package=DATE_ADD(NOW(), INTERVAL %s DAY),
-                    quantity_exam=%s
-                WHERE id_user=%s
-            """, (id_package, duration, quantity, id_user))
-
-            logging.info(f"Updated user {id_user} with package {id_package}")
+        cursor.execute(
+            "UPDATE users SET package=%s, start_package=%s, end_package=%s WHERE id=%s",
+            (package, now, end, id_user)
+        )
 
         conn.commit()
+        cursor.close()
+        conn.close()
 
-        return jsonify({"resultCode": 0, "message": "Success"}), 200
+        logging.warning("✔ DB UPDATE COMPLETE")
 
-    except Exception as e:
-        if conn:
-            conn.rollback()
-        logging.error(f"IPN Error: {str(e)}", exc_info=True)
-        return jsonify({"resultCode": 1000, "message": "System error"}), 200
+        return jsonify({'message': 'SUCCESS'}), 200
 
-    finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
+    # ======= 5. NẾU THANH TOÁN THẤT BẠI ======== #
+    logging.warning("❌ PAYMENT FAILED → SET status = -1")
 
+    cursor.execute(
+        "UPDATE payment SET status=-1 WHERE id_order=%s",
+        (order_id,)
+    )
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return jsonify({'message': 'FAILED'}), 200
 
 # ---- Check status MoMo ----
 @momo_bp.route("/momo/check-status/<order_id>", methods=["GET"])
