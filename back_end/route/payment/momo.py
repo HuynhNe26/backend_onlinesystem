@@ -64,33 +64,32 @@ def generate_momo_signature(params, secret_key):
 
 
 def verify_momo_ipn_signature(data, secret_key):
-    keys = [
-        "accessKey",
-        "amount",
-        "extraData",
-        "message",
-        "orderId",
-        "orderInfo",
-        "orderType",
-        "partnerCode",
-        "payType",
-        "requestId",
-        "responseTime",
-        "resultCode",
-        "transId"
-    ]
+    rawSignature = (
+        f"accessKey={data.get('accessKey', '')}"
+        f"&amount={data.get('amount', '')}"
+        f"&extraData={data.get('extraData', '')}"
+        f"&message={data.get('message', '')}"
+        f"&orderId={data.get('orderId', '')}"
+        f"&orderInfo={data.get('orderInfo', '')}"
+        f"&orderType={data.get('orderType', '')}"
+        f"&partnerCode={data.get('partnerCode', '')}"
+        f"&payType={data.get('payType', '')}"
+        f"&requestId={data.get('requestId', '')}"
+        f"&responseTime={data.get('responseTime', '')}"
+        f"&resultCode={data.get('resultCode', '')}"
+        f"&transId={data.get('transId', '')}"
+    )
 
-    rawSignature = "&".join([f"{key}={data.get(key, '')}" for key in keys])
+    logging.warning("RAW IPN SIG: " + rawSignature)
 
-    logging.debug(f"IPN Raw signature: {rawSignature}")
+    h = hmac.new(secret_key.encode(), rawSignature.encode(), hashlib.sha256)
+    expected = h.hexdigest()
+    received = data.get("signature")
 
-    h = hmac.new(secret_key.encode('utf-8'), rawSignature.encode('utf-8'), hashlib.sha256)
-    expected_signature = h.hexdigest()
-    received_signature = data.get("signature", "")
+    logging.warning(f"EXPECTED: {expected}")
+    logging.warning(f"RECEIVED: {received}")
 
-    logging.debug(f"Expected: {expected_signature}, Received: {received_signature}")
-
-    return expected_signature == received_signature
+    return expected == received
 
 # ---- Tạo Payment MoMo ----
 @momo_bp.route("/momo", methods=["POST"])
