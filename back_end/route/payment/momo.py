@@ -64,26 +64,26 @@ def generate_momo_signature(params, secret_key):
 
 
 def verify_momo_ipn_signature(data, secret_key):
-    """Xác thực chữ ký IPN (UTF-8)"""
-    rawSignature = (
-            "accessKey=" + data.get('accessKey', '') +
-            "&amount=" + str(data.get('amount', '')) +
-            "&extraData=" + data.get('extraData', '') +
-            "&message=" + data.get('message', '') +
-            "&orderId=" + data.get('orderId', '') +
-            "&orderInfo=" + data.get('orderInfo', '') +
-            "&orderType=" + data.get('orderType', '') +
-            "&partnerCode=" + data.get('partnerCode', '') +
-            "&payType=" + data.get('payType', '') +
-            "&requestId=" + data.get('requestId', '') +
-            "&responseTime=" + str(data.get('responseTime', '')) +
-            "&resultCode=" + str(data.get('resultCode', '')) +
-            "&transId=" + str(data.get('transId', ''))
-    )
+    keys = [
+        "accessKey",
+        "amount",
+        "extraData",
+        "message",
+        "orderId",
+        "orderInfo",
+        "orderType",
+        "partnerCode",
+        "payType",
+        "requestId",
+        "responseTime",
+        "resultCode",
+        "transId"
+    ]
+
+    rawSignature = "&".join([f"{key}={data.get(key, '')}" for key in keys])
 
     logging.debug(f"IPN Raw signature: {rawSignature}")
 
-    # Chỉ thay ascii → utf-8
     h = hmac.new(secret_key.encode('utf-8'), rawSignature.encode('utf-8'), hashlib.sha256)
     expected_signature = h.hexdigest()
     received_signature = data.get("signature", "")
