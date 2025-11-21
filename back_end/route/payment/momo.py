@@ -1,4 +1,3 @@
-import datetime
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 import hmac
@@ -6,6 +5,7 @@ import hashlib
 import json
 import requests
 import uuid
+import time
 import logging
 from ...config.db_config import get_db_connection
 
@@ -34,7 +34,6 @@ def get_current_user_id():
     except:
         return identity
 
-
 def generate_momo_signature(params, secret_key):
     """Tạo chữ ký theo đúng format MoMo (UTF-8)"""
     rawSignature = (
@@ -50,13 +49,48 @@ def generate_momo_signature(params, secret_key):
             "&requestType=" + params['requestType']
     )
 
-    logging.debug(f"RAW SIGNATURE: {rawSignature}")
+    logging.debug(f"--------------------RAW SIGNATURE----------------")
+    logging.debug(rawSignature)
+
+    # Chỉ thay ascii → utf-8
     h = hmac.new(secret_key.encode('utf-8'), rawSignature.encode('utf-8'), hashlib.sha256)
     signature = h.hexdigest()
-    logging.debug(f"SIGNATURE: {signature}")
+
+
+    logging.debug(f"--------------------SIGNATURE----------------")
+    logging.debug(signature)
 
     return signature
 
+
+def verify_momo_ipn_signature(data, secret_key):
+    """Xác thực chữ ký IPN (UTF-8)"""
+    rawSignature = (
+            "accessKey=" + data.get('accessKey', '') +
+            "&amount=" + str(data.get('amount', '')) +
+            "&extraData=" + data.get('extraData', '') +
+            "&message=" + data.get('message', '') +
+            "&orderId=" + data.get('orderId', '') +
+            "&orderInfo=" + data.get('orderInfo', '') +
+            "&orderType=" + data.get('orderType', '') +
+            "&partnerCode=" + data.get('partnerCode', '') +
+            "&payType=" + data.get('payType', '') +
+            "&requestId=" + data.get('requestId', '') +
+            "&responseTime=" + str(data.get('responseTime', '')) +
+            "&resultCode=" + str(data.get('resultCode', '')) +
+            "&transId=" + str(data.get('transId', ''))
+    )
+
+    logging.debug(f"IPN Raw signature: {rawSignature}")
+
+    # Chỉ thay ascii → utf-8
+    h = hmac.new(secret_key.encode('utf-8'), rawSignature.encode('utf-8'), hashlib.sha256)
+    expected_signature = h.hexdigest()
+    received_signature = data.get("signature", "")
+
+    logging.debug(f"Expected: {expected_signature}, Received: {received_signature}")
+
+    return expected_signature == received_signature
 
 # ---- Tạo Payment MoMo ----
 @momo_bp.route("/momo", methods=["POST"])
@@ -88,10 +122,14 @@ def momo_payment():
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
+        # Tạo orderId và requestId bằng UUID như example
         order_id = str(uuid.uuid4())
         request_id = str(uuid.uuid4())
+
+        # extraData để trống
         extra_data = ""
 
+        # Tạo params theo đúng thứ tự để tạo signature
         params = {
             'accessKey': MOMO_CONFIG["accessKey"],
             'amount': str(price),
@@ -105,8 +143,10 @@ def momo_payment():
             'requestType': "captureWallet"
         }
 
+        # Tạo chữ ký
         signature = generate_momo_signature(params, MOMO_CONFIG["secretKey"])
 
+        # Tạo JSON data gửi đến MoMo (thêm các field bổ sung)
         payload = {
             'partnerCode': MOMO_CONFIG["partnerCode"],
             'partnerName': MOMO_CONFIG["partnerName"],
@@ -123,8 +163,10 @@ def momo_payment():
             'signature': signature
         }
 
-        logging.info(f"JSON REQUEST: {json.dumps(payload, indent=2)}")
+        logging.info(f"--------------------JSON REQUEST----------------")
+        logging.info(json.dumps(payload, indent=2))
 
+        # Lưu vào database
         extra_info = json.dumps({"id_package": id_package, "id_user": id_user})
         cursor.execute("""
             INSERT INTO payment (id_user, id_package, id_order, amount, status, payment, code, created_at)
@@ -132,14 +174,24 @@ def momo_payment():
         """, (id_user, id_package, order_id, price, "Đang giao dịch", "momo", extra_info))
         conn.commit()
 
+        # Gửi request đến MoMo
+        payload_json = json.dumps(payload)
+        headers = {
+            'Content-Type': 'application/json',
+            'Content-Length': str(len(payload_json))
+        }
+
         resp = requests.post(
             MOMO_CONFIG["endpoint"],
-            data=json.dumps(payload),
-            headers={'Content-Type': 'application/json'},
+            data=payload_json,
+            headers=headers,
             timeout=10
         )
 
-        logging.info(f"MOMO RESPONSE: {resp.status_code} - {resp.text}")
+        logging.info(f"--------------------JSON RESPONSE----------------")
+        logging.info(f"Status Code: {resp.status_code}")
+        logging.info(f"Response: {resp.text}")
+
         result = resp.json()
 
         if result.get("resultCode") == 0 and result.get("payUrl"):
@@ -154,7 +206,8 @@ def momo_payment():
         return jsonify({
             "success": False,
             "message": result.get("message", "Lỗi tạo link thanh toán"),
-            "resultCode": result.get("resultCode")
+            "resultCode": result.get("resultCode"),
+            "details": result
         }), 400
 
     except Exception as e:
@@ -174,53 +227,18 @@ def momo_payment():
 def momo_ipn():
     conn = cursor = None
     try:
-        logging.warning("=" * 50)
-        logging.warning("=== IPN RECEIVED ===")
-
         data = request.get_json()
-        logging.warning(f"IPN DATA: {json.dumps(data, indent=2)}")
+        logging.info(f"=== IPN RECEIVED ===")
+        logging.info(json.dumps(data, indent=2))
 
         if not data:
-            logging.error("❌ NO DATA RECEIVED")
-            return jsonify({"resultCode": 1, "message": "No data"}), 200
+            return jsonify({"resultCode": 1, "message": "No IPN data"}), 200
 
-        # ======= 1. VERIFY SIGNATURE ======== #
-        raw = (
-            f"accessKey={data.get('accessKey', '')}"
-            f"&amount={data.get('amount', '')}"
-            f"&extraData={data.get('extraData', '')}"
-            f"&message={data.get('message', '')}"
-            f"&orderId={data.get('orderId', '')}"
-            f"&orderInfo={data.get('orderInfo', '')}"
-            f"&orderType={data.get('orderType', '')}"
-            f"&partnerCode={data.get('partnerCode', '')}"
-            f"&payType={data.get('payType', '')}"
-            f"&requestId={data.get('requestId', '')}"
-            f"&responseTime={data.get('responseTime', '')}"
-            f"&resultCode={data.get('resultCode', '')}"
-            f"&transId={data.get('transId', '')}"
-        )
+        # Verify signature
+        if not verify_momo_ipn_signature(data, MOMO_CONFIG["secretKey"]):
+            logging.error("Invalid signature in IPN")
+            return jsonify({"resultCode": 97, "message": "Invalid signature"}), 403
 
-        logging.warning(f"RAW SIGNATURE: {raw}")
-
-        h = hmac.new(
-            MOMO_CONFIG["secretKey"].encode('utf-8'),
-            raw.encode('utf-8'),
-            hashlib.sha256
-        )
-        expected_signature = h.hexdigest()
-        received_signature = data.get("signature", "")
-
-        logging.warning(f"EXPECTED: {expected_signature}")
-        logging.warning(f"RECEIVED: {received_signature}")
-
-        if expected_signature != received_signature:
-            logging.error("❌ INVALID SIGNATURE")
-            return jsonify({"resultCode": 97, "message": "Invalid signature"}), 200
-
-        logging.warning("✅ SIGNATURE VERIFIED")
-
-        # ======= 2. GET ORDER FROM DATABASE ======== #
         order_id = data.get("orderId")
         result_code = int(data.get("resultCode", -1))
         trans_id = data.get("transId")
@@ -232,23 +250,19 @@ def momo_ipn():
         tx = cursor.fetchone()
 
         if not tx:
-            logging.error(f"❌ ORDER NOT FOUND: {order_id}")
+            logging.error(f"Order not found: {order_id}")
             return jsonify({"resultCode": 2, "message": "Order not found"}), 200
-
-        logging.warning(f"✅ ORDER FOUND: {order_id}")
 
         # Kiểm tra đã xử lý chưa
         if tx["status"] not in ["Đang giao dịch"]:
-            logging.warning(f"⚠️ ALREADY PROCESSED: {tx['status']}")
+            logging.info(f"Order already processed: {order_id}")
             return jsonify({"resultCode": 0, "message": "Already processed"}), 200
 
-        # ======= 3. UPDATE PAYMENT STATUS ======== #
+        # Cập nhật trạng thái thanh toán
         if result_code == 0:
             status_text = "Giao dịch thành công"
-            logging.warning("✅ PAYMENT SUCCESS - UPDATING DATABASE")
         else:
             status_text = "Giao dịch thất bại"
-            logging.warning(f"❌ PAYMENT FAILED - Result code: {result_code}")
 
         cursor.execute("""
             UPDATE payment 
@@ -256,12 +270,18 @@ def momo_ipn():
             WHERE id_order=%s
         """, (status_text, trans_id, order_id))
 
-        # ======= 4. UPDATE USER PACKAGE (CHỈ KHI THANH TOÁN THÀNH CÔNG) ======== #
+        # Nếu thanh toán thành công → cập nhật user package
         if result_code == 0:
             id_user = tx["id_user"]
             id_package = tx["id_package"]
 
-            logging.warning(f"Updating user {id_user} with package {id_package}")
+            cursor.execute("SELECT * FROM package WHERE id_package=%s", (id_package,))
+            pkg = cursor.fetchone()
+
+            if not pkg:
+                logging.error(f"Package not found: {id_package}")
+                conn.rollback()
+                return jsonify({"resultCode": 3, "message": "Package not found"}), 200
 
             # Logic gói cước
             if id_package == 1:
@@ -286,18 +306,16 @@ def momo_ipn():
                 WHERE id_user=%s
             """, (id_package, duration, quantity, id_user))
 
-            logging.warning(f"✅ USER PACKAGE UPDATED: user={id_user}, package={id_package}, duration={duration} days")
+            logging.info(f"Updated user {id_user} with package {id_package}")
 
         conn.commit()
-        logging.warning("✅ DATABASE COMMITTED")
-        logging.warning("=" * 50)
 
         return jsonify({"resultCode": 0, "message": "Success"}), 200
 
     except Exception as e:
         if conn:
             conn.rollback()
-        logging.error(f"❌ IPN ERROR: {str(e)}", exc_info=True)
+        logging.error(f"IPN Error: {str(e)}", exc_info=True)
         return jsonify({"resultCode": 1000, "message": "System error"}), 200
 
     finally:
