@@ -13,6 +13,7 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %
 
 momo_bp = Blueprint("momo_bp", __name__)
 
+# Thông tin test chính thức của MoMo
 MOMO_CONFIG = {
     "endpoint": "https://test-payment.momo.vn/v2/gateway/api/create",
     "partnerCode": "MOMO",
@@ -34,8 +35,9 @@ def get_current_user_id():
     except:
         return identity
 
+
 def generate_momo_signature(params, secret_key):
-    """Tạo chữ ký theo đúng format MoMo (UTF-8)"""
+    """Tạo chữ ký theo đúng format MoMo"""
     rawSignature = (
             "accessKey=" + params['accessKey'] +
             "&amount=" + params['amount'] +
@@ -52,10 +54,8 @@ def generate_momo_signature(params, secret_key):
     logging.debug(f"--------------------RAW SIGNATURE----------------")
     logging.debug(rawSignature)
 
-    # Chỉ thay ascii → utf-8
-    h = hmac.new(secret_key.encode('utf-8'), rawSignature.encode('utf-8'), hashlib.sha256)
+    h = hmac.new(bytes(secret_key, 'ascii'), bytes(rawSignature, 'ascii'), hashlib.sha256)
     signature = h.hexdigest()
-
 
     logging.debug(f"--------------------SIGNATURE----------------")
     logging.debug(signature)
@@ -64,7 +64,7 @@ def generate_momo_signature(params, secret_key):
 
 
 def verify_momo_ipn_signature(data, secret_key):
-    """Xác thực chữ ký IPN (UTF-8)"""
+    """Xác thực chữ ký IPN"""
     rawSignature = (
             "accessKey=" + data.get('accessKey', '') +
             "&amount=" + str(data.get('amount', '')) +
@@ -83,14 +83,14 @@ def verify_momo_ipn_signature(data, secret_key):
 
     logging.debug(f"IPN Raw signature: {rawSignature}")
 
-    # Chỉ thay ascii → utf-8
-    h = hmac.new(secret_key.encode('utf-8'), rawSignature.encode('utf-8'), hashlib.sha256)
+    h = hmac.new(bytes(secret_key, 'ascii'), bytes(rawSignature, 'ascii'), hashlib.sha256)
     expected_signature = h.hexdigest()
     received_signature = data.get("signature", "")
 
     logging.debug(f"Expected: {expected_signature}, Received: {received_signature}")
 
     return expected_signature == received_signature
+
 
 # ---- Tạo Payment MoMo ----
 @momo_bp.route("/momo", methods=["POST"])
@@ -237,7 +237,7 @@ def momo_ipn():
         # Verify signature
         if not verify_momo_ipn_signature(data, MOMO_CONFIG["secretKey"]):
             logging.error("Invalid signature in IPN")
-            return jsonify({"resultCode": 97, "message": "Invalid signature"}), 403
+            return jsonify({"resultCode": 97, "message": "Invalid signature"}), 200
 
         order_id = data.get("orderId")
         result_code = int(data.get("resultCode", -1))
