@@ -245,30 +245,6 @@
         "documentation": {}
     },
     {
-        "label": "request",
-        "importPath": "flask",
-        "description": "flask",
-        "isExtraImport": true,
-        "detail": "flask",
-        "documentation": {}
-    },
-    {
-        "label": "jsonify",
-        "importPath": "flask",
-        "description": "flask",
-        "isExtraImport": true,
-        "detail": "flask",
-        "documentation": {}
-    },
-    {
-        "label": "Blueprint",
-        "importPath": "flask",
-        "description": "flask",
-        "isExtraImport": true,
-        "detail": "flask",
-        "documentation": {}
-    },
-    {
         "label": "jsonify",
         "importPath": "flask",
         "description": "flask",
@@ -291,14 +267,6 @@
         "importPath": "traceback",
         "description": "traceback",
         "detail": "traceback",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
         "documentation": {}
     },
     {
@@ -462,6 +430,14 @@
         "documentation": {}
     },
     {
+        "label": "cursor",
+        "importPath": "back_end.config.database",
+        "description": "back_end.config.database",
+        "isExtraImport": true,
+        "detail": "back_end.config.database",
+        "documentation": {}
+    },
+    {
         "label": "re",
         "kind": 6,
         "isExtraImport": true,
@@ -492,6 +468,14 @@
         "description": "back_end.route.admin.admin",
         "isExtraImport": true,
         "detail": "back_end.route.admin.admin",
+        "documentation": {}
+    },
+    {
+        "label": "users_ad",
+        "importPath": "back_end.route.admin.users",
+        "description": "back_end.route.admin.users",
+        "isExtraImport": true,
+        "detail": "back_end.route.admin.users",
         "documentation": {}
     },
     {
@@ -685,7 +669,7 @@
         "kind": 2,
         "importPath": "back_end.route.admin.exam",
         "description": "back_end.route.admin.exam",
-        "peekOfCode": "def get_departments():\n    db = None\n    cursor = None\n    try:\n        db = get_db_connection()\n        cursor = db.cursor(dictionary=True)\n        cursor.execute(\"SELECT id_department, name_department FROM department\")\n        data = cursor.fetchall()\n        return jsonify({\"success\": True, \"data\": data}), 200\n    except Exception:",
+        "peekOfCode": "def get_departments():\n    db = None\n    cursor = None\n    try:\n        db = get_db_connection()\n        cursor = db.cursor(dictionary=True)\n        cursor.execute(\"SELECT id_department, name_department FROM department\")\n        return jsonify({\"success\": True, \"data\": cursor.fetchall()})\n    except Exception:\n        print(\"Lỗi lấy departments:\", traceback.format_exc())",
         "detail": "back_end.route.admin.exam",
         "documentation": {}
     },
@@ -694,7 +678,7 @@
         "kind": 2,
         "importPath": "back_end.route.admin.exam",
         "description": "back_end.route.admin.exam",
-        "peekOfCode": "def get_classrooms():\n    db = None\n    cursor = None\n    try:\n        db = get_db_connection()\n        cursor = db.cursor(dictionary=True)\n        cursor.execute(\"SELECT id_class, name_class FROM classroom\")\n        data = cursor.fetchall()\n        return jsonify({\"success\": True, \"data\": data}), 200\n    except Exception:",
+        "peekOfCode": "def get_classrooms():\n    db = None\n    cursor = None\n    try:\n        db = get_db_connection()\n        cursor = db.cursor(dictionary=True)\n        cursor.execute(\"SELECT id_class, class_name FROM class\")\n        return jsonify({\"success\": True, \"data\": cursor.fetchall()})\n    except Exception:\n        print(\"Lỗi lấy classrooms:\", traceback.format_exc())",
         "detail": "back_end.route.admin.exam",
         "documentation": {}
     },
@@ -703,7 +687,7 @@
         "kind": 2,
         "importPath": "back_end.route.admin.exam",
         "description": "back_end.route.admin.exam",
-        "peekOfCode": "def get_difficulties():\n    db = None\n    cursor = None\n    try:\n        db = get_db_connection()\n        cursor = db.cursor(dictionary=True)\n        cursor.execute(\"SELECT id_diff, name_diff FROM difficult\")\n        data = cursor.fetchall()\n        return jsonify({\"success\": True, \"data\": data}), 200\n    except Exception:",
+        "peekOfCode": "def get_difficulties():\n    db = None\n    cursor = None\n    try:\n        db = get_db_connection()\n        cursor = db.cursor(dictionary=True)\n        cursor.execute(\"SELECT id_diff, difficulty FROM difficulty\")\n        return jsonify({\"success\": True, \"data\": cursor.fetchall()})\n    except Exception:\n        print(\"Lỗi lấy difficulties:\", traceback.format_exc())",
         "detail": "back_end.route.admin.exam",
         "documentation": {}
     },
@@ -712,61 +696,7 @@
         "kind": 2,
         "importPath": "back_end.route.admin.exam",
         "description": "back_end.route.admin.exam",
-        "peekOfCode": "def get_categories():\n    # Return allowed categories so FE can render dropdown\n    return jsonify({\"success\": True, \"data\": EXAM_CATEGORIES}), 200\n@exam_bp.route('/create', methods=['POST'])\ndef create_exam():\n    db = None\n    cursor = None\n    try:\n        data = request.get_json() or {}\n        id_department = data.get('id_department')",
-        "detail": "back_end.route.admin.exam",
-        "documentation": {}
-    },
-    {
-        "label": "create_exam",
-        "kind": 2,
-        "importPath": "back_end.route.admin.exam",
-        "description": "back_end.route.admin.exam",
-        "peekOfCode": "def create_exam():\n    db = None\n    cursor = None\n    try:\n        data = request.get_json() or {}\n        id_department = data.get('id_department')\n        id_class = data.get('id_class')\n        id_diff = data.get('id_diff')\n        total_question = data.get('total_question')\n        duration = data.get('duration')",
-        "detail": "back_end.route.admin.exam",
-        "documentation": {}
-    },
-    {
-        "label": "add_questions_to_exam",
-        "kind": 2,
-        "importPath": "back_end.route.admin.exam",
-        "description": "back_end.route.admin.exam",
-        "peekOfCode": "def add_questions_to_exam(id_exam):\n    db = None\n    cursor = None\n    try:\n        data = request.get_json() or {}\n        questions = data.get('questions')\n        if not questions or not isinstance(questions, list):\n            return jsonify({\"success\": False, \"message\": \"Danh sách questions phải là list\"}), 400\n        db = get_db_connection()\n        cursor = db.cursor()",
-        "detail": "back_end.route.admin.exam",
-        "documentation": {}
-    },
-    {
-        "label": "get_exam_detail",
-        "kind": 2,
-        "importPath": "back_end.route.admin.exam",
-        "description": "back_end.route.admin.exam",
-        "peekOfCode": "def get_exam_detail(id_exam):\n    db = None\n    cursor = None\n    try:\n        db = get_db_connection()\n        cursor = db.cursor(dictionary=True)\n        cursor.execute(\"SELECT * FROM exam WHERE id_exam = %s\", (id_exam,))\n        row = cursor.fetchone()\n        if not row:\n            return jsonify({\"success\": False, \"message\": \"Không tìm thấy đề\"}), 404",
-        "detail": "back_end.route.admin.exam",
-        "documentation": {}
-    },
-    {
-        "label": "list_exams",
-        "kind": 2,
-        "importPath": "back_end.route.admin.exam",
-        "description": "back_end.route.admin.exam",
-        "peekOfCode": "def list_exams():\n    # Optional filters via query params: department, class, diff, cat\n    id_department = request.args.get('id_department')\n    id_class = request.args.get('id_class')\n    id_diff = request.args.get('id_diff')\n    exam_cat = request.args.get('exam_cat')\n    db = None\n    cursor = None\n    try:\n        db = get_db_connection()",
-        "detail": "back_end.route.admin.exam",
-        "documentation": {}
-    },
-    {
-        "label": "update_exam",
-        "kind": 2,
-        "importPath": "back_end.route.admin.exam",
-        "description": "back_end.route.admin.exam",
-        "peekOfCode": "def update_exam(id_exam):\n    db = None\n    cursor = None\n    try:\n        data = request.get_json() or {}\n        # Allow update of several fields: exam_cat, start_time, end_time, total_ques, duration\n        exam_cat = data.get('exam_cat')\n        start_time = data.get('start_time')\n        end_time = data.get('end_time')\n        total_question = data.get('total_question')",
-        "detail": "back_end.route.admin.exam",
-        "documentation": {}
-    },
-    {
-        "label": "delete_exam",
-        "kind": 2,
-        "importPath": "back_end.route.admin.exam",
-        "description": "back_end.route.admin.exam",
-        "peekOfCode": "def delete_exam(id_exam):\n    db = None\n    cursor = None\n    try:\n        db = get_db_connection()\n        cursor = db.cursor()\n        # delete exam_question first to maintain FK\n        cursor.execute(\"DELETE FROM exam_question WHERE id_exam = %s\", (id_exam,))\n        cursor.execute(\"DELETE FROM exam WHERE id_exam = %s\", (id_exam,))\n        db.commit()",
+        "peekOfCode": "def get_categories():\n    try:\n        return jsonify({\"success\": True, \"data\": EXAM_CATEGORIES})\n    except Exception:\n        print(\"Lỗi lấy categories:\", traceback.format_exc())\n        return jsonify({\"success\": False, \"message\": \"Lỗi server\"}), 500\n# ------------------------ 1) Create question ------------------------\n@exam_bp.route('/question/create', methods=['POST'])\ndef create_question():\n    db = None",
         "detail": "back_end.route.admin.exam",
         "documentation": {}
     },
@@ -802,7 +732,7 @@
         "kind": 5,
         "importPath": "back_end.route.admin.exam",
         "description": "back_end.route.admin.exam",
-        "peekOfCode": "exam_bp = Blueprint('exam_bp', __name__, url_prefix='/exam')\nEXAM_CATEGORIES = [\n    {\"key\": \"draft\", \"label\": \"Bản nháp\"},\n    {\"key\": \"scheduled\", \"label\": \"Đã lên lịch\"},\n    {\"key\": \"published\", \"label\": \"Đã công bố\"},\n    {\"key\": \"closed\", \"label\": \"Đã đóng\"},\n    {\"key\": \"archived\", \"label\": \"Lưu trữ\"}\n]\nALLOWED_CATS = {c['key'] for c in EXAM_CATEGORIES}\ndef _close(cursor, db):",
+        "peekOfCode": "exam_bp = Blueprint('exam_bp', __name__)\nEXAM_CATEGORIES = [\n    {\"key\": \"draft\", \"label\": \"Luyện thi\"},\n    {\"key\": \"scheduled\", \"label\": \"Đã lên lịch\"},\n    {\"key\": \"published\", \"label\": \"Đã công bố\"},\n    {\"key\": \"closed\", \"label\": \"Đã đóng\"},\n    {\"key\": \"archived\", \"label\": \"Lưu trữ\"}\n]\nALLOWED_CATS = {c['key'] for c in EXAM_CATEGORIES}\n# ------------------------ Helper ------------------------",
         "detail": "back_end.route.admin.exam",
         "documentation": {}
     },
@@ -811,7 +741,7 @@
         "kind": 5,
         "importPath": "back_end.route.admin.exam",
         "description": "back_end.route.admin.exam",
-        "peekOfCode": "EXAM_CATEGORIES = [\n    {\"key\": \"draft\", \"label\": \"Bản nháp\"},\n    {\"key\": \"scheduled\", \"label\": \"Đã lên lịch\"},\n    {\"key\": \"published\", \"label\": \"Đã công bố\"},\n    {\"key\": \"closed\", \"label\": \"Đã đóng\"},\n    {\"key\": \"archived\", \"label\": \"Lưu trữ\"}\n]\nALLOWED_CATS = {c['key'] for c in EXAM_CATEGORIES}\ndef _close(cursor, db):\n    try:",
+        "peekOfCode": "EXAM_CATEGORIES = [\n    {\"key\": \"draft\", \"label\": \"Luyện thi\"},\n    {\"key\": \"scheduled\", \"label\": \"Đã lên lịch\"},\n    {\"key\": \"published\", \"label\": \"Đã công bố\"},\n    {\"key\": \"closed\", \"label\": \"Đã đóng\"},\n    {\"key\": \"archived\", \"label\": \"Lưu trữ\"}\n]\nALLOWED_CATS = {c['key'] for c in EXAM_CATEGORIES}\n# ------------------------ Helper ------------------------\ndef _close(cursor, db):",
         "detail": "back_end.route.admin.exam",
         "documentation": {}
     },
@@ -820,34 +750,7 @@
         "kind": 5,
         "importPath": "back_end.route.admin.exam",
         "description": "back_end.route.admin.exam",
-        "peekOfCode": "ALLOWED_CATS = {c['key'] for c in EXAM_CATEGORIES}\ndef _close(cursor, db):\n    try:\n        if cursor:\n            cursor.close()\n    except:\n        pass\n    try:\n        if db:\n            db.close()",
-        "detail": "back_end.route.admin.exam",
-        "documentation": {}
-    },
-    {
-        "label": "exam_bp",
-        "kind": 5,
-        "importPath": "back_end.route.admin.exam",
-        "description": "back_end.route.admin.exam",
-        "peekOfCode": "exam_bp = Blueprint('exam_bp', __name__, url_prefix='/exam')\nEXAM_CATEGORIES = [\n    {\"key\": \"draft\", \"label\": \"Luyện thi\"},\n    {\"key\": \"scheduled\", \"label\": \"Đã lên lịch\"},\n    {\"key\": \"published\", \"label\": \"Đã công bố\"},\n    {\"key\": \"closed\", \"label\": \"Đã đóng\"},\n    {\"key\": \"archived\", \"label\": \"Lưu trữ\"}\n]\nALLOWED_CATS = {c['key'] for c in EXAM_CATEGORIES}\ndef _close(cursor, db):",
-        "detail": "back_end.route.admin.exam",
-        "documentation": {}
-    },
-    {
-        "label": "EXAM_CATEGORIES",
-        "kind": 5,
-        "importPath": "back_end.route.admin.exam",
-        "description": "back_end.route.admin.exam",
-        "peekOfCode": "EXAM_CATEGORIES = [\n    {\"key\": \"draft\", \"label\": \"Luyện thi\"},\n    {\"key\": \"scheduled\", \"label\": \"Đã lên lịch\"},\n    {\"key\": \"published\", \"label\": \"Đã công bố\"},\n    {\"key\": \"closed\", \"label\": \"Đã đóng\"},\n    {\"key\": \"archived\", \"label\": \"Lưu trữ\"}\n]\nALLOWED_CATS = {c['key'] for c in EXAM_CATEGORIES}\ndef _close(cursor, db):\n    try:",
-        "detail": "back_end.route.admin.exam",
-        "documentation": {}
-    },
-    {
-        "label": "ALLOWED_CATS",
-        "kind": 5,
-        "importPath": "back_end.route.admin.exam",
-        "description": "back_end.route.admin.exam",
-        "peekOfCode": "ALLOWED_CATS = {c['key'] for c in EXAM_CATEGORIES}\ndef _close(cursor, db):\n    try:\n        if cursor:\n            cursor.close()\n    except:\n        pass\n    try:\n        if db:\n            db.close()",
+        "peekOfCode": "ALLOWED_CATS = {c['key'] for c in EXAM_CATEGORIES}\n# ------------------------ Helper ------------------------\ndef _close(cursor, db):\n    if cursor: cursor.close()\n    if db: db.close()\ndef _validate_datetime_str(dt_str):\n    if not dt_str: raise ValueError(\"Empty datetime string\")\n    for fmt in (\"%Y-%m-%d %H:%M:%S\",\"%Y-%m-%d %H:%M\"):\n        try: return datetime.strptime(dt_str, fmt)\n        except: continue",
         "detail": "back_end.route.admin.exam",
         "documentation": {}
     },
@@ -870,48 +773,21 @@
         "documentation": {}
     },
     {
-        "label": "is_admin",
+        "label": "getAllUser",
         "kind": 2,
-        "importPath": "back_end.route.admin.manage_users",
-        "description": "back_end.route.admin.manage_users",
-        "peekOfCode": "def is_admin():\n    claims = get_jwt()\n    return int(claims.get(\"level\", 1)) >= 2\n@manage_users_bp.route('/all', methods=['GET'])\n@jwt_required()\ndef list_users():\n    if not is_admin():\n        return jsonify({\"msg\": \"Không có quyền\"}), 403\n    try:\n        conn = get_db_connection()",
-        "detail": "back_end.route.admin.manage_users",
+        "importPath": "back_end.route.admin.users",
+        "description": "back_end.route.admin.users",
+        "peekOfCode": "def getAllUser():\n    db = None\n    cursor = None\n    try:\n        db = get_db_connection()\n        cursor = db.cursor(dictionary=True)\n        cursor.execute(\"SELECT * FROM users\")\n        users = cursor.fetchall()\n        if not users:\n            return jsonify({'msg':'Lỗi lấy thông tin người dùng!'}), 400",
+        "detail": "back_end.route.admin.users",
         "documentation": {}
     },
     {
-        "label": "list_users",
-        "kind": 2,
-        "importPath": "back_end.route.admin.manage_users",
-        "description": "back_end.route.admin.manage_users",
-        "peekOfCode": "def list_users():\n    if not is_admin():\n        return jsonify({\"msg\": \"Không có quyền\"}), 403\n    try:\n        conn = get_db_connection()\n        cursor = conn.cursor(dictionary=True)\n        cursor.execute(\n            \"SELECT id_user, fullName, username, email, role, status, gender, level FROM users WHERE level=1 ORDER BY id_user DESC\")\n        users = cursor.fetchall()\n        return jsonify({\"data\": users}), 200",
-        "detail": "back_end.route.admin.manage_users",
-        "documentation": {}
-    },
-    {
-        "label": "update_user",
-        "kind": 2,
-        "importPath": "back_end.route.admin.manage_users",
-        "description": "back_end.route.admin.manage_users",
-        "peekOfCode": "def update_user(user_id):\n    if not is_admin():\n        return jsonify({\"msg\": \"Không có quyền\"}), 403\n    data = request.get_json() or {}\n    fields, values = [], []\n    if data.get(\"fullName\"):\n        fields.append(\"fullName=%s\")\n        values.append(data[\"fullName\"])\n    if data.get(\"email\"):\n        fields.append(\"email=%s\")",
-        "detail": "back_end.route.admin.manage_users",
-        "documentation": {}
-    },
-    {
-        "label": "delete_user",
-        "kind": 2,
-        "importPath": "back_end.route.admin.manage_users",
-        "description": "back_end.route.admin.manage_users",
-        "peekOfCode": "def delete_user(user_id):\n    if not is_admin():\n        return jsonify({\"msg\": \"Không có quyền\"}), 403\n    try:\n        conn = get_db_connection()\n        cursor = conn.cursor()\n        cursor.execute(\"DELETE FROM users WHERE id_user=%s AND level=1\", (user_id,))\n        conn.commit()\n        if cursor.rowcount == 0:\n            return jsonify({\"msg\": \"Không tìm thấy user hoặc không thể xóa\"}), 404",
-        "detail": "back_end.route.admin.manage_users",
-        "documentation": {}
-    },
-    {
-        "label": "manage_users_bp",
+        "label": "users_ad",
         "kind": 5,
-        "importPath": "back_end.route.admin.manage_users",
-        "description": "back_end.route.admin.manage_users",
-        "peekOfCode": "manage_users_bp = Blueprint('manage_users_bp', __name__)\ndef is_admin():\n    claims = get_jwt()\n    return int(claims.get(\"level\", 1)) >= 2\n@manage_users_bp.route('/all', methods=['GET'])\n@jwt_required()\ndef list_users():\n    if not is_admin():\n        return jsonify({\"msg\": \"Không có quyền\"}), 403\n    try:",
-        "detail": "back_end.route.admin.manage_users",
+        "importPath": "back_end.route.admin.users",
+        "description": "back_end.route.admin.users",
+        "peekOfCode": "users_ad = Blueprint('users_ad', __name__)\n@users_ad.route(\"/users\", methods=['GET'])\ndef getAllUser():\n    db = None\n    cursor = None\n    try:\n        db = get_db_connection()\n        cursor = db.cursor(dictionary=True)\n        cursor.execute(\"SELECT * FROM users\")\n        users = cursor.fetchall()",
+        "detail": "back_end.route.admin.users",
         "documentation": {}
     },
     {
@@ -1117,7 +993,7 @@
         "kind": 5,
         "importPath": "back_end.app",
         "description": "back_end.app",
-        "peekOfCode": "app.config[\"JWT_SECRET_KEY\"] = os.environ.get(\"JWT_SECRET_KEY\", \"online_testing@123\")\njwt = JWTManager(app)\napp.register_blueprint(users_bp, url_prefix='/api/users')\napp.register_blueprint(exam_bp, url_prefix='/api/exam')\napp.register_blueprint(package_bp, url_prefix='/api')\napp.register_blueprint(login_bp, url_prefix='/api/admin')\napp.register_blueprint(admin_bp, url_prefix='/api/admin')\nif __name__ == '__main__':\n    port = int(os.environ.get('PORT', 5000))\n    app.run(host='0.0.0.0', port=port, debug=False)",
+        "peekOfCode": "app.config[\"JWT_SECRET_KEY\"] = os.environ.get(\"JWT_SECRET_KEY\", \"online_testing@123\")\njwt = JWTManager(app)\napp.register_blueprint(users_bp, url_prefix='/api/users')\napp.register_blueprint(exam_bp, url_prefix='/api/exam')\napp.register_blueprint(package_bp, url_prefix='/api')\napp.register_blueprint(login_bp, url_prefix='/api/admin')\napp.register_blueprint(admin_bp, url_prefix='/api/admin')\napp.register_blueprint(users_ad, url_prefix='/api')\nif __name__ == '__main__':\n    port = int(os.environ.get('PORT', 5000))",
         "detail": "back_end.app",
         "documentation": {}
     },
@@ -1126,7 +1002,7 @@
         "kind": 5,
         "importPath": "back_end.app",
         "description": "back_end.app",
-        "peekOfCode": "jwt = JWTManager(app)\napp.register_blueprint(users_bp, url_prefix='/api/users')\napp.register_blueprint(exam_bp, url_prefix='/api/exam')\napp.register_blueprint(package_bp, url_prefix='/api')\napp.register_blueprint(login_bp, url_prefix='/api/admin')\napp.register_blueprint(admin_bp, url_prefix='/api/admin')\nif __name__ == '__main__':\n    port = int(os.environ.get('PORT', 5000))\n    app.run(host='0.0.0.0', port=port, debug=False)",
+        "peekOfCode": "jwt = JWTManager(app)\napp.register_blueprint(users_bp, url_prefix='/api/users')\napp.register_blueprint(exam_bp, url_prefix='/api/exam')\napp.register_blueprint(package_bp, url_prefix='/api')\napp.register_blueprint(login_bp, url_prefix='/api/admin')\napp.register_blueprint(admin_bp, url_prefix='/api/admin')\napp.register_blueprint(users_ad, url_prefix='/api')\nif __name__ == '__main__':\n    port = int(os.environ.get('PORT', 5000))\n    app.run(host='0.0.0.0', port=port, debug=False)",
         "detail": "back_end.app",
         "documentation": {}
     }

@@ -6,6 +6,7 @@ import os
 # admin
 from back_end.route.admin.login import login_bp
 from back_end.route.admin.admin import admin_bp
+from back_end.route.admin.users import users_ad
 
 # users
 from back_end.route.users.auth import users_bp
@@ -35,6 +36,7 @@ app.register_blueprint(package_bp, url_prefix='/api')
 
 app.register_blueprint(login_bp, url_prefix='/api/admin')
 app.register_blueprint(admin_bp, url_prefix='/api/admin')
+app.register_blueprint(users_ad, url_prefix='/api')
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
