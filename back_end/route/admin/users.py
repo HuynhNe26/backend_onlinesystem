@@ -12,7 +12,7 @@ def getAllUser():
         db = get_db_connection()
         cursor = db.cursor(dictionary=True)
         
-        cursor.execute("SELECT * FROM users")
+        cursor.execute("SELECT * FROM users WHERE level = 1")
         
         users = cursor.fetchall()
         

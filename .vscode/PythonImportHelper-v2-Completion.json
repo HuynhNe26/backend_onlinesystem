@@ -310,6 +310,22 @@
         "documentation": {}
     },
     {
+        "label": "jwt_required",
+        "importPath": "flask_jwt_extended",
+        "description": "flask_jwt_extended",
+        "isExtraImport": true,
+        "detail": "flask_jwt_extended",
+        "documentation": {}
+    },
+    {
+        "label": "get_jwt_identity",
+        "importPath": "flask_jwt_extended",
+        "description": "flask_jwt_extended",
+        "isExtraImport": true,
+        "detail": "flask_jwt_extended",
+        "documentation": {}
+    },
+    {
         "label": "create_access_token",
         "importPath": "flask_jwt_extended",
         "description": "flask_jwt_extended",
@@ -387,6 +403,14 @@
         "description": "flask_jwt_extended",
         "isExtraImport": true,
         "detail": "flask_jwt_extended",
+        "documentation": {}
+    },
+    {
+        "label": "cursor",
+        "importPath": "back_end.config.database",
+        "description": "back_end.config.database",
+        "isExtraImport": true,
+        "detail": "back_end.config.database",
         "documentation": {}
     },
     {
@@ -732,6 +756,15 @@
         "documentation": {}
     },
     {
+        "label": "logout_admin",
+        "kind": 2,
+        "importPath": "back_end.route.admin.login",
+        "description": "back_end.route.admin.login",
+        "peekOfCode": "def logout_admin():\n    try:\n        user_id = get_jwt_identity()\n        db = get_db_connection()\n        cursor = db.cursor(dictionary=True)\n        cursor.execute(\"UPDATE users SET logout_time = NOW() WHERE id_user=%s\", (user_id,))\n        return jsonify({\n            \"msg\": \"Đăng xuất thành công!\",\n            \"user_id\": user_id\n        }), 200",
+        "detail": "back_end.route.admin.login",
+        "documentation": {}
+    },
+    {
         "label": "login_bp",
         "kind": 5,
         "importPath": "back_end.route.admin.login",
@@ -745,7 +778,7 @@
         "kind": 2,
         "importPath": "back_end.route.admin.users",
         "description": "back_end.route.admin.users",
-        "peekOfCode": "def getAllUser():\n    db = None\n    cursor = None\n    try:\n        db = get_db_connection()\n        cursor = db.cursor(dictionary=True)\n        cursor.execute(\"SELECT * FROM users\")\n        users = cursor.fetchall()\n        if not users:\n            return jsonify({'msg':'Lỗi lấy thông tin người dùng!'}), 400",
+        "peekOfCode": "def getAllUser():\n    db = None\n    cursor = None\n    try:\n        db = get_db_connection()\n        cursor = db.cursor(dictionary=True)\n        cursor.execute(\"SELECT * FROM users WHERE level = 1\")\n        users = cursor.fetchall()\n        if not users:\n            return jsonify({'msg':'Lỗi lấy thông tin người dùng!'}), 400",
         "detail": "back_end.route.admin.users",
         "documentation": {}
     },
@@ -754,7 +787,7 @@
         "kind": 5,
         "importPath": "back_end.route.admin.users",
         "description": "back_end.route.admin.users",
-        "peekOfCode": "users_ad = Blueprint('users_ad', __name__)\n@users_ad.route(\"/users\", methods=['GET'])\ndef getAllUser():\n    db = None\n    cursor = None\n    try:\n        db = get_db_connection()\n        cursor = db.cursor(dictionary=True)\n        cursor.execute(\"SELECT * FROM users\")\n        users = cursor.fetchall()",
+        "peekOfCode": "users_ad = Blueprint('users_ad', __name__)\n@users_ad.route(\"/users\", methods=['GET'])\ndef getAllUser():\n    db = None\n    cursor = None\n    try:\n        db = get_db_connection()\n        cursor = db.cursor(dictionary=True)\n        cursor.execute(\"SELECT * FROM users WHERE level = 1\")\n        users = cursor.fetchall()",
         "detail": "back_end.route.admin.users",
         "documentation": {}
     },

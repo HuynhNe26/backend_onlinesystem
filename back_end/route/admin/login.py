@@ -1,6 +1,8 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from datetime import timedelta
+from back_end.config.database import cursor
 from ...config.db_config import get_db_connection
 
 login_bp = Blueprint('login', __name__)
@@ -64,6 +66,32 @@ def login_admin():
 
     except Exception as e:
         print("Login error:", e)
+        return jsonify({"msg": "Lỗi server"}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if db:
+            db.close()
+            
+@login_bp.route('/logout', methods=['POST'])
+@jwt_required()
+def logout_admin():
+    try:
+        user_id = get_jwt_identity()
+        
+        db = get_db_connection()
+        cursor = db.cursor(dictionary=True)
+        
+        cursor.execute("UPDATE users SET logout_time = NOW() WHERE id_user=%s", (user_id,))
+
+        return jsonify({
+            "msg": "Đăng xuất thành công!",
+            "user_id": user_id
+        }), 200
+
+    except Exception as e:
+        print("Logout error:", e)
         return jsonify({"msg": "Lỗi server"}), 500
 
     finally:
