@@ -38,7 +38,6 @@ def getAdminDetail(id):
         db = get_db_connection()
         cursor = db.cursor(dictionary=True)
 
-        # THAM SỐ PHẢI LÀ TUPLE (id,)
         cursor.execute("SELECT * FROM users WHERE id_user = %s", (id,))
         admin = cursor.fetchone()
 
@@ -57,6 +56,12 @@ def getAdminDetail(id):
         if db:
             db.close()
 
+from flask import Blueprint, request, jsonify
+from ...config.db_config import get_db_connection
+import traceback
+
+admin_bp = Blueprint("admin_bp", __name__)
+
 @admin_bp.route('/create', methods=['POST'])
 def create_admin():
     db = None
@@ -65,14 +70,19 @@ def create_admin():
         data = request.get_json()
 
         email = data.get("email")
-        fullName = data.get("fullName")
-        dateOfBirth = data.get("dateOfBirth")
+        full_name = data.get("fullName")          
+        date_of_birth = data.get("dateOfBirth")
         password = data.get("password")
-        level = int(data.get("level"))
         gender = data.get("gender")
+        level_raw = data.get("level")
 
-        if not all([email, fullName, dateOfBirth, password, level, gender]):
+        if not all([email, full_name, date_of_birth, password, gender, level_raw]):
             return jsonify({"success": False, "message": "Thiếu dữ liệu bắt buộc"}), 400
+
+        try:
+            level = int(level_raw)
+        except:
+            return jsonify({"success": False, "message": "Level không hợp lệ"}), 400
 
         db = get_db_connection()
         cursor = db.cursor(dictionary=True)
@@ -84,19 +94,21 @@ def create_admin():
 
         role = "Quản trị viên" if level == 2 else "Quản trị viên cấp cao"
 
+        status = "Tài khoản mới"
+        
         query = """
-            INSERT INTO users (email, fullName, dateOfBirth, password, level, gender, status, role, created_at)
+            INSERT INTO users 
+            (email, fullName, dateOfBirth, password, level, gender, status, role, create_at)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW())
         """
-
         cursor.execute(query, (
             email,
-            fullName,
-            dateOfBirth,
-            password,     
+            full_name,
+            date_of_birth,
+            password,
             level,
             gender,
-            "Tài khoản mới",
+            status,
             role
         ))
 
@@ -105,7 +117,7 @@ def create_admin():
         return jsonify({"success": True, "message": "Tạo quản trị viên thành công"}), 201
 
     except Exception as e:
-        print("Lỗi tạo quản trị viên:", e)
+        print("Lỗi tạo quản trị viên:", traceback.format_exc())
         return jsonify({"success": False, "message": "Lỗi server"}), 500
 
     finally:
@@ -113,4 +125,5 @@ def create_admin():
             cursor.close()
         if db:
             db.close()
+
 

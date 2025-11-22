@@ -237,6 +237,30 @@
         "documentation": {}
     },
     {
+        "label": "request",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "jsonify",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "Blueprint",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
         "label": "jsonify",
         "importPath": "flask",
         "description": "flask",
@@ -259,6 +283,15 @@
         "importPath": "requests",
         "description": "requests",
         "detail": "requests",
+        "documentation": {}
+    },
+    {
+        "label": "traceback",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "traceback",
+        "description": "traceback",
+        "detail": "traceback",
         "documentation": {}
     },
     {
@@ -610,7 +643,7 @@
         "kind": 2,
         "importPath": "back_end.route.admin.admin",
         "description": "back_end.route.admin.admin",
-        "peekOfCode": "def getAdminDetail(id):\n    db = None\n    cursor = None\n    try:\n        db = get_db_connection()\n        cursor = db.cursor(dictionary=True)\n        # THAM SỐ PHẢI LÀ TUPLE (id,)\n        cursor.execute(\"SELECT * FROM users WHERE id_user = %s\", (id,))\n        admin = cursor.fetchone()\n        if not admin:",
+        "peekOfCode": "def getAdminDetail(id):\n    db = None\n    cursor = None\n    try:\n        db = get_db_connection()\n        cursor = db.cursor(dictionary=True)\n        cursor.execute(\"SELECT * FROM users WHERE id_user = %s\", (id,))\n        admin = cursor.fetchone()\n        if not admin:\n            return jsonify({\"msg\": \"Không tìm thấy quản trị viên\"}), 404",
         "detail": "back_end.route.admin.admin",
         "documentation": {}
     },
@@ -619,7 +652,7 @@
         "kind": 2,
         "importPath": "back_end.route.admin.admin",
         "description": "back_end.route.admin.admin",
-        "peekOfCode": "def create_admin():\n    db = None\n    cursor = None\n    try:\n        data = request.get_json()\n        email = data.get(\"email\")\n        fullName = data.get(\"fullName\")\n        dateOfBirth = data.get(\"dateOfBirth\")\n        password = data.get(\"password\")\n        level = int(data.get(\"level\"))",
+        "peekOfCode": "def create_admin():\n    db = None\n    cursor = None\n    try:\n        data = request.get_json()\n        email = data.get(\"email\")\n        full_name = data.get(\"fullName\")          \n        date_of_birth = data.get(\"dateOfBirth\")\n        password = data.get(\"password\")\n        gender = data.get(\"gender\")",
         "detail": "back_end.route.admin.admin",
         "documentation": {}
     },
@@ -629,6 +662,15 @@
         "importPath": "back_end.route.admin.admin",
         "description": "back_end.route.admin.admin",
         "peekOfCode": "admin_bp = Blueprint('admin_bp', __name__)\n@admin_bp.route('/admin', methods=['GET'])\ndef getAdllAdmin():\n    db = None\n    cursor = None\n    try:\n        db = get_db_connection()\n        cursor = db.cursor(dictionary=True)\n        cursor.execute('SELECT * FROM users WHERE level >= 2')\n        admins = cursor.fetchall()",
+        "detail": "back_end.route.admin.admin",
+        "documentation": {}
+    },
+    {
+        "label": "admin_bp",
+        "kind": 5,
+        "importPath": "back_end.route.admin.admin",
+        "description": "back_end.route.admin.admin",
+        "peekOfCode": "admin_bp = Blueprint(\"admin_bp\", __name__)\n@admin_bp.route('/create', methods=['POST'])\ndef create_admin():\n    db = None\n    cursor = None\n    try:\n        data = request.get_json()\n        email = data.get(\"email\")\n        full_name = data.get(\"fullName\")          \n        date_of_birth = data.get(\"dateOfBirth\")",
         "detail": "back_end.route.admin.admin",
         "documentation": {}
     },
