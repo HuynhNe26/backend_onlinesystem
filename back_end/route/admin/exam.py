@@ -50,7 +50,7 @@ def get_classrooms():
     try:
         db = get_db_connection()
         cursor = db.cursor(dictionary=True)
-        cursor.execute("SELECT id_class, name_class FROM class")
+        cursor.execute("SELECT id_class, class_name FROM class")
         return jsonify({"success": True, "data": cursor.fetchall()})
     except Exception:
         print("Lỗi lấy classrooms:", traceback.format_exc())
@@ -65,7 +65,7 @@ def get_difficulties():
     try:
         db = get_db_connection()
         cursor = db.cursor(dictionary=True)
-        cursor.execute("SELECT id_diff, name_diff FROM difficulty")
+        cursor.execute("SELECT id_diff, difficulty FROM difficulty")
         return jsonify({"success": True, "data": cursor.fetchall()})
     except Exception:
         print("Lỗi lấy difficulties:", traceback.format_exc())
