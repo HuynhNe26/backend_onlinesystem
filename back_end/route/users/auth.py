@@ -110,35 +110,3 @@ def login():
     finally:
         cursor.close()
         conn.close()
-
-@users_bp.route('/update_package', methods=['POST'])
-@jwt_required()
-def update_package():
-    user_id = get_current_user_id()
-    data = request.get_json()
-    id_package = data.get('id_package')  # đúng tên field
-
-    if not id_package:
-        return jsonify({"success": False, "message": "Thiếu id_package."}), 400
-
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    try:
-        cursor.execute(
-            """
-            UPDATE users
-            SET id_package = %s
-            WHERE id_user = %s
-            """,
-            (id_package, user_id)
-        )
-        conn.commit()
-
-        return jsonify({"success": True, "message": "Cập nhật gói dịch vụ thành công!"})
-
-    except Exception as e:
-        return jsonify({"success": False, "message": str(e)}), 500
-
-    finally:
-        cursor.close()
-        conn.close()

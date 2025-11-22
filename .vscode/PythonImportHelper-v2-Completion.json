@@ -390,14 +390,6 @@
         "documentation": {}
     },
     {
-        "label": "cursor",
-        "importPath": "back_end.config.database",
-        "description": "back_end.config.database",
-        "isExtraImport": true,
-        "detail": "back_end.config.database",
-        "documentation": {}
-    },
-    {
         "label": "generate_password_hash",
         "importPath": "werkzeug.security",
         "description": "werkzeug.security",
@@ -790,15 +782,6 @@
         "importPath": "back_end.route.users.auth",
         "description": "back_end.route.users.auth",
         "peekOfCode": "def login():\n    data = request.get_json()\n    if not data or \"email\" not in data or \"password\" not in data:\n        return jsonify({\"success\": False, \"message\": \"Thiếu email hoặc mật khẩu.\"}), 400\n    email = data[\"email\"].strip().lower()\n    password = data[\"password\"]\n    conn = get_db_connection()\n    cursor = conn.cursor(dictionary=True)\n    try:\n        cursor.execute(\"SELECT * FROM users WHERE email = %s\", (email,))",
-        "detail": "back_end.route.users.auth",
-        "documentation": {}
-    },
-    {
-        "label": "update_package",
-        "kind": 2,
-        "importPath": "back_end.route.users.auth",
-        "description": "back_end.route.users.auth",
-        "peekOfCode": "def update_package():\n    user_id = get_current_user_id()\n    data = request.get_json()\n    id_package = data.get('id_package')  # đúng tên field\n    if not id_package:\n        return jsonify({\"success\": False, \"message\": \"Thiếu id_package.\"}), 400\n    conn = get_db_connection()\n    cursor = conn.cursor()\n    try:\n        cursor.execute(",
         "detail": "back_end.route.users.auth",
         "documentation": {}
     },
