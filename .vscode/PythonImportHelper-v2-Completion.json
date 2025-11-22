@@ -406,14 +406,6 @@
         "documentation": {}
     },
     {
-        "label": "cursor",
-        "importPath": "back_end.config.database",
-        "description": "back_end.config.database",
-        "isExtraImport": true,
-        "detail": "back_end.config.database",
-        "documentation": {}
-    },
-    {
         "label": "generate_password_hash",
         "importPath": "werkzeug.security",
         "description": "werkzeug.security",

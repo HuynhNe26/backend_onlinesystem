@@ -2,7 +2,6 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from datetime import timedelta
-from back_end.config.database import cursor
 from ...config.db_config import get_db_connection
 
 login_bp = Blueprint('login', __name__)
