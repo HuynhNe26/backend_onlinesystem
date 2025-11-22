@@ -681,15 +681,6 @@
         "documentation": {}
     },
     {
-        "label": "admin_bp",
-        "kind": 5,
-        "importPath": "back_end.route.admin.admin",
-        "description": "back_end.route.admin.admin",
-        "peekOfCode": "admin_bp = Blueprint(\"admin_bp\", __name__)\n@admin_bp.route('/create', methods=['POST'])\ndef create_admin():\n    db = None\n    cursor = None\n    try:\n        data = request.get_json()\n        email = data.get(\"email\")\n        full_name = data.get(\"fullName\")          \n        date_of_birth = data.get(\"dateOfBirth\")",
-        "detail": "back_end.route.admin.admin",
-        "documentation": {}
-    },
-    {
         "label": "get_departments",
         "kind": 2,
         "importPath": "back_end.route.admin.exam",

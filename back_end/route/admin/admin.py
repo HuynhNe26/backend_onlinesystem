@@ -57,8 +57,6 @@ def getAdminDetail(id):
         if db:
             db.close()
 
-admin_bp = Blueprint("admin_bp", __name__)
-
 @admin_bp.route('/create', methods=['POST'])
 def create_admin():
     db = None
