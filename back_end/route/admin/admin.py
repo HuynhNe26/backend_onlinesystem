@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify
 from ...config.db_config import get_db_connection
-import requests
+import request
+import traceback
 
 admin_bp = Blueprint('admin_bp', __name__)
 
@@ -55,10 +56,6 @@ def getAdminDetail(id):
             cursor.close()
         if db:
             db.close()
-
-from flask import Blueprint, request, jsonify
-from ...config.db_config import get_db_connection
-import traceback
 
 admin_bp = Blueprint("admin_bp", __name__)
 
