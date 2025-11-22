@@ -1,0 +1,950 @@
+[
+    {
+        "label": "runpy",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "runpy",
+        "description": "runpy",
+        "detail": "runpy",
+        "documentation": {}
+    },
+    {
+        "label": "annotations",
+        "importPath": "__future__",
+        "description": "__future__",
+        "isExtraImport": true,
+        "detail": "__future__",
+        "documentation": {}
+    },
+    {
+        "label": "os",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "os",
+        "description": "os",
+        "detail": "os",
+        "documentation": {}
+    },
+    {
+        "label": "site",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "site",
+        "description": "site",
+        "detail": "site",
+        "documentation": {}
+    },
+    {
+        "label": "sys",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "sys",
+        "description": "sys",
+        "detail": "sys",
+        "documentation": {}
+    },
+    {
+        "label": "mysql.connector",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "mysql.connector",
+        "description": "mysql.connector",
+        "detail": "mysql.connector",
+        "documentation": {}
+    },
+    {
+        "label": "Error",
+        "importPath": "mysql.connector",
+        "description": "mysql.connector",
+        "isExtraImport": true,
+        "detail": "mysql.connector",
+        "documentation": {}
+    },
+    {
+        "label": "load_dotenv",
+        "importPath": "dotenv",
+        "description": "dotenv",
+        "isExtraImport": true,
+        "detail": "dotenv",
+        "documentation": {}
+    },
+    {
+        "label": "Blueprint",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "jsonify",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "Blueprint",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "request",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "jsonify",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "Blueprint",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "request",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "jsonify",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "Blueprint",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "request",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "jsonify",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "Blueprint",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "request",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "jsonify",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "Blueprint",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "request",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "jsonify",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "Blueprint",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "request",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "jsonify",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "Blueprint",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "jsonify",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "Flask",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "create_access_token",
+        "importPath": "flask_jwt_extended",
+        "description": "flask_jwt_extended",
+        "isExtraImport": true,
+        "detail": "flask_jwt_extended",
+        "documentation": {}
+    },
+    {
+        "label": "jwt_required",
+        "importPath": "flask_jwt_extended",
+        "description": "flask_jwt_extended",
+        "isExtraImport": true,
+        "detail": "flask_jwt_extended",
+        "documentation": {}
+    },
+    {
+        "label": "get_jwt",
+        "importPath": "flask_jwt_extended",
+        "description": "flask_jwt_extended",
+        "isExtraImport": true,
+        "detail": "flask_jwt_extended",
+        "documentation": {}
+    },
+    {
+        "label": "create_access_token",
+        "importPath": "flask_jwt_extended",
+        "description": "flask_jwt_extended",
+        "isExtraImport": true,
+        "detail": "flask_jwt_extended",
+        "documentation": {}
+    },
+    {
+        "label": "get_jwt_identity",
+        "importPath": "flask_jwt_extended",
+        "description": "flask_jwt_extended",
+        "isExtraImport": true,
+        "detail": "flask_jwt_extended",
+        "documentation": {}
+    },
+    {
+        "label": "jwt_required",
+        "importPath": "flask_jwt_extended",
+        "description": "flask_jwt_extended",
+        "isExtraImport": true,
+        "detail": "flask_jwt_extended",
+        "documentation": {}
+    },
+    {
+        "label": "jwt_required",
+        "importPath": "flask_jwt_extended",
+        "description": "flask_jwt_extended",
+        "isExtraImport": true,
+        "detail": "flask_jwt_extended",
+        "documentation": {}
+    },
+    {
+        "label": "get_jwt_identity",
+        "importPath": "flask_jwt_extended",
+        "description": "flask_jwt_extended",
+        "isExtraImport": true,
+        "detail": "flask_jwt_extended",
+        "documentation": {}
+    },
+    {
+        "label": "jwt_required",
+        "importPath": "flask_jwt_extended",
+        "description": "flask_jwt_extended",
+        "isExtraImport": true,
+        "detail": "flask_jwt_extended",
+        "documentation": {}
+    },
+    {
+        "label": "get_jwt_identity",
+        "importPath": "flask_jwt_extended",
+        "description": "flask_jwt_extended",
+        "isExtraImport": true,
+        "detail": "flask_jwt_extended",
+        "documentation": {}
+    },
+    {
+        "label": "jwt_required",
+        "importPath": "flask_jwt_extended",
+        "description": "flask_jwt_extended",
+        "isExtraImport": true,
+        "detail": "flask_jwt_extended",
+        "documentation": {}
+    },
+    {
+        "label": "get_jwt_identity",
+        "importPath": "flask_jwt_extended",
+        "description": "flask_jwt_extended",
+        "isExtraImport": true,
+        "detail": "flask_jwt_extended",
+        "documentation": {}
+    },
+    {
+        "label": "JWTManager",
+        "importPath": "flask_jwt_extended",
+        "description": "flask_jwt_extended",
+        "isExtraImport": true,
+        "detail": "flask_jwt_extended",
+        "documentation": {}
+    },
+    {
+        "label": "timedelta",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "generate_password_hash",
+        "importPath": "werkzeug.security",
+        "description": "werkzeug.security",
+        "isExtraImport": true,
+        "detail": "werkzeug.security",
+        "documentation": {}
+    },
+    {
+        "label": "generate_password_hash",
+        "importPath": "werkzeug.security",
+        "description": "werkzeug.security",
+        "isExtraImport": true,
+        "detail": "werkzeug.security",
+        "documentation": {}
+    },
+    {
+        "label": "check_password_hash",
+        "importPath": "werkzeug.security",
+        "description": "werkzeug.security",
+        "isExtraImport": true,
+        "detail": "werkzeug.security",
+        "documentation": {}
+    },
+    {
+        "label": "re",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "re",
+        "description": "re",
+        "detail": "re",
+        "documentation": {}
+    },
+    {
+        "label": "CORS",
+        "importPath": "flask_cors",
+        "description": "flask_cors",
+        "isExtraImport": true,
+        "detail": "flask_cors",
+        "documentation": {}
+    },
+    {
+        "label": "login_bp",
+        "importPath": "back_end.route.admin.login",
+        "description": "back_end.route.admin.login",
+        "isExtraImport": true,
+        "detail": "back_end.route.admin.login",
+        "documentation": {}
+    },
+    {
+        "label": "admin_bp",
+        "importPath": "back_end.route.admin.admin",
+        "description": "back_end.route.admin.admin",
+        "isExtraImport": true,
+        "detail": "back_end.route.admin.admin",
+        "documentation": {}
+    },
+    {
+        "label": "users_bp",
+        "importPath": "back_end.route.users.auth",
+        "description": "back_end.route.users.auth",
+        "isExtraImport": true,
+        "detail": "back_end.route.users.auth",
+        "documentation": {}
+    },
+    {
+        "label": "exam_bp",
+        "importPath": "back_end.route.users.exam",
+        "description": "back_end.route.users.exam",
+        "isExtraImport": true,
+        "detail": "back_end.route.users.exam",
+        "documentation": {}
+    },
+    {
+        "label": "package_bp",
+        "importPath": "back_end.route.users.package",
+        "description": "back_end.route.users.package",
+        "isExtraImport": true,
+        "detail": "back_end.route.users.package",
+        "documentation": {}
+    },
+    {
+        "label": "bin_dir",
+        "kind": 5,
+        "importPath": ".venv.Scripts.activate_this",
+        "description": ".venv.Scripts.activate_this",
+        "peekOfCode": "bin_dir = os.path.dirname(abs_file)\nbase = bin_dir[: -len('Scripts') - 1]  # strip away the bin part from the __file__, plus the path separator\n# prepend bin to PATH (this file is inside the bin directory)\nos.environ[\"PATH\"] = os.pathsep.join([bin_dir, *os.environ.get(\"PATH\", \"\").split(os.pathsep)])\nos.environ[\"VIRTUAL_ENV\"] = base  # virtual env is right above bin directory\nos.environ[\"VIRTUAL_ENV_PROMPT\"] = '' or os.path.basename(base)\n# add the virtual environments libraries to the host python import mechanism\nprev_length = len(sys.path)\nfor lib in '..\\\\Lib\\\\site-packages'.split(os.pathsep):\n    path = os.path.realpath(os.path.join(bin_dir, lib))",
+        "detail": ".venv.Scripts.activate_this",
+        "documentation": {}
+    },
+    {
+        "label": "base",
+        "kind": 5,
+        "importPath": ".venv.Scripts.activate_this",
+        "description": ".venv.Scripts.activate_this",
+        "peekOfCode": "base = bin_dir[: -len('Scripts') - 1]  # strip away the bin part from the __file__, plus the path separator\n# prepend bin to PATH (this file is inside the bin directory)\nos.environ[\"PATH\"] = os.pathsep.join([bin_dir, *os.environ.get(\"PATH\", \"\").split(os.pathsep)])\nos.environ[\"VIRTUAL_ENV\"] = base  # virtual env is right above bin directory\nos.environ[\"VIRTUAL_ENV_PROMPT\"] = '' or os.path.basename(base)\n# add the virtual environments libraries to the host python import mechanism\nprev_length = len(sys.path)\nfor lib in '..\\\\Lib\\\\site-packages'.split(os.pathsep):\n    path = os.path.realpath(os.path.join(bin_dir, lib))\n    site.addsitedir(path.decode(\"utf-8\") if '' else path)",
+        "detail": ".venv.Scripts.activate_this",
+        "documentation": {}
+    },
+    {
+        "label": "os.environ[\"PATH\"]",
+        "kind": 5,
+        "importPath": ".venv.Scripts.activate_this",
+        "description": ".venv.Scripts.activate_this",
+        "peekOfCode": "os.environ[\"PATH\"] = os.pathsep.join([bin_dir, *os.environ.get(\"PATH\", \"\").split(os.pathsep)])\nos.environ[\"VIRTUAL_ENV\"] = base  # virtual env is right above bin directory\nos.environ[\"VIRTUAL_ENV_PROMPT\"] = '' or os.path.basename(base)\n# add the virtual environments libraries to the host python import mechanism\nprev_length = len(sys.path)\nfor lib in '..\\\\Lib\\\\site-packages'.split(os.pathsep):\n    path = os.path.realpath(os.path.join(bin_dir, lib))\n    site.addsitedir(path.decode(\"utf-8\") if '' else path)\nsys.path[:] = sys.path[prev_length:] + sys.path[0:prev_length]\nsys.real_prefix = sys.prefix",
+        "detail": ".venv.Scripts.activate_this",
+        "documentation": {}
+    },
+    {
+        "label": "os.environ[\"VIRTUAL_ENV\"]",
+        "kind": 5,
+        "importPath": ".venv.Scripts.activate_this",
+        "description": ".venv.Scripts.activate_this",
+        "peekOfCode": "os.environ[\"VIRTUAL_ENV\"] = base  # virtual env is right above bin directory\nos.environ[\"VIRTUAL_ENV_PROMPT\"] = '' or os.path.basename(base)\n# add the virtual environments libraries to the host python import mechanism\nprev_length = len(sys.path)\nfor lib in '..\\\\Lib\\\\site-packages'.split(os.pathsep):\n    path = os.path.realpath(os.path.join(bin_dir, lib))\n    site.addsitedir(path.decode(\"utf-8\") if '' else path)\nsys.path[:] = sys.path[prev_length:] + sys.path[0:prev_length]\nsys.real_prefix = sys.prefix\nsys.prefix = base",
+        "detail": ".venv.Scripts.activate_this",
+        "documentation": {}
+    },
+    {
+        "label": "os.environ[\"VIRTUAL_ENV_PROMPT\"]",
+        "kind": 5,
+        "importPath": ".venv.Scripts.activate_this",
+        "description": ".venv.Scripts.activate_this",
+        "peekOfCode": "os.environ[\"VIRTUAL_ENV_PROMPT\"] = '' or os.path.basename(base)\n# add the virtual environments libraries to the host python import mechanism\nprev_length = len(sys.path)\nfor lib in '..\\\\Lib\\\\site-packages'.split(os.pathsep):\n    path = os.path.realpath(os.path.join(bin_dir, lib))\n    site.addsitedir(path.decode(\"utf-8\") if '' else path)\nsys.path[:] = sys.path[prev_length:] + sys.path[0:prev_length]\nsys.real_prefix = sys.prefix\nsys.prefix = base",
+        "detail": ".venv.Scripts.activate_this",
+        "documentation": {}
+    },
+    {
+        "label": "prev_length",
+        "kind": 5,
+        "importPath": ".venv.Scripts.activate_this",
+        "description": ".venv.Scripts.activate_this",
+        "peekOfCode": "prev_length = len(sys.path)\nfor lib in '..\\\\Lib\\\\site-packages'.split(os.pathsep):\n    path = os.path.realpath(os.path.join(bin_dir, lib))\n    site.addsitedir(path.decode(\"utf-8\") if '' else path)\nsys.path[:] = sys.path[prev_length:] + sys.path[0:prev_length]\nsys.real_prefix = sys.prefix\nsys.prefix = base",
+        "detail": ".venv.Scripts.activate_this",
+        "documentation": {}
+    },
+    {
+        "label": "sys.path[:]",
+        "kind": 5,
+        "importPath": ".venv.Scripts.activate_this",
+        "description": ".venv.Scripts.activate_this",
+        "peekOfCode": "sys.path[:] = sys.path[prev_length:] + sys.path[0:prev_length]\nsys.real_prefix = sys.prefix\nsys.prefix = base",
+        "detail": ".venv.Scripts.activate_this",
+        "documentation": {}
+    },
+    {
+        "label": "sys.real_prefix",
+        "kind": 5,
+        "importPath": ".venv.Scripts.activate_this",
+        "description": ".venv.Scripts.activate_this",
+        "peekOfCode": "sys.real_prefix = sys.prefix\nsys.prefix = base",
+        "detail": ".venv.Scripts.activate_this",
+        "documentation": {}
+    },
+    {
+        "label": "sys.prefix",
+        "kind": 5,
+        "importPath": ".venv.Scripts.activate_this",
+        "description": ".venv.Scripts.activate_this",
+        "peekOfCode": "sys.prefix = base",
+        "detail": ".venv.Scripts.activate_this",
+        "documentation": {}
+    },
+    {
+        "label": "db",
+        "kind": 5,
+        "importPath": "back_end.config.database",
+        "description": "back_end.config.database",
+        "peekOfCode": "db = mysql.connector.connect(\n    host=\"localhost\",\n    user=\"root\",\n    passwd=\"Huynh@2608\"\n)\ncursor = db.cursor()\ncursor.execute(\"DROP DATABASE IF EXISTS online_testing\")\ncursor.execute(\"CREATE DATABASE IF NOT EXISTS online_testing\")\ncursor.execute(\"USE online_testing\")\nsql_script = \"\"\"",
+        "detail": "back_end.config.database",
+        "documentation": {}
+    },
+    {
+        "label": "cursor",
+        "kind": 5,
+        "importPath": "back_end.config.database",
+        "description": "back_end.config.database",
+        "peekOfCode": "cursor = db.cursor()\ncursor.execute(\"DROP DATABASE IF EXISTS online_testing\")\ncursor.execute(\"CREATE DATABASE IF NOT EXISTS online_testing\")\ncursor.execute(\"USE online_testing\")\nsql_script = \"\"\"\n-- 1. Package\nCREATE TABLE IF NOT EXISTS package (\n    id_package INT PRIMARY KEY AUTO_INCREMENT,\n    name_package VARCHAR(250) NOT NULL,\n    price_month INT NOT NULL,",
+        "detail": "back_end.config.database",
+        "documentation": {}
+    },
+    {
+        "label": "sql_script",
+        "kind": 5,
+        "importPath": "back_end.config.database",
+        "description": "back_end.config.database",
+        "peekOfCode": "sql_script = \"\"\"\n-- 1. Package\nCREATE TABLE IF NOT EXISTS package (\n    id_package INT PRIMARY KEY AUTO_INCREMENT,\n    name_package VARCHAR(250) NOT NULL,\n    price_month INT NOT NULL,\n    description_package TEXT NOT NULL\n);\nINSERT INTO package (name_package, price_month, description_package) VALUES\n('Miễn phí', 0, 'Gói cơ bản với quyền truy cập giới hạn vào các bài kiểm tra'),",
+        "detail": "back_end.config.database",
+        "documentation": {}
+    },
+    {
+        "label": "get_db_connection",
+        "kind": 2,
+        "importPath": "back_end.config.db_config",
+        "description": "back_end.config.db_config",
+        "peekOfCode": "def get_db_connection():\n    try:\n        conn = mysql.connector.connect(\n            host=os.getenv(\"DB_HOST\"),\n            user=os.getenv(\"DB_USER\"),\n            password=os.getenv(\"DB_PASS\"),\n            database=os.getenv(\"DB_NAME\"),\n            port=int(os.getenv(\"DB_PORT\", 3306)),\n            unix_socket=None\n        )",
+        "detail": "back_end.config.db_config",
+        "documentation": {}
+    },
+    {
+        "label": "conn",
+        "kind": 5,
+        "importPath": "back_end.config.test_db",
+        "description": "back_end.config.test_db",
+        "peekOfCode": "conn = get_db_connection()\nif conn:\n    cursor = conn.cursor()\n    cursor.execute(\"SHOW TABLES;\")\n    print(\"Các bảng trong database:\")\n    for x in cursor.fetchall():\n        print(x)\n    conn.close()",
+        "detail": "back_end.config.test_db",
+        "documentation": {}
+    },
+    {
+        "label": "getAdllAdmin",
+        "kind": 2,
+        "importPath": "back_end.route.admin.admin",
+        "description": "back_end.route.admin.admin",
+        "peekOfCode": "def getAdllAdmin():\n    db = None\n    cursor = None\n    try:\n        db = get_db_connection()\n        cursor = db.cursor(dictionary=True)\n        cursor.execute('SELECT * FROM users WHERE level >= 2')\n        admins = cursor.fetchall()\n        if not admins:\n            return jsonify({\"msg\": \"Không có dữ liệu quản trị viên\"}), 404",
+        "detail": "back_end.route.admin.admin",
+        "documentation": {}
+    },
+    {
+        "label": "getAdminDetail",
+        "kind": 2,
+        "importPath": "back_end.route.admin.admin",
+        "description": "back_end.route.admin.admin",
+        "peekOfCode": "def getAdminDetail(id):\n    db = None\n    cursor = None\n    try:\n        db = get_db_connection()\n        cursor = db.cursor(dictionary=True)\n        # Query với tham số\n        cursor.execute(\"SELECT * FROM users WHERE id_user = %s\", (id))\n        admin = cursor.fetchone()\n        if not admin:",
+        "detail": "back_end.route.admin.admin",
+        "documentation": {}
+    },
+    {
+        "label": "admin_bp",
+        "kind": 5,
+        "importPath": "back_end.route.admin.admin",
+        "description": "back_end.route.admin.admin",
+        "peekOfCode": "admin_bp = Blueprint('admin_bp', __name__)\n@admin_bp.route('/admin', methods=['GET'])\ndef getAdllAdmin():\n    db = None\n    cursor = None\n    try:\n        db = get_db_connection()\n        cursor = db.cursor(dictionary=True)\n        cursor.execute('SELECT * FROM users WHERE level >= 2')\n        admins = cursor.fetchall()",
+        "detail": "back_end.route.admin.admin",
+        "documentation": {}
+    },
+    {
+        "label": "create_exam",
+        "kind": 2,
+        "importPath": "back_end.route.admin.exam",
+        "description": "back_end.route.admin.exam",
+        "peekOfCode": "def create_exam():\n    \"\"\"\n    Admin tạo đề thi mới (draft)\n    \"\"\"\n    db = None\n    cursor = None\n    try:\n        data = request.get_json()\n        name_ex = data['name_ex']\n        total_ques = data['total_ques']",
+        "detail": "back_end.route.admin.exam",
+        "documentation": {}
+    },
+    {
+        "label": "add_question",
+        "kind": 2,
+        "importPath": "back_end.route.admin.exam",
+        "description": "back_end.route.admin.exam",
+        "peekOfCode": "def add_question():\n    \"\"\"\n    Admin thêm câu hỏi mới\n    \"\"\"\n    db = None\n    cursor = None\n    try:\n        data = request.get_json()\n        id_category = data['id_category']\n        ques_text = data['ques_text']",
+        "detail": "back_end.route.admin.exam",
+        "documentation": {}
+    },
+    {
+        "label": "add_questions_to_exam",
+        "kind": 2,
+        "importPath": "back_end.route.admin.exam",
+        "description": "back_end.route.admin.exam",
+        "peekOfCode": "def add_questions_to_exam(exam_id):\n    \"\"\"\n    Admin tick chọn các câu hỏi cho đề thi\n    \"\"\"\n    db = None\n    cursor = None\n    try:\n        data = request.get_json()\n        question_ids = data['question_ids']\n        db = get_db_connection()",
+        "detail": "back_end.route.admin.exam",
+        "documentation": {}
+    },
+    {
+        "label": "get_exam_questions",
+        "kind": 2,
+        "importPath": "back_end.route.admin.exam",
+        "description": "back_end.route.admin.exam",
+        "peekOfCode": "def get_exam_questions(exam_id):\n    db = None\n    cursor = None\n    try:\n        db = get_db_connection()\n        cursor = db.cursor(dictionary=True)\n        sql = \"\"\"SELECT q.* \n                 FROM questions q\n                 JOIN exam_question eq ON q.id_ques = eq.id_ques\n                 WHERE eq.id_ex = %s\"\"\"",
+        "detail": "back_end.route.admin.exam",
+        "documentation": {}
+    },
+    {
+        "label": "publish_exam",
+        "kind": 2,
+        "importPath": "back_end.route.admin.exam",
+        "description": "back_end.route.admin.exam",
+        "peekOfCode": "def publish_exam(exam_id):\n    db = None\n    cursor = None\n    try:\n        db = get_db_connection()\n        cursor = db.cursor()\n        sql = \"UPDATE exam SET exam_cat = 'published' WHERE id_ex = %s\"\n        cursor.execute(sql, (exam_id,))\n        db.commit()\n        return jsonify({\"msg\": \"Đề thi đã được publish\"}), 200",
+        "detail": "back_end.route.admin.exam",
+        "documentation": {}
+    },
+    {
+        "label": "exam_bp",
+        "kind": 5,
+        "importPath": "back_end.route.admin.exam",
+        "description": "back_end.route.admin.exam",
+        "peekOfCode": "exam_bp = Blueprint('exam_bp', __name__)\n# --- 1. Tạo đề thi (Draft) ---\n@exam_bp.route('/admin/exam', methods=['POST'])\ndef create_exam():\n    \"\"\"\n    Admin tạo đề thi mới (draft)\n    \"\"\"\n    db = None\n    cursor = None\n    try:",
+        "detail": "back_end.route.admin.exam",
+        "documentation": {}
+    },
+    {
+        "label": "login_admin",
+        "kind": 2,
+        "importPath": "back_end.route.admin.login",
+        "description": "back_end.route.admin.login",
+        "peekOfCode": "def login_admin():\n    if request.method == 'OPTIONS':\n        return '', 204\n    data = request.get_json()\n    email = data.get(\"email\")\n    password = data.get(\"password\")\n    print(f\"Login attempt - Email: {email}\")\n    if not email or not password:\n        return jsonify({\"msg\": \"Thiếu thông tin!\"}), 400\n    try:",
+        "detail": "back_end.route.admin.login",
+        "documentation": {}
+    },
+    {
+        "label": "login_bp",
+        "kind": 5,
+        "importPath": "back_end.route.admin.login",
+        "description": "back_end.route.admin.login",
+        "peekOfCode": "login_bp = Blueprint('login', __name__)\n@login_bp.route('/login', methods=['POST', 'OPTIONS'])\ndef login_admin():\n    if request.method == 'OPTIONS':\n        return '', 204\n    data = request.get_json()\n    email = data.get(\"email\")\n    password = data.get(\"password\")\n    print(f\"Login attempt - Email: {email}\")\n    if not email or not password:",
+        "detail": "back_end.route.admin.login",
+        "documentation": {}
+    },
+    {
+        "label": "is_admin",
+        "kind": 2,
+        "importPath": "back_end.route.admin.manage_users",
+        "description": "back_end.route.admin.manage_users",
+        "peekOfCode": "def is_admin():\n    claims = get_jwt()\n    return int(claims.get(\"level\", 1)) >= 2\n@manage_users_bp.route('/all', methods=['GET'])\n@jwt_required()\ndef list_users():\n    if not is_admin():\n        return jsonify({\"msg\": \"Không có quyền\"}), 403\n    try:\n        conn = get_db_connection()",
+        "detail": "back_end.route.admin.manage_users",
+        "documentation": {}
+    },
+    {
+        "label": "list_users",
+        "kind": 2,
+        "importPath": "back_end.route.admin.manage_users",
+        "description": "back_end.route.admin.manage_users",
+        "peekOfCode": "def list_users():\n    if not is_admin():\n        return jsonify({\"msg\": \"Không có quyền\"}), 403\n    try:\n        conn = get_db_connection()\n        cursor = conn.cursor(dictionary=True)\n        cursor.execute(\n            \"SELECT id_user, fullName, username, email, role, status, gender, level FROM users WHERE level=1 ORDER BY id_user DESC\")\n        users = cursor.fetchall()\n        return jsonify({\"data\": users}), 200",
+        "detail": "back_end.route.admin.manage_users",
+        "documentation": {}
+    },
+    {
+        "label": "update_user",
+        "kind": 2,
+        "importPath": "back_end.route.admin.manage_users",
+        "description": "back_end.route.admin.manage_users",
+        "peekOfCode": "def update_user(user_id):\n    if not is_admin():\n        return jsonify({\"msg\": \"Không có quyền\"}), 403\n    data = request.get_json() or {}\n    fields, values = [], []\n    if data.get(\"fullName\"):\n        fields.append(\"fullName=%s\")\n        values.append(data[\"fullName\"])\n    if data.get(\"email\"):\n        fields.append(\"email=%s\")",
+        "detail": "back_end.route.admin.manage_users",
+        "documentation": {}
+    },
+    {
+        "label": "delete_user",
+        "kind": 2,
+        "importPath": "back_end.route.admin.manage_users",
+        "description": "back_end.route.admin.manage_users",
+        "peekOfCode": "def delete_user(user_id):\n    if not is_admin():\n        return jsonify({\"msg\": \"Không có quyền\"}), 403\n    try:\n        conn = get_db_connection()\n        cursor = conn.cursor()\n        cursor.execute(\"DELETE FROM users WHERE id_user=%s AND level=1\", (user_id,))\n        conn.commit()\n        if cursor.rowcount == 0:\n            return jsonify({\"msg\": \"Không tìm thấy user hoặc không thể xóa\"}), 404",
+        "detail": "back_end.route.admin.manage_users",
+        "documentation": {}
+    },
+    {
+        "label": "manage_users_bp",
+        "kind": 5,
+        "importPath": "back_end.route.admin.manage_users",
+        "description": "back_end.route.admin.manage_users",
+        "peekOfCode": "manage_users_bp = Blueprint('manage_users_bp', __name__)\ndef is_admin():\n    claims = get_jwt()\n    return int(claims.get(\"level\", 1)) >= 2\n@manage_users_bp.route('/all', methods=['GET'])\n@jwt_required()\ndef list_users():\n    if not is_admin():\n        return jsonify({\"msg\": \"Không có quyền\"}), 403\n    try:",
+        "detail": "back_end.route.admin.manage_users",
+        "documentation": {}
+    },
+    {
+        "label": "get_current_user_id",
+        "kind": 2,
+        "importPath": "back_end.route.users.auth",
+        "description": "back_end.route.users.auth",
+        "peekOfCode": "def get_current_user_id():\n    identity = get_jwt_identity()\n    if isinstance(identity, dict):\n        return identity.get(\"id\") or identity.get(\"id_user\")\n    try:\n        return int(identity)\n    except (ValueError, TypeError):\n        return identity\n@users_bp.route('/register', methods=['POST'])\ndef register():",
+        "detail": "back_end.route.users.auth",
+        "documentation": {}
+    },
+    {
+        "label": "register",
+        "kind": 2,
+        "importPath": "back_end.route.users.auth",
+        "description": "back_end.route.users.auth",
+        "peekOfCode": "def register():\n    data = request.get_json()\n    required_fields = [\"fullName\", \"email\", \"password\", \"gender\"]\n    if not data or not all(field in data for field in required_fields):\n        return jsonify({\"success\": False, \"message\": \"Thiếu dữ liệu bắt buộc.\"}), 400\n    fullName = data[\"fullName\"].strip()\n    email = data[\"email\"].strip().lower()\n    password = data[\"password\"]\n    gender = data[\"gender\"]\n    avatar = data.get(\"avatar\")",
+        "detail": "back_end.route.users.auth",
+        "documentation": {}
+    },
+    {
+        "label": "login",
+        "kind": 2,
+        "importPath": "back_end.route.users.auth",
+        "description": "back_end.route.users.auth",
+        "peekOfCode": "def login():\n    data = request.get_json()\n    if not data or \"email\" not in data or \"password\" not in data:\n        return jsonify({\"success\": False, \"message\": \"Thiếu email hoặc mật khẩu.\"}), 400\n    email = data[\"email\"].strip().lower()\n    password = data[\"password\"]\n    conn = get_db_connection()\n    cursor = conn.cursor(dictionary=True)\n    try:\n        cursor.execute(\"SELECT * FROM users WHERE email = %s\", (email,))",
+        "detail": "back_end.route.users.auth",
+        "documentation": {}
+    },
+    {
+        "label": "update_package",
+        "kind": 2,
+        "importPath": "back_end.route.users.auth",
+        "description": "back_end.route.users.auth",
+        "peekOfCode": "def update_package():\n    user_id = get_current_user_id()\n    data = request.get_json()\n    id_package = data.get('id_package')  # đúng tên field\n    if not id_package:\n        return jsonify({\"success\": False, \"message\": \"Thiếu id_package.\"}), 400\n    conn = get_db_connection()\n    cursor = conn.cursor()\n    try:\n        cursor.execute(",
+        "detail": "back_end.route.users.auth",
+        "documentation": {}
+    },
+    {
+        "label": "users_bp",
+        "kind": 5,
+        "importPath": "back_end.route.users.auth",
+        "description": "back_end.route.users.auth",
+        "peekOfCode": "users_bp = Blueprint('users_bp', __name__)\ndef get_current_user_id():\n    identity = get_jwt_identity()\n    if isinstance(identity, dict):\n        return identity.get(\"id\") or identity.get(\"id_user\")\n    try:\n        return int(identity)\n    except (ValueError, TypeError):\n        return identity\n@users_bp.route('/register', methods=['POST'])",
+        "detail": "back_end.route.users.auth",
+        "documentation": {}
+    },
+    {
+        "label": "get_current_user_id",
+        "kind": 2,
+        "importPath": "back_end.route.users.classroom",
+        "description": "back_end.route.users.classroom",
+        "peekOfCode": "def get_current_user_id():\n    identity = get_jwt_identity()\n    if isinstance(identity, dict):\n        return identity.get(\"id\") or identity.get(\"id_user\")\n    try:\n        return int(identity)\n    except (ValueError, TypeError):\n        return identity\n@classroom_bp.route('/exam', methods=['POST'])\ndef register():",
+        "detail": "back_end.route.users.classroom",
+        "documentation": {}
+    },
+    {
+        "label": "register",
+        "kind": 2,
+        "importPath": "back_end.route.users.classroom",
+        "description": "back_end.route.users.classroom",
+        "peekOfCode": "def register():\n    data = request.get_json()\n    required_fields = [\"fullName\", \"username\", \"email\", \"password\", \"gender\"]\n    if not all(field in data for field in required_fields):\n        return jsonify({\"success\": False, \"message\": \"Thiếu dữ liệu.\"}), 400\n    success, message = create_user(\n        data[\"fullName\"],\n        data[\"username\"],\n        data[\"email\"],\n        data[\"password\"],",
+        "detail": "back_end.route.users.classroom",
+        "documentation": {}
+    },
+    {
+        "label": "classroom_bp",
+        "kind": 5,
+        "importPath": "back_end.route.users.classroom",
+        "description": "back_end.route.users.classroom",
+        "peekOfCode": "classroom_bp = Blueprint('classroom_bp', __name__)\ndef get_current_user_id():\n    identity = get_jwt_identity()\n    if isinstance(identity, dict):\n        return identity.get(\"id\") or identity.get(\"id_user\")\n    try:\n        return int(identity)\n    except (ValueError, TypeError):\n        return identity\n@classroom_bp.route('/exam', methods=['POST'])",
+        "detail": "back_end.route.users.classroom",
+        "documentation": {}
+    },
+    {
+        "label": "get_current_user_id",
+        "kind": 2,
+        "importPath": "back_end.route.users.exam",
+        "description": "back_end.route.users.exam",
+        "peekOfCode": "def get_current_user_id():\n    identity = get_jwt_identity()\n    if isinstance(identity, dict):\n        return identity.get(\"id\") or identity.get(\"user_id\") or identity.get(\"id_user\")\n    return identity\n@exam_bp.route(\"/departments\", methods=[\"GET\"])\ndef get_departments():\n    conn = get_db_connection()\n    cursor = conn.cursor(dictionary=True)\n    try:",
+        "detail": "back_end.route.users.exam",
+        "documentation": {}
+    },
+    {
+        "label": "get_departments",
+        "kind": 2,
+        "importPath": "back_end.route.users.exam",
+        "description": "back_end.route.users.exam",
+        "peekOfCode": "def get_departments():\n    conn = get_db_connection()\n    cursor = conn.cursor(dictionary=True)\n    try:\n        cursor.execute(\"\"\"\n            SELECT id_department, name_department \n            FROM department\n            WHERE status = 'Đang hoạt động'\n        \"\"\")\n        return jsonify({\"success\": True, \"departments\": cursor.fetchall()}), 200",
+        "detail": "back_end.route.users.exam",
+        "documentation": {}
+    },
+    {
+        "label": "get_classes",
+        "kind": 2,
+        "importPath": "back_end.route.users.exam",
+        "description": "back_end.route.users.exam",
+        "peekOfCode": "def get_classes(dept_id):\n    conn = get_db_connection()\n    cursor = conn.cursor(dictionary=True)\n    try:\n        cursor.execute(\"\"\"\n            SELECT id_class, class_name\n            FROM classroom\n            WHERE id_department = %s\n        \"\"\", (dept_id,))\n        return jsonify({\"success\": True, \"classes\": cursor.fetchall()}), 200",
+        "detail": "back_end.route.users.exam",
+        "documentation": {}
+    },
+    {
+        "label": "get_exams_by_class",
+        "kind": 2,
+        "importPath": "back_end.route.users.exam",
+        "description": "back_end.route.users.exam",
+        "peekOfCode": "def get_exams_by_class(class_id):\n    conn = get_db_connection()\n    cursor = conn.cursor(dictionary=True)\n    try:\n        cursor.execute(\"\"\"\n            SELECT id_ex, name_ex, total_ques, duration\n            FROM exam\n            WHERE id_class = %s\n            ORDER BY id_ex DESC\n        \"\"\", (class_id,))",
+        "detail": "back_end.route.users.exam",
+        "documentation": {}
+    },
+    {
+        "label": "get_exam_detail",
+        "kind": 2,
+        "importPath": "back_end.route.users.exam",
+        "description": "back_end.route.users.exam",
+        "peekOfCode": "def get_exam_detail(exam_id):\n    conn = get_db_connection()\n    cursor = conn.cursor(dictionary=True)\n    try:\n        cursor.execute(\"SELECT id_ex, name_ex, total_ques, duration FROM exam WHERE id_ex=%s\", (exam_id,))\n        exam_info = cursor.fetchone()\n        if not exam_info:\n            return jsonify({\"success\": False, \"message\": \"Không tìm thấy đề thi\"}), 404\n        cursor.execute(\"\"\"\n            SELECT q.id_ques, q.ques_text, q.ans_a, q.ans_b, q.ans_c, q.ans_d,",
+        "detail": "back_end.route.users.exam",
+        "documentation": {}
+    },
+    {
+        "label": "submit_exam",
+        "kind": 2,
+        "importPath": "back_end.route.users.exam",
+        "description": "back_end.route.users.exam",
+        "peekOfCode": "def submit_exam(exam_id):\n    user_id = get_current_user_id()\n    if not user_id:\n        return jsonify({\"success\": False, \"message\": \"User ID trong token không hợp lệ\"}), 400\n    data = request.get_json()\n    answers = data.get(\"answers\")\n    start_time = data.get(\"start_time\")\n    if not answers or not start_time:\n        return jsonify({\"success\": False, \"message\": \"Dữ liệu gửi lên không hợp lệ\"}), 400\n    conn = get_db_connection()",
+        "detail": "back_end.route.users.exam",
+        "documentation": {}
+    },
+    {
+        "label": "exam_history",
+        "kind": 2,
+        "importPath": "back_end.route.users.exam",
+        "description": "back_end.route.users.exam",
+        "peekOfCode": "def exam_history():\n    user_id = get_current_user_id()\n    conn = get_db_connection()\n    cursor = conn.cursor(dictionary=True)\n    try:\n        cursor.execute(\"\"\"\n            SELECT r.id_result, e.name_ex AS exam_name,\n                   r.score, r.total_correct,\n                   r.start_time, r.completed_time\n            FROM results r",
+        "detail": "back_end.route.users.exam",
+        "documentation": {}
+    },
+    {
+        "label": "get_result_detail",
+        "kind": 2,
+        "importPath": "back_end.route.users.exam",
+        "description": "back_end.route.users.exam",
+        "peekOfCode": "def get_result_detail(result_id):\n    user_id = get_current_user_id()\n    conn = get_db_connection()\n    cursor = conn.cursor(dictionary=True)\n    try:\n        cursor.execute(\"\"\"\n            SELECT r.id_result, r.score, r.total_correct, r.start_time, \n                   r.completed_time, e.name_ex AS exam_name, e.total_ques\n            FROM results r\n            JOIN exam e ON e.id_ex = r.id_ex",
+        "detail": "back_end.route.users.exam",
+        "documentation": {}
+    },
+    {
+        "label": "exam_bp",
+        "kind": 5,
+        "importPath": "back_end.route.users.exam",
+        "description": "back_end.route.users.exam",
+        "peekOfCode": "exam_bp = Blueprint(\"exam_bp\", __name__)\ndef get_current_user_id():\n    identity = get_jwt_identity()\n    if isinstance(identity, dict):\n        return identity.get(\"id\") or identity.get(\"user_id\") or identity.get(\"id_user\")\n    return identity\n@exam_bp.route(\"/departments\", methods=[\"GET\"])\ndef get_departments():\n    conn = get_db_connection()\n    cursor = conn.cursor(dictionary=True)",
+        "detail": "back_end.route.users.exam",
+        "documentation": {}
+    },
+    {
+        "label": "get_all_packages",
+        "kind": 2,
+        "importPath": "back_end.route.users.package",
+        "description": "back_end.route.users.package",
+        "peekOfCode": "def get_all_packages():\n    try:\n        conn = get_db_connection()\n        cursor = conn.cursor(dictionary=True)\n        cursor.execute(\"SELECT * FROM package ORDER BY id_package\")\n        packages = cursor.fetchall()\n        cursor.close()\n        conn.close()\n        return jsonify({\n            \"msg\": \"Lấy danh sách package thành công\",",
+        "detail": "back_end.route.users.package",
+        "documentation": {}
+    },
+    {
+        "label": "get_package_by_id",
+        "kind": 2,
+        "importPath": "back_end.route.users.package",
+        "description": "back_end.route.users.package",
+        "peekOfCode": "def get_package_by_id(package_id):\n    \"\"\"\n    Lấy thông tin chi tiết 1 package theo ID\n    Endpoint: GET /api/packages/<id>\n    \"\"\"\n    try:\n        conn = get_db_connection()\n        cursor = conn.cursor(dictionary=True)\n        cursor.execute(\"SELECT * FROM package WHERE id_package = %s\", (package_id,))\n        package = cursor.fetchone()",
+        "detail": "back_end.route.users.package",
+        "documentation": {}
+    },
+    {
+        "label": "package_bp",
+        "kind": 5,
+        "importPath": "back_end.route.users.package",
+        "description": "back_end.route.users.package",
+        "peekOfCode": "package_bp = Blueprint('package_bp', __name__)\n@package_bp.route('/packages', methods=['GET'])\ndef get_all_packages():\n    try:\n        conn = get_db_connection()\n        cursor = conn.cursor(dictionary=True)\n        cursor.execute(\"SELECT * FROM package ORDER BY id_package\")\n        packages = cursor.fetchall()\n        cursor.close()\n        conn.close()",
+        "detail": "back_end.route.users.package",
+        "documentation": {}
+    },
+    {
+        "label": "app",
+        "kind": 5,
+        "importPath": "back_end.app",
+        "description": "back_end.app",
+        "peekOfCode": "app = Flask(__name__)\nfrontend_origins = [\n    \"https://frontend-admin-onlinesystem-eugd.onrender.com\",\n    \"http://localhost:3000\",\n]\nCORS(app,\n     origins=frontend_origins,\n     supports_credentials=True,\n     allow_headers=[\"Content-Type\", \"Authorization\", \"Access-Control-Allow-Credentials\"],\n     methods=[\"GET\", \"POST\", \"PUT\", \"DELETE\", \"OPTIONS\"],",
+        "detail": "back_end.app",
+        "documentation": {}
+    },
+    {
+        "label": "frontend_origins",
+        "kind": 5,
+        "importPath": "back_end.app",
+        "description": "back_end.app",
+        "peekOfCode": "frontend_origins = [\n    \"https://frontend-admin-onlinesystem-eugd.onrender.com\",\n    \"http://localhost:3000\",\n]\nCORS(app,\n     origins=frontend_origins,\n     supports_credentials=True,\n     allow_headers=[\"Content-Type\", \"Authorization\", \"Access-Control-Allow-Credentials\"],\n     methods=[\"GET\", \"POST\", \"PUT\", \"DELETE\", \"OPTIONS\"],\n     expose_headers=[\"Content-Type\", \"Authorization\"])",
+        "detail": "back_end.app",
+        "documentation": {}
+    },
+    {
+        "label": "app.config[\"JWT_SECRET_KEY\"]",
+        "kind": 5,
+        "importPath": "back_end.app",
+        "description": "back_end.app",
+        "peekOfCode": "app.config[\"JWT_SECRET_KEY\"] = os.environ.get(\"JWT_SECRET_KEY\", \"online_testing@123\")\njwt = JWTManager(app)\napp.register_blueprint(users_bp, url_prefix='/api/users')\napp.register_blueprint(exam_bp, url_prefix='/api/exam')\napp.register_blueprint(package_bp, url_prefix='/api')\napp.register_blueprint(login_bp, url_prefix='/api/admin')\napp.register_blueprint(admin_bp, url_prefix='/api/admin')\nif __name__ == '__main__':\n    port = int(os.environ.get('PORT', 5000))\n    app.run(host='0.0.0.0', port=port, debug=False)",
+        "detail": "back_end.app",
+        "documentation": {}
+    },
+    {
+        "label": "jwt",
+        "kind": 5,
+        "importPath": "back_end.app",
+        "description": "back_end.app",
+        "peekOfCode": "jwt = JWTManager(app)\napp.register_blueprint(users_bp, url_prefix='/api/users')\napp.register_blueprint(exam_bp, url_prefix='/api/exam')\napp.register_blueprint(package_bp, url_prefix='/api')\napp.register_blueprint(login_bp, url_prefix='/api/admin')\napp.register_blueprint(admin_bp, url_prefix='/api/admin')\nif __name__ == '__main__':\n    port = int(os.environ.get('PORT', 5000))\n    app.run(host='0.0.0.0', port=port, debug=False)",
+        "detail": "back_end.app",
+        "documentation": {}
+    }
+]

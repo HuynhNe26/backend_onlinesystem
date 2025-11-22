@@ -28,3 +28,30 @@ def getAdllAdmin():
             cursor.close()
         if db:
             db.close()
+
+@admin_bp.route('/<int:id>', methods=['GET'])
+def getAdminDetail(id):
+    db = None
+    cursor = None
+    try:
+        db = get_db_connection()
+        cursor = db.cursor(dictionary=True)
+
+        # Query với tham số
+        cursor.execute("SELECT * FROM users WHERE id_user = %s", (id))
+        admin = cursor.fetchone()
+
+        if not admin:
+            return jsonify({"msg": "Không tìm thấy quản trị viên"}), 404
+
+        return jsonify({"success": True, "data": admin}), 200
+
+    except Exception as e:
+        print("Lỗi lấy dữ liệu:", e)
+        return jsonify({"msg": "Lỗi server"}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if db:
+            db.close()

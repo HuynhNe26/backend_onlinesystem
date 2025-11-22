@@ -9,10 +9,7 @@ from back_end.route.admin.admin import admin_bp
 
 # users
 from back_end.route.users.auth import users_bp
-from back_end.route.payment.momo import momo_bp
-from back_end.route.payment.vnpay import vnpay_bp
 from back_end.route.users.exam import exam_bp
-from back_end.route.users.category import category_bp
 from back_end.route.users.package import package_bp
 
 app = Flask(__name__)
@@ -33,10 +30,7 @@ app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY", "online_testing@
 jwt = JWTManager(app)
 
 app.register_blueprint(users_bp, url_prefix='/api/users')
-app.register_blueprint(momo_bp, url_prefix="/api/payment")
-app.register_blueprint(vnpay_bp, url_prefix="/api/payment")
 app.register_blueprint(exam_bp, url_prefix='/api/exam')
-app.register_blueprint(category_bp, url_prefix='/api/categories')
 app.register_blueprint(package_bp, url_prefix='/api')
 
 app.register_blueprint(login_bp, url_prefix='/api/admin')
