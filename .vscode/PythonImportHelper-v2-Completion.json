@@ -310,22 +310,6 @@
         "documentation": {}
     },
     {
-        "label": "jwt_required",
-        "importPath": "flask_jwt_extended",
-        "description": "flask_jwt_extended",
-        "isExtraImport": true,
-        "detail": "flask_jwt_extended",
-        "documentation": {}
-    },
-    {
-        "label": "get_jwt",
-        "importPath": "flask_jwt_extended",
-        "description": "flask_jwt_extended",
-        "isExtraImport": true,
-        "detail": "flask_jwt_extended",
-        "documentation": {}
-    },
-    {
         "label": "create_access_token",
         "importPath": "flask_jwt_extended",
         "description": "flask_jwt_extended",
@@ -406,11 +390,11 @@
         "documentation": {}
     },
     {
-        "label": "generate_password_hash",
-        "importPath": "werkzeug.security",
-        "description": "werkzeug.security",
+        "label": "cursor",
+        "importPath": "back_end.config.database",
+        "description": "back_end.config.database",
         "isExtraImport": true,
-        "detail": "werkzeug.security",
+        "detail": "back_end.config.database",
         "documentation": {}
     },
     {
@@ -427,14 +411,6 @@
         "description": "werkzeug.security",
         "isExtraImport": true,
         "detail": "werkzeug.security",
-        "documentation": {}
-    },
-    {
-        "label": "cursor",
-        "importPath": "back_end.config.database",
-        "description": "back_end.config.database",
-        "isExtraImport": true,
-        "detail": "back_end.config.database",
         "documentation": {}
     },
     {
@@ -615,7 +591,7 @@
         "kind": 2,
         "importPath": "back_end.config.db_config",
         "description": "back_end.config.db_config",
-        "peekOfCode": "def get_db_connection():\n    try:\n        conn = mysql.connector.connect(\n            host=os.getenv(\"DB_HOST\"),\n            user=os.getenv(\"DB_USER\"),\n            password=os.getenv(\"DB_PASS\"),\n            database=os.getenv(\"DB_NAME\"),\n            port=int(os.getenv(\"DB_PORT\"), 3306),\n            unix_socket=None\n        )",
+        "peekOfCode": "def get_db_connection():\n    try:\n        conn = mysql.connector.connect(\n            host=os.getenv(\"DB_HOST\"),\n            user=os.getenv(\"DB_USER\"),\n            password=os.getenv(\"DB_PASS\"),\n            database=os.getenv(\"DB_NAME\"),\n            port=int(os.getenv(\"DB_PORT\", 3306)),\n            unix_socket=None\n        )",
         "detail": "back_end.config.db_config",
         "documentation": {}
     },

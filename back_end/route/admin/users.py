@@ -1,7 +1,5 @@
 
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required, get_jwt
-from werkzeug.security import generate_password_hash
 from back_end.config.database import cursor
 from ...config.db_config import get_db_connection
 
