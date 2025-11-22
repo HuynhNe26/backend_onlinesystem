@@ -85,6 +85,14 @@
         "documentation": {}
     },
     {
+        "label": "request",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
         "label": "Blueprint",
         "importPath": "flask",
         "description": "flask",
@@ -274,15 +282,6 @@
         "description": "flask",
         "isExtraImport": true,
         "detail": "flask",
-        "documentation": {}
-    },
-    {
-        "label": "request",
-        "kind": 6,
-        "isExtraImport": true,
-        "importPath": "request",
-        "description": "request",
-        "detail": "request",
         "documentation": {}
     },
     {
