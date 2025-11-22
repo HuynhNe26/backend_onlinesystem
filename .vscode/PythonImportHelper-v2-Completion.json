@@ -615,7 +615,7 @@
         "kind": 2,
         "importPath": "back_end.config.db_config",
         "description": "back_end.config.db_config",
-        "peekOfCode": "def get_db_connection():\n    try:\n        conn = mysql.connector.connect(\n            host=os.getenv(\"DB_HOST\"),\n            user=os.getenv(\"DB_USER\"),\n            password=os.getenv(\"DB_PASS\"),\n            database=os.getenv(\"DB_NAME\"),\n            port=int(os.getenv(\"DB_PORT\", 3306)),\n            unix_socket=None\n        )",
+        "peekOfCode": "def get_db_connection():\n    try:\n        conn = mysql.connector.connect(\n            host=os.getenv(\"DB_HOST\"),\n            user=os.getenv(\"DB_USER\"),\n            password=os.getenv(\"DB_PASS\"),\n            database=os.getenv(\"DB_NAME\"),\n            port=int(os.getenv(\"DB_PORT\")),\n            unix_socket=None\n        )",
         "detail": "back_end.config.db_config",
         "documentation": {}
     },
