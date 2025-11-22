@@ -253,6 +253,15 @@
         "documentation": {}
     },
     {
+        "label": "requests",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "requests",
+        "description": "requests",
+        "detail": "requests",
+        "documentation": {}
+    },
+    {
         "label": "create_access_token",
         "importPath": "flask_jwt_extended",
         "description": "flask_jwt_extended",
@@ -601,7 +610,16 @@
         "kind": 2,
         "importPath": "back_end.route.admin.admin",
         "description": "back_end.route.admin.admin",
-        "peekOfCode": "def getAdminDetail(id):\n    db = None\n    cursor = None\n    try:\n        db = get_db_connection()\n        cursor = db.cursor(dictionary=True)\n        # Query với tham số\n        cursor.execute(\"SELECT * FROM users WHERE id_user = %s\", (id))\n        admin = cursor.fetchone()\n        if not admin:",
+        "peekOfCode": "def getAdminDetail(id):\n    db = None\n    cursor = None\n    try:\n        db = get_db_connection()\n        cursor = db.cursor(dictionary=True)\n        # THAM SỐ PHẢI LÀ TUPLE (id,)\n        cursor.execute(\"SELECT * FROM users WHERE id_user = %s\", (id,))\n        admin = cursor.fetchone()\n        if not admin:",
+        "detail": "back_end.route.admin.admin",
+        "documentation": {}
+    },
+    {
+        "label": "create_admin",
+        "kind": 2,
+        "importPath": "back_end.route.admin.admin",
+        "description": "back_end.route.admin.admin",
+        "peekOfCode": "def create_admin():\n    db = None\n    cursor = None\n    try:\n        data = request.get_json()\n        email = data.get(\"email\")\n        fullName = data.get(\"fullName\")\n        dateOfBirth = data.get(\"dateOfBirth\")\n        password = data.get(\"password\")\n        level = int(data.get(\"level\"))",
         "detail": "back_end.route.admin.admin",
         "documentation": {}
     },
