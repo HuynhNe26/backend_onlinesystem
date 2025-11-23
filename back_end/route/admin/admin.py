@@ -2,6 +2,8 @@ from flask import Blueprint, jsonify
 from ...config.db_config import get_db_connection
 from flask import request
 import traceback
+from datetime import datetime
+import re
 
 admin_bp = Blueprint('admin_bp', __name__)
 
@@ -134,25 +136,58 @@ def updateAdmin(id):
 
         if not all([email, full_name, date_of_birth, gender]):
             return jsonify({"success": False, "msg": "Thiếu thông tin bắt buộc"}), 400
+
+        email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        if not re.match(email_regex, email):
+            return jsonify({"success": False, "msg": "Email không hợp lệ"}), 400
+        
+        if gender not in ['Nam', 'Nữ']:
+            return jsonify({"success": False, "msg": "Giới tính không hợp lệ"}), 400
         
         db = get_db_connection()
         cursor = db.cursor(dictionary=True)
 
-        cursor.execute("SELECT * FROM users WHERE id_user=%s", (id,))
+        cursor.execute("SELECT * FROM users WHERE id_user=%s AND role='admin'", (id,))
         admin = cursor.fetchone()
         
         if not admin:
             return jsonify({"success": False, "msg": "Không tìm thấy quản trị viên"}), 404
+
+        cursor.execute("SELECT id FROM users WHERE email=%s AND id_user!=%s", (email, id))
+        existing_email = cursor.fetchone()
+        
+        if existing_email:
+            return jsonify({"success": False, "msg": "Email đã được sử dụng bởi tài khoản khác"}), 409
+
+        try:
+            birth_date = datetime.strptime(date_of_birth, '%Y-%m-%d')
+            today = datetime.now()
+            age = (today - birth_date).days / 365.25
+            
+            if age < 18:
+                return jsonify({"success": False, "msg": "Quản trị viên phải từ 18 tuổi trở lên"}), 400
+            
+            if age > 100:
+                return jsonify({"success": False, "msg": "Ngày sinh không hợp lệ"}), 400
+                
+        except ValueError:
+            return jsonify({"success": False, "msg": "Định dạng ngày sinh không hợp lệ (YYYY-MM-DD)"}), 400
+        
+        if len(full_name.strip()) < 2:
+            return jsonify({"success": False, "msg": "Họ tên phải có ít nhất 2 ký tự"}), 400
+        
+        if len(full_name) > 100:
+            return jsonify({"success": False, "msg": "Họ tên không được quá 100 ký tự"}), 400
 
         update_query = """
             UPDATE users 
             SET email=%s, fullName=%s, dateOfBirth=%s, gender=%s 
             WHERE id_user=%s
         """
-        cursor.execute(update_query, (email, full_name, date_of_birth, gender, id))
+        cursor.execute(update_query, (email, full_name.strip(), date_of_birth, gender, id))
         db.commit()
         
-        cursor.execute("SELECT * FROM users WHERE id=%s", (id,))
+        cursor.execute("SELECT * FROM users WHERE id_user=%s", (id,))
         updated_admin = cursor.fetchone()
 
         return jsonify({"success": True, "msg": "Cập nhật thành công", "data": updated_admin}), 200
