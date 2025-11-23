@@ -41,7 +41,7 @@ app.register_blueprint(package_bp, url_prefix='/api')
 app.register_blueprint(login_bp, url_prefix='/api/admin')
 app.register_blueprint(admin_bp, url_prefix='/api/admin')
 app.register_blueprint(users_ad, url_prefix='/api')
-app.register_blueprint(exam_ad, url_prefix='/api/exam')
+app.register_blueprint(exam_ad, url_prefix='/api/ad_exam')
 
 # -------------------- Run App --------------------
 if __name__ == '__main__':
