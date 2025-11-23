@@ -147,7 +147,7 @@ def updateAdmin(id):
         db = get_db_connection()
         cursor = db.cursor(dictionary=True)
 
-        cursor.execute("SELECT * FROM users WHERE id_user=%s AND role='admin'", (id,))
+        cursor.execute("SELECT * FROM users WHERE id_user=%s", (id,))
         admin = cursor.fetchone()
         
         if not admin:
