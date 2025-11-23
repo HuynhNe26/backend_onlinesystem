@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from back_end.config.db_config import get_db_connection
 import traceback
 
-exam_bp = Blueprint('exam_bp', __name__)
+exam_ad = Blueprint('exam_ad', __name__)
 
 def _close(cursor, db):
     if cursor:
@@ -11,7 +11,7 @@ def _close(cursor, db):
         db.close()
 
 # Departments
-@exam_bp.route('/departments', methods=['GET'])
+@exam_ad.route('/departments', methods=['GET'])
 def get_departments():
     db = cursor = None
     try:
@@ -27,7 +27,7 @@ def get_departments():
         _close(cursor, db)
 
 # Classrooms
-@exam_bp.route('/classrooms', methods=['GET'])
+@exam_ad.route('/classrooms', methods=['GET'])
 def get_classrooms():
     db = cursor = None
     try:
