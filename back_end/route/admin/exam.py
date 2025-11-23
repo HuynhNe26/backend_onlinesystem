@@ -42,7 +42,8 @@ def get_classrooms():
 
         db = get_db_connection()
         cursor = db.cursor(dictionary=True)
-        cursor.execute("SELECT id_class, class_name FROM classroom WHERE id_department = %s", (id_department,))
+        cursor.execute("SELECT id_class, class_name FROM classroom WHERE id_department = 1")
+
         classes = cursor.fetchall()
         return jsonify({"success": True, "data": classes})
     except Exception:
