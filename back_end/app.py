@@ -28,6 +28,7 @@ CORS(app,
      expose_headers=["Content-Type", "Authorization"])
 
 app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY", "online_testing@123")
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=1)
 jwt = JWTManager(app)
 
 app.register_blueprint(users_bp, url_prefix='/api/users')

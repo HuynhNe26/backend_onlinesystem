@@ -99,9 +99,6 @@ def login():
                 "status": user['status'],
                 "gender": user['gender'],
                 "level": user['level'],
-                "id_package": user.get('id_package'),
-                "start_package": user.get('start_package').isoformat() if user.get('start_package') else None,
-                "end_package": user.get('end_package').isoformat() if user.get('end_package') else None
             }
         }), 200
 
@@ -110,3 +107,32 @@ def login():
     finally:
         cursor.close()
         conn.close()
+
+@users_bp.route('/auth/verify', methods=['GET'])
+@jwt_required()
+def verify_token():
+    try:
+        current_user_id = get_current_user_id()
+
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(
+            "SELECT id_user, fullName, email, role, status, gender, level, avatar FROM users WHERE id_user = %s",
+            (current_user_id,))
+        user = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        if user:
+            new_access_token = create_access_token(identity=str(user['id_user']))
+
+            return jsonify({
+                "success": True,
+                "user": user,
+                "token": new_access_token
+            }), 200
+        else:
+            return jsonify({"success": False, "message": "User invalid"}), 401
+
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500

@@ -49,16 +49,20 @@ def get_classes(dept_id):
 
 @exam_bp.route("/classes/<int:class_id>/exams", methods=["GET"])
 def get_exams_by_class(class_id):
+    difficulty = request.args.get('difficulty', default=1, type=int)
+
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     try:
         cursor.execute("""
-            SELECT id_ex, name_ex, total_ques, duration
+            SELECT id_ex, name_ex, total_ques, duration, id_diff
             FROM exam
-            WHERE id_class = %s
+            WHERE id_class = %s AND id_diff = %s
             ORDER BY id_ex DESC
-        """, (class_id,))
-        return jsonify({"success": True, "exams": cursor.fetchall()}), 200
+        """, (class_id, difficulty))
+        exams = cursor.fetchall()
+        return jsonify({"success": True, "exams": exams}), 200
+
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
     finally:
@@ -247,6 +251,7 @@ def get_result_detail(result_id):
 
         cursor.execute("""
             SELECT 
+                a.id_ans
                 a.id_ques,
                 q.ques_text,
                 q.ans_a,
@@ -263,7 +268,7 @@ def get_result_detail(result_id):
             WHERE a.id_user = %s AND a.id_ex = (
                 SELECT id_ex FROM results WHERE id_result = %s
             )
-            ORDER BY a.id_inter ASC
+            ORDER BY id_ans DECS
         """, (user_id, result_id))
 
         answers = cursor.fetchall()
