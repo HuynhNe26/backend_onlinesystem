@@ -35,6 +35,12 @@ def get_classrooms():
         if not id_department:
             return jsonify({"success": False, "message": "Thiếu id_department"}), 400
 
+        # Cast sang int để chắc chắn MySQL không báo lỗi kiểu dữ liệu
+        try:
+            id_department = int(id_department)
+        except ValueError:
+            return jsonify({"success": False, "message": "id_department phải là số"}), 400
+
         db = get_db_connection()
         cursor = db.cursor(dictionary=True)
         sql = "SELECT id_class, class_name FROM classroom WHERE id_department = %s"
