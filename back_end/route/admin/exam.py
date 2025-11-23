@@ -35,7 +35,6 @@ def get_classrooms():
         if not id_department:
             return jsonify({"success": False, "message": "Thiếu id_department"}), 400
 
-        # Cast sang int để chắc chắn MySQL không báo lỗi kiểu dữ liệu
         try:
             id_department = int(id_department)
         except ValueError:
@@ -43,8 +42,7 @@ def get_classrooms():
 
         db = get_db_connection()
         cursor = db.cursor(dictionary=True)
-        sql = "SELECT id_class, class_name FROM classroom WHERE id_department = %s"
-        cursor.execute(sql, (id_department,))
+        cursor.execute("SELECT id_class, class_name FROM classroom WHERE id_department = %s", (id_department,))
         classes = cursor.fetchall()
         return jsonify({"success": True, "data": classes})
     except Exception:
