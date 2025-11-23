@@ -22,3 +22,25 @@ def get_departments():
         return jsonify({"success": False, "message": "Lỗi server"}), 500
     finally:
         _close(cursor, db)
+
+@exam_bp.route('/classrooms', methods=['GET'])
+def get_classrooms():
+    db = cursor = None
+    try:
+        id_department = request.args.get("id_department")  # Lấy từ query param
+        if not id_department:
+            return jsonify({"success": False, "message": "Thiếu id_department"}), 400
+
+        db = get_db_connection()
+        cursor = db.cursor(dictionary=True)
+        sql = "SELECT id_class, class_name FROM class WHERE id_department = %s"
+        cursor.execute(sql, (id_department,))
+        classes = cursor.fetchall()
+
+        return jsonify({"success": True, "data": classes})
+
+    except Exception:
+        print("Lỗi lấy classrooms:", traceback.format_exc())
+        return jsonify({"success": False, "message": "Lỗi server"}), 500
+    finally:
+        _close(cursor, db)
