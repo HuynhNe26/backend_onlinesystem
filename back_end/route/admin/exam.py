@@ -27,29 +27,28 @@ def get_departments():
         _close(cursor, db)
 
 # Classrooms
-@exam_bp.route('/classrooms', methods=['GET'])
-def get_classrooms():
+@exam_bp.route('/classrooms/<int:id_department>', methods=['GET'])
+def get_classrooms_by_department(id_department):
     db = cursor = None
     try:
-        id_department = request.args.get("id_department")
-        if not id_department:
-            return jsonify({"success": False, "message": "Thiếu id_department"}), 400
-
-        try:
-            id_department = int(id_department)
-        except ValueError:
-            return jsonify({"success": False, "message": "id_department phải là số"}), 400
-
         db = get_db_connection()
         cursor = db.cursor(dictionary=True)
+
         cursor.execute(
             "SELECT id_class, class_name FROM classroom WHERE id_department = %s",
             (id_department,)
         )
         classes = cursor.fetchall()
-        return jsonify({"success": True, "data": classes})
-    except Exception:
+
+        if not classes:
+            return jsonify({"msg": "Không tìm thấy lớp học"}), 404
+
+        return jsonify({"success": True, "data": classes}), 200
+
+    except Exception as e:
         print("Lỗi lấy classrooms:", traceback.format_exc())
-        return jsonify({"success": False, "message": "Lỗi server"}), 500
+        return jsonify({"msg": "Lỗi server"}), 500
+
     finally:
         _close(cursor, db)
+
