@@ -27,7 +27,7 @@ def get_departments():
         _close(cursor, db)
 
 # Classrooms
-@exam_bp.route('/classrooms', methods=['GET'])
+@exam_bp.route('/classrooms', methods=['POST'])
 def get_classrooms():
     db = cursor = None
     try:
