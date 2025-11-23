@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from back_end.config.db_config import get_db_connection
 import traceback
 
@@ -27,15 +27,25 @@ def get_departments():
 def get_classrooms():
     db = cursor = None
     try:
-        id_department = request.args.get("id_department")  # Lấy từ query param
-        if not id_department:
+        # Lấy id_department từ query string
+        id_department_str = request.args.get("id_department")
+        if not id_department_str:
             return jsonify({"success": False, "message": "Thiếu id_department"}), 400
+
+        try:
+            id_department = int(id_department_str)
+        except ValueError:
+            return jsonify({"success": False, "message": "id_department không hợp lệ"}), 400
 
         db = get_db_connection()
         cursor = db.cursor(dictionary=True)
+
         sql = "SELECT id_class, class_name FROM class WHERE id_department = %s"
         cursor.execute(sql, (id_department,))
         classes = cursor.fetchall()
+
+        if not classes:
+            print(f"Không tìm thấy lớp cho department_id = {id_department}")
 
         return jsonify({"success": True, "data": classes})
 
