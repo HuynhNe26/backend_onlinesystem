@@ -10,7 +10,7 @@ def _close(cursor, db):
     if db:
         db.close()
 
-# Lấy danh sách phòng ban
+# Departments
 @exam_bp.route('/departments', methods=['GET'])
 def get_departments():
     db = cursor = None
@@ -26,12 +26,11 @@ def get_departments():
     finally:
         _close(cursor, db)
 
-# Lấy danh sách lớp theo id_department
+# Classrooms
 @exam_bp.route('/classrooms', methods=['GET'])
 def get_classrooms():
     db = cursor = None
     try:
-        # Lấy id_department từ query param
         id_department = request.args.get("id_department")
         if not id_department:
             return jsonify({"success": False, "message": "Thiếu id_department"}), 400
@@ -43,9 +42,10 @@ def get_classrooms():
 
         db = get_db_connection()
         cursor = db.cursor(dictionary=True)
-
-        # Query classroom theo id_department
-        cursor.execute("SELECT id_class, class_name FROM classroom WHERE id_department = %s", (id_department,))
+        cursor.execute(
+            "SELECT id_class, class_name FROM classroom WHERE id_department = %s",
+            (id_department,)
+        )
         classes = cursor.fetchall()
         return jsonify({"success": True, "data": classes})
     except Exception:
