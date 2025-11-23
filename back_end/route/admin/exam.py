@@ -10,6 +10,7 @@ def _close(cursor, db):
     if db:
         db.close()
 
+# Lấy danh sách phòng ban
 @exam_bp.route('/departments', methods=['GET'])
 def get_departments():
     db = cursor = None
@@ -18,18 +19,19 @@ def get_departments():
         cursor = db.cursor(dictionary=True)
         cursor.execute("SELECT id_department, name_department FROM department")
         departments = cursor.fetchall()
-        return jsonify({"success": True, "departments": departments})
+        return jsonify({"success": True, "data": departments})
     except Exception:
         print("Lỗi lấy departments:", traceback.format_exc())
         return jsonify({"success": False, "message": "Lỗi server"}), 500
     finally:
         _close(cursor, db)
 
+# Lấy danh sách lớp theo id_department
 @exam_bp.route('/classrooms', methods=['GET'])
 def get_classrooms():
     db = cursor = None
     try:
-        id_department = request.args.get("id_department")  # <- query param
+        id_department = request.args.get("id_department")
         if not id_department:
             return jsonify({"success": False, "message": "Thiếu id_department"}), 400
 
@@ -38,7 +40,7 @@ def get_classrooms():
         sql = "SELECT id_class, class_name FROM classroom WHERE id_department = %s"
         cursor.execute(sql, (id_department,))
         classes = cursor.fetchall()
-        return jsonify({"success": True, "classes": classes})
+        return jsonify({"success": True, "data": classes})
     except Exception:
         print("Lỗi lấy classrooms:", traceback.format_exc())
         return jsonify({"success": False, "message": "Lỗi server"}), 500
