@@ -149,6 +149,30 @@
         "documentation": {}
     },
     {
+        "label": "jsonify",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "request",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "Blueprint",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
         "label": "request",
         "importPath": "flask",
         "description": "flask",
@@ -759,6 +783,24 @@
         "description": "back_end.route.admin.login",
         "peekOfCode": "login_bp = Blueprint('login', __name__)\n@login_bp.route('/login', methods=['POST', 'OPTIONS'])\ndef login_admin():\n    if request.method == 'OPTIONS':\n        return '', 204\n    data = request.get_json()\n    email = data.get(\"email\")\n    password = data.get(\"password\")\n    print(f\"Login attempt - Email: {email}\")\n    if not email or not password:",
         "detail": "back_end.route.admin.login",
+        "documentation": {}
+    },
+    {
+        "label": "getUser",
+        "kind": 2,
+        "importPath": "back_end.route.admin.statistic",
+        "description": "back_end.route.admin.statistic",
+        "peekOfCode": "def getUser():\n    db = None\n    cursor = None\n    try:\n        db = get_db_connection()\n        cursor = db.cursor(dictionary=True)\n        cursor.execute('SELECT * FROM users WHERE level = 1')\n        users = cursor.fetchall()\n        if not users:\n            return jsonify({\"msg\": \"Không có dữ liệu người dùng\"}), 404",
+        "detail": "back_end.route.admin.statistic",
+        "documentation": {}
+    },
+    {
+        "label": "statistic",
+        "kind": 5,
+        "importPath": "back_end.route.admin.statistic",
+        "description": "back_end.route.admin.statistic",
+        "peekOfCode": "statistic = Blueprint('statistic', __name__)\nstatistic.route(\"/user\", methods=['GET'])\ndef getUser():\n    db = None\n    cursor = None\n    try:\n        db = get_db_connection()\n        cursor = db.cursor(dictionary=True)\n        cursor.execute('SELECT * FROM users WHERE level = 1')\n        users = cursor.fetchall()",
+        "detail": "back_end.route.admin.statistic",
         "documentation": {}
     },
     {
