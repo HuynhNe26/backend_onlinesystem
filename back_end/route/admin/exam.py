@@ -62,15 +62,18 @@ def get_difficulties():
     try:
         db = get_db_connection()
         cursor = db.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM difficulty")
+        cursor.execute("SELECT id_diff, difficulty FROM difficulty")  # chọn rõ cột
         diffs = cursor.fetchall()
         return jsonify({"success": True, "data": diffs})
     except Exception:
+        import traceback
         print("Lỗi lấy difficulties:", traceback.format_exc())
         return jsonify({"success": False, "message": "Lỗi server"}), 500
     finally:
-        _close(cursor, db)
-
+        if cursor:
+            cursor.close()
+        if db:
+            db.close()
 # -------------------- Create exam --------------------
 @exam_ad.route('/create', methods=['POST'])
 def create_exam():
