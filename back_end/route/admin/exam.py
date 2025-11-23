@@ -31,14 +31,23 @@ def get_departments():
 def get_classrooms():
     db = cursor = None
     try:
+        # Lấy id_department từ query param
+        id_department = request.args.get("id_department")
+        if not id_department:
+            return jsonify({"success": False, "message": "Thiếu id_department"}), 400
+
+        try:
+            id_department = int(id_department)
+        except ValueError:
+            return jsonify({"success": False, "message": "id_department phải là số"}), 400
+
         db = get_db_connection()
         cursor = db.cursor(dictionary=True)
 
-        # Lấy cố định id_department = 1
-        cursor.execute("SELECT id_class, class_name FROM classroom WHERE id_department = 1")
+        # Query classroom theo id_department
+        cursor.execute("SELECT id_class, class_name FROM classroom WHERE id_department = %s", (id_department,))
         classes = cursor.fetchall()
         return jsonify({"success": True, "data": classes})
-
     except Exception:
         print("Lỗi lấy classrooms:", traceback.format_exc())
         return jsonify({"success": False, "message": "Lỗi server"}), 500
