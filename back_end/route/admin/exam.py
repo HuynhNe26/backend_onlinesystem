@@ -62,7 +62,7 @@ def get_difficulties():
     try:
         db = get_db_connection()
         cursor = db.cursor(dictionary=True)
-        cursor.execute("SELECT id_diff, difficulty FROM dificulty")
+        cursor.execute("SELECT id_diff, difficulty FROM difficulty")
         diffs = cursor.fetchall()
         return jsonify({"success": True, "data": diffs})
     except Exception:
