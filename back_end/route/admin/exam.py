@@ -14,7 +14,6 @@ EXAM_CATEGORIES = [
 ]
 ALLOWED_CATS = {c['key'] for c in EXAM_CATEGORIES}
 
-# ------------------------ Helper ------------------------
 def _close(cursor, db):
     if cursor: cursor.close()
     if db: db.close()
@@ -27,11 +26,10 @@ def _validate_datetime_str(dt_str):
     try: return datetime.strptime(dt_str, "%Y-%m-%d")
     except: raise ValueError("Invalid datetime format. Use YYYY-MM-DD HH:MM[:SS]")
 
-# ------------------------ 0) Dropdowns ------------------------
+# ----------------- Dropdowns -----------------
 @exam_bp.route('/departments', methods=['GET'])
 def get_departments():
-    db = None
-    cursor = None
+    db = cursor = None
     try:
         db = get_db_connection()
         cursor = db.cursor(dictionary=True)
@@ -45,12 +43,15 @@ def get_departments():
 
 @exam_bp.route('/classrooms', methods=['GET'])
 def get_classrooms():
-    db = None
-    cursor = None
+    db = cursor = None
     try:
+        id_dept = request.args.get("id_department")
         db = get_db_connection()
         cursor = db.cursor(dictionary=True)
-        cursor.execute("SELECT id_class, class_name FROM class")
+        if id_dept:
+            cursor.execute("SELECT id_class, class_name, id_department FROM class WHERE id_department=%s", (id_dept,))
+        else:
+            cursor.execute("SELECT id_class, class_name, id_department FROM class")
         return jsonify({"success": True, "data": cursor.fetchall()})
     except Exception:
         print("Lỗi lấy classrooms:", traceback.format_exc())
@@ -60,8 +61,7 @@ def get_classrooms():
 
 @exam_bp.route('/difficulties', methods=['GET'])
 def get_difficulties():
-    db = None
-    cursor = None
+    db = cursor = None
     try:
         db = get_db_connection()
         cursor = db.cursor(dictionary=True)
@@ -81,11 +81,10 @@ def get_categories():
         print("Lỗi lấy categories:", traceback.format_exc())
         return jsonify({"success": False, "message": "Lỗi server"}), 500
 
-# ------------------------ 1) Create question ------------------------
+# ----------------- Create question -----------------
 @exam_bp.route('/question/create', methods=['POST'])
 def create_question():
-    db = None
-    cursor = None
+    db = cursor = None
     try:
         data = request.get_json() or {}
         ques_text = data.get('ques_text')
@@ -114,11 +113,10 @@ def create_question():
     finally:
         _close(cursor, db)
 
-# ------------------------ 2) Create exam ------------------------
+# ----------------- Create exam -----------------
 @exam_bp.route('/create', methods=['POST'])
 def create_exam():
-    db = None
-    cursor = None
+    db = cursor = None
     try:
         data = request.get_json() or {}
         id_department = data.get('id_department')
@@ -159,11 +157,10 @@ def create_exam():
     finally:
         _close(cursor, db)
 
-# ------------------------ 3) Add questions to exam ------------------------
+# ----------------- Add questions -----------------
 @exam_bp.route('/<int:id_exam>/add-questions', methods=['POST'])
 def add_questions_to_exam(id_exam):
-    db = None
-    cursor = None
+    db = cursor = None
     try:
         data = request.get_json() or {}
         questions = data.get('questions')
