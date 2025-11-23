@@ -121,4 +121,50 @@ def create_admin():
         if db:
             db.close()
 
+@admin_bp.route('/update/<int:id>', methods=['PUT'])
+def updateAdmin(id):
+    db = None
+    cursor = None
+    try:
+        data = request.get_json()
+        email = data.get("email")
+        full_name = data.get("fullName")          
+        date_of_birth = data.get("dateOfBirth")
+        gender = data.get("gender")
 
+        if not all([email, full_name, date_of_birth, gender]):
+            return jsonify({"success": False, "msg": "Thiếu thông tin bắt buộc"}), 400
+        
+        db = get_db_connection()
+        cursor = db.cursor(dictionary=True)
+
+        cursor.execute("SELECT * FROM users WHERE id_user=%s", (id,))
+        admin = cursor.fetchone()
+        
+        if not admin:
+            return jsonify({"success": False, "msg": "Không tìm thấy quản trị viên"}), 404
+
+        update_query = """
+            UPDATE users 
+            SET email=%s, fullName=%s, dateOfBirth=%s, gender=%s 
+            WHERE id_user=%s
+        """
+        cursor.execute(update_query, (email, full_name, date_of_birth, gender, id))
+        db.commit()
+        
+        cursor.execute("SELECT * FROM users WHERE id=%s", (id,))
+        updated_admin = cursor.fetchone()
+
+        return jsonify({"success": True, "msg": "Cập nhật thành công", "data": updated_admin}), 200
+
+    except Exception as e:
+        if db:
+            db.rollback()
+        print("Lỗi cập nhật dữ liệu:", e)
+        return jsonify({"success": False, "msg": "Lỗi server"}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if db:
+            db.close()

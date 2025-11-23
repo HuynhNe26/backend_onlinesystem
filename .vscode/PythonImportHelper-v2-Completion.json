@@ -278,6 +278,46 @@
         "documentation": {}
     },
     {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "timedelta",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "timedelta",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
         "label": "create_access_token",
         "importPath": "flask_jwt_extended",
         "description": "flask_jwt_extended",
@@ -379,38 +419,6 @@
         "description": "flask_jwt_extended",
         "isExtraImport": true,
         "detail": "flask_jwt_extended",
-        "documentation": {}
-    },
-    {
-        "label": "timedelta",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "timedelta",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
         "documentation": {}
     },
     {
@@ -656,6 +664,15 @@
         "documentation": {}
     },
     {
+        "label": "updateAdmin",
+        "kind": 2,
+        "importPath": "back_end.route.admin.admin",
+        "description": "back_end.route.admin.admin",
+        "peekOfCode": "def updateAdmin(id):\n    db = None\n    cursor = None\n    try:\n        data = request.get_json()\n        email = data.get(\"email\")\n        full_name = data.get(\"fullName\")          \n        date_of_birth = data.get(\"dateOfBirth\")\n        gender = data.get(\"gender\")\n        if not all([email, full_name, date_of_birth, gender]):",
+        "detail": "back_end.route.admin.admin",
+        "documentation": {}
+    },
+    {
         "label": "admin_bp",
         "kind": 5,
         "importPath": "back_end.route.admin.admin",
@@ -683,11 +700,29 @@
         "documentation": {}
     },
     {
+        "label": "get_difficulties",
+        "kind": 2,
+        "importPath": "back_end.route.admin.exam",
+        "description": "back_end.route.admin.exam",
+        "peekOfCode": "def get_difficulties():\n    db = cursor = None\n    try:\n        db = get_db_connection()\n        cursor = db.cursor(dictionary=True)\n        cursor.execute(\"SELECT id_diff, difficulty FROM difficulty\")  # chọn rõ cột\n        diffs = cursor.fetchall()\n        return jsonify({\"success\": True, \"data\": diffs})\n    except Exception:\n        import traceback",
+        "detail": "back_end.route.admin.exam",
+        "documentation": {}
+    },
+    {
+        "label": "create_exam",
+        "kind": 2,
+        "importPath": "back_end.route.admin.exam",
+        "description": "back_end.route.admin.exam",
+        "peekOfCode": "def create_exam():\n    db = cursor = None\n    try:\n        data = request.get_json()\n        required_fields = [\"id_department\", \"id_class\", \"id_diff\", \"total_ques\", \"duration\", \"name_ex\"]\n        for field in required_fields:\n            if field not in data or data[field] in [None, \"\"]:\n                return jsonify({\"success\": False, \"message\": f\"Thiếu {field}\"}), 400\n        db = get_db_connection()\n        cursor = db.cursor()",
+        "detail": "back_end.route.admin.exam",
+        "documentation": {}
+    },
+    {
         "label": "exam_ad",
         "kind": 5,
         "importPath": "back_end.route.admin.exam",
         "description": "back_end.route.admin.exam",
-        "peekOfCode": "exam_ad = Blueprint('exam_ad', __name__)\ndef _close(cursor, db):\n    if cursor:\n        cursor.close()\n    if db:\n        db.close()\n# Departments\n@exam_ad.route('/departments', methods=['GET'])\ndef get_departments():\n    db = cursor = None",
+        "peekOfCode": "exam_ad = Blueprint('exam_ad', __name__)\ndef _close(cursor, db):\n    if cursor:\n        cursor.close()\n    if db:\n        db.close()\n# -------------------- Departments --------------------\n@exam_ad.route('/departments', methods=['GET'])\ndef get_departments():\n    db = cursor = None",
         "detail": "back_end.route.admin.exam",
         "documentation": {}
     },
@@ -957,7 +992,7 @@
         "kind": 5,
         "importPath": "back_end.app",
         "description": "back_end.app",
-        "peekOfCode": "jwt = JWTManager(app)\n# Users\napp.register_blueprint(users_bp, url_prefix='/api/users')\napp.register_blueprint(exam_bp, url_prefix='/api/exam')\napp.register_blueprint(package_bp, url_prefix='/api')\n# Admin\napp.register_blueprint(login_bp, url_prefix='/api/admin')\napp.register_blueprint(admin_bp, url_prefix='/api/admin')\napp.register_blueprint(users_ad, url_prefix='/api')\napp.register_blueprint(exam_ad, url_prefix='/api/exam')",
+        "peekOfCode": "jwt = JWTManager(app)\n# Users\napp.register_blueprint(users_bp, url_prefix='/api/users')\napp.register_blueprint(exam_bp, url_prefix='/api/exam')\napp.register_blueprint(package_bp, url_prefix='/api')\n# Admin\napp.register_blueprint(login_bp, url_prefix='/api/admin')\napp.register_blueprint(admin_bp, url_prefix='/api/admin')\napp.register_blueprint(users_ad, url_prefix='/api')\napp.register_blueprint(exam_ad, url_prefix='/api/ad_exam')",
         "detail": "back_end.app",
         "documentation": {}
     }
