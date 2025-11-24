@@ -268,7 +268,7 @@ def get_result_detail(result_id):
             WHERE a.id_user = %s AND a.id_ex = (
                 SELECT id_ex FROM results WHERE id_result = %s
             )
-            ORDER BY id_ans DECS
+            ORDER BY id_ans DESC
         """, (user_id, result_id))
 
         answers = cursor.fetchall()
