@@ -251,7 +251,7 @@ def get_result_detail(result_id):
 
         cursor.execute("""
             SELECT 
-                a.id_ans
+                a.id_ans,
                 a.id_ques,
                 q.ques_text,
                 q.ans_a,
