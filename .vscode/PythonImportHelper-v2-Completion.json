@@ -687,20 +687,11 @@
         "documentation": {}
     },
     {
-        "label": "create_admin",
-        "kind": 2,
-        "importPath": "back_end.route.admin.admin",
-        "description": "back_end.route.admin.admin",
-        "peekOfCode": "def create_admin():\n    db = None\n    cursor = None\n    try:\n        data = request.get_json()\n        email = data.get(\"email\")\n        full_name = data.get(\"fullName\")          \n        date_of_birth = data.get(\"dateOfBirth\")\n        password = data.get(\"password\")\n        gender = data.get(\"gender\")",
-        "detail": "back_end.route.admin.admin",
-        "documentation": {}
-    },
-    {
         "label": "updateAdmin",
         "kind": 2,
         "importPath": "back_end.route.admin.admin",
         "description": "back_end.route.admin.admin",
-        "peekOfCode": "def updateAdmin(id):\n    db = None\n    cursor = None\n    try:\n        data = request.get_json()\n        email = data.get(\"email\")\n        full_name = data.get(\"fullName\")          \n        date_of_birth = data.get(\"dateOfBirth\")\n        gender = data.get(\"gender\")\n        if not all([email, full_name, date_of_birth, gender]):",
+        "peekOfCode": "def updateAdmin(id):\n    db = None\n    cursor = None\n    try:\n        data = request.get_json()\n        email = data.get(\"email\")\n        full_name = data.get(\"fullName\")\n        date_of_birth = data.get(\"dateOfBirth\")\n        gender = data.get(\"gender\")\n        print(\"RECEIVED:\", data)",
         "detail": "back_end.route.admin.admin",
         "documentation": {}
     },
