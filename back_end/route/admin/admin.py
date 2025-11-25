@@ -153,38 +153,18 @@ def updateAdmin(id):
         if not admin:
             return jsonify({"success": False, "msg": "Không tìm thấy quản trị viên"}), 404
 
-        cursor.execute("SELECT id FROM users WHERE email=%s AND id_user!=%s", (email, id))
+        cursor.execute("SELECT id_user FROM users WHERE email=%s AND id_user!=%s", (email, id))
         existing_email = cursor.fetchone()
         
         if existing_email:
             return jsonify({"success": False, "msg": "Email đã được sử dụng bởi tài khoản khác"}), 409
-
-        try:
-            birth_date = datetime.strptime(date_of_birth, '%Y-%m-%d')
-            today = datetime.now()
-            age = (today - birth_date).days / 365.25
-            
-            if age < 18:
-                return jsonify({"success": False, "msg": "Quản trị viên phải từ 18 tuổi trở lên"}), 400
-            
-            if age > 100:
-                return jsonify({"success": False, "msg": "Ngày sinh không hợp lệ"}), 400
-                
-        except ValueError:
-            return jsonify({"success": False, "msg": "Định dạng ngày sinh không hợp lệ (YYYY-MM-DD)"}), 400
-        
-        if len(full_name.strip()) < 2:
-            return jsonify({"success": False, "msg": "Họ tên phải có ít nhất 2 ký tự"}), 400
-        
-        if len(full_name) > 100:
-            return jsonify({"success": False, "msg": "Họ tên không được quá 100 ký tự"}), 400
 
         update_query = """
             UPDATE users 
             SET email=%s, fullName=%s, dateOfBirth=%s, gender=%s 
             WHERE id_user=%s
         """
-        cursor.execute(update_query, (email, full_name.strip(), date_of_birth, gender, id))
+        cursor.execute(update_query, (email, full_name, date_of_birth, gender, id))
         db.commit()
         
         cursor.execute("SELECT * FROM users WHERE id_user=%s", (id,))
