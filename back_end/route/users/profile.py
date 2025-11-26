@@ -34,10 +34,15 @@ def get_user(id_user):
         if not user:
             return jsonify({"success": False, "message": "Không tìm thấy người dùng"}), 404
 
-        # Chuẩn hóa dateOfBirth về string YYYY-MM-DD nếu là datetime
+        # ✅ Chuẩn hóa dateOfBirth về dạng YYYY-MM-DD
         if user.get("dateOfBirth"):
             try:
-                user["dateOfBirth"] = str(user["dateOfBirth"]).split(" ")[0]
+                # Nếu là datetime.date hoặc datetime.datetime
+                if hasattr(user["dateOfBirth"], "strftime"):
+                    user["dateOfBirth"] = user["dateOfBirth"].strftime("%Y-%m-%d")
+                else:
+                    # Nếu là string thì cắt đúng 10 ký tự đầu
+                    user["dateOfBirth"] = str(user["dateOfBirth"])[:10]
             except Exception:
                 pass
 
