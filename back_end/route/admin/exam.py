@@ -123,13 +123,13 @@ def add_question():
         if not data:
             return jsonify({"success": False, "message": "Không nhận được dữ liệu"}), 400
 
-        # Kiểm tra các trường bắt buộc
+        # Các trường bắt buộc
         required_fields = ["ques_text", "ans_a", "ans_b", "ans_c", "ans_d", "correct_ans", "point"]
         for f in required_fields:
             if f not in data or str(data[f]).strip() == "":
                 return jsonify({"success": False, "message": f"Thiếu {f}"}), 400
 
-        # Safe convert point sang float
+        # Convert point sang float
         try:
             point = float(data["point"])
         except ValueError:
@@ -139,8 +139,9 @@ def add_question():
         cursor = db.cursor()
 
         sql = """
-            INSERT INTO questions(ques_text, ans_a, ans_b, ans_c, ans_d, correct_ans, point, explanation) 
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
+            INSERT INTO questions
+            (ques_text, ans_a, ans_b, ans_c, ans_d, correct_ans, point, explanation)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         """
         cursor.execute(sql, (
             data["ques_text"].strip(),
@@ -150,7 +151,7 @@ def add_question():
             data["ans_d"].strip(),
             data["correct_ans"].strip(),
             point,
-            data.get("explanation", "").strip()
+            str(data.get("explanation", "")).strip()
         ))
 
         db.commit()
@@ -165,13 +166,12 @@ def add_question():
     except Exception as e:
         import traceback
         print("Lỗi add_question:", traceback.format_exc())
-        return jsonify({"success": False, "message": str(e)}), 500
+        return jsonify({"success": False, "message": "Lỗi server: " + str(e)}), 500
     finally:
         if cursor:
             cursor.close()
         if db:
             db.close()
-
 # -------------------- Gắn câu hỏi vào đề --------------------
 @exam_ad.route('/add_exam_question', methods=['POST'])
 def add_exam_question():
