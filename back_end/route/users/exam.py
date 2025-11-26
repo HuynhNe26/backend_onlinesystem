@@ -30,6 +30,96 @@ def get_departments():
         cursor.close()
         conn.close()
 
+# ================= CRUD DEPARTMENT =================
+@exam_bp.route("/departments", methods=["POST"])
+def create_department():
+    data = request.get_json()
+    name = data.get("name_department")
+
+    if not name:
+        return jsonify({"success": False, "message": "Tên khoa không được để trống"}), 400
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    try:
+        cursor.execute("""
+            INSERT INTO department (name_department, status)
+            VALUES (%s, 'Đang hoạt động')
+        """, (name,))
+        conn.commit()
+        return jsonify({"success": True, "message": "Tạo khoa thành công"}), 201
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+
+@exam_bp.route("/departments/<int:dept_id>", methods=["GET"])
+def get_department(dept_id):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    try:
+        cursor.execute("""
+            SELECT id_department, name_department, status
+            FROM department
+            WHERE id_department = %s
+        """, (dept_id,))
+        dep = cursor.fetchone()
+        if not dep:
+            return jsonify({"success": False, "message": "Không tìm thấy khoa"}), 404
+        return jsonify({"success": True, "department": dep}), 200
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+
+@exam_bp.route("/departments/<int:dept_id>", methods=["PUT"])
+def update_department(dept_id):
+    data = request.get_json()
+    name = data.get("name_department")
+
+    if not name:
+        return jsonify({"success": False, "message": "Tên khoa không được để trống"}), 400
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    try:
+        cursor.execute("""
+            UPDATE department
+            SET name_department = %s
+            WHERE id_department = %s
+        """, (name, dept_id))
+        conn.commit()
+        return jsonify({"success": True, "message": "Cập nhật khoa thành công"}), 200
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+
+@exam_bp.route("/departments/<int:dept_id>", methods=["DELETE"])
+def delete_department(dept_id):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    try:
+        cursor.execute("""
+            UPDATE department
+            SET status = 'Ngừng hoạt động'
+            WHERE id_department = %s
+        """, (dept_id,))
+        conn.commit()
+        return jsonify({"success": True, "message": "Đã ngừng hoạt động khoa"}), 200
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+
 @exam_bp.route("/departments/<int:dept_id>/classes", methods=["GET"])
 def get_classes(dept_id):
     conn = get_db_connection()
