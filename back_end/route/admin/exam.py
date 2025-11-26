@@ -280,5 +280,49 @@ def exam_detail():
     finally:
         if cursor: cursor.close()
         if db: db.close()
+@exam_ad.route('/delete_exam', methods=['DELETE'])
+def delete_exam():
+    db = cursor = None
+    try:
+        data = request.get_json() or {}
+        id_ex = data.get("id_ex", None)
+        mode = (data.get("mode") or "keep_questions").strip()
+        # mode: "keep_questions" (mặc định) hoặc "delete_questions"
+
+        if not id_ex:
+            return jsonify({"success": False, "message": "Thiếu id_ex"}), 400
+
+        db = get_db_connection()
+        cursor = db.cursor()
+        db.start_transaction()
+
+        # Lấy danh sách id_ques thuộc đề (phục vụ mode delete_questions)
+        cursor.execute("SELECT id_ques FROM exam_question WHERE id_ex = %s", (int(id_ex),))
+        ques_ids = [row[0] for row in cursor.fetchall()]
+
+        # Xóa quan hệ câu hỏi-đề
+        cursor.execute("DELETE FROM exam_question WHERE id_ex = %s", (int(id_ex),))
+        # Xóa đề
+        cursor.execute("DELETE FROM exam WHERE id_ex = %s", (int(id_ex),))
+
+        if mode == "delete_questions" and ques_ids:
+            # Chỉ xóa câu hỏi nếu không còn gắn ở đề khác
+            # (tránh xóa nhầm câu hỏi đang dùng nơi khác)
+            for qid in ques_ids:
+                cursor.execute("SELECT COUNT(*) FROM exam_question WHERE id_ques = %s", (qid,))
+                cnt = cursor.fetchone()[0]
+                if cnt == 0:
+                    cursor.execute("DELETE FROM questions WHERE id_ques = %s", (qid,))
+
+        db.commit()
+        return jsonify({"success": True, "message": "Xóa đề thi thành công", "mode": mode})
+    except Exception as e:
+        import traceback
+        print("Lỗi delete_exam:", traceback.format_exc())
+        if db: db.rollback()
+        return jsonify({"success": False, "message": "Lỗi server: " + str(e)}), 500
+    finally:
+        if cursor: cursor.close()
+        if db: db.close()
 
 
