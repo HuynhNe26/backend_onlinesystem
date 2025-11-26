@@ -140,7 +140,7 @@ def add_question():
             data["ans_c"],
             data["ans_d"],
             data["correct_ans"],
-            int(data["point"]),
+            float(data["point"]),
             data.get("explanation", "")
         ))
 
