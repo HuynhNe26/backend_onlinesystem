@@ -224,7 +224,7 @@ def get_exams():
                 e.end_time,
                 IFNULL(c.class_name,'') as class_name,
                 IFNULL(d.difficulty,'') as difficulty
-            FROM exams e
+            FROM exam e
             LEFT JOIN classroom c ON e.id_class = c.id_class
             LEFT JOIN difficulty d ON e.id_diff = d.id_diff
             ORDER BY e.id_ex DESC
