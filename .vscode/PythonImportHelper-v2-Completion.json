@@ -261,22 +261,6 @@
         "documentation": {}
     },
     {
-        "label": "Blueprint",
-        "importPath": "flask",
-        "description": "flask",
-        "isExtraImport": true,
-        "detail": "flask",
-        "documentation": {}
-    },
-    {
-        "label": "jsonify",
-        "importPath": "flask",
-        "description": "flask",
-        "isExtraImport": true,
-        "detail": "flask",
-        "documentation": {}
-    },
-    {
         "label": "Flask",
         "importPath": "flask",
         "description": "flask",
@@ -400,22 +384,6 @@
     },
     {
         "label": "jwt_required",
-        "importPath": "flask_jwt_extended",
-        "description": "flask_jwt_extended",
-        "isExtraImport": true,
-        "detail": "flask_jwt_extended",
-        "documentation": {}
-    },
-    {
-        "label": "jwt_required",
-        "importPath": "flask_jwt_extended",
-        "description": "flask_jwt_extended",
-        "isExtraImport": true,
-        "detail": "flask_jwt_extended",
-        "documentation": {}
-    },
-    {
-        "label": "get_jwt_identity",
         "importPath": "flask_jwt_extended",
         "description": "flask_jwt_extended",
         "isExtraImport": true,
@@ -1008,33 +976,6 @@
         "description": "back_end.route.users.exam",
         "peekOfCode": "exam_bp = Blueprint(\"exam_bp\", __name__)\ndef get_current_user_id():\n    identity = get_jwt_identity()\n    if isinstance(identity, dict):\n        return identity.get(\"id\") or identity.get(\"user_id\") or identity.get(\"id_user\")\n    return identity\n@exam_bp.route(\"/departments\", methods=[\"GET\"])\ndef get_departments():\n    conn = get_db_connection()\n    cursor = conn.cursor(dictionary=True)",
         "detail": "back_end.route.users.exam",
-        "documentation": {}
-    },
-    {
-        "label": "get_all_packages",
-        "kind": 2,
-        "importPath": "back_end.route.users.package",
-        "description": "back_end.route.users.package",
-        "peekOfCode": "def get_all_packages():\n    try:\n        conn = get_db_connection()\n        cursor = conn.cursor(dictionary=True)\n        cursor.execute(\"SELECT * FROM package ORDER BY id_package\")\n        packages = cursor.fetchall()\n        cursor.close()\n        conn.close()\n        return jsonify({\n            \"msg\": \"Lấy danh sách package thành công\",",
-        "detail": "back_end.route.users.package",
-        "documentation": {}
-    },
-    {
-        "label": "get_package_by_id",
-        "kind": 2,
-        "importPath": "back_end.route.users.package",
-        "description": "back_end.route.users.package",
-        "peekOfCode": "def get_package_by_id(package_id):\n    \"\"\"\n    Lấy thông tin chi tiết 1 package theo ID\n    Endpoint: GET /api/packages/<id>\n    \"\"\"\n    try:\n        conn = get_db_connection()\n        cursor = conn.cursor(dictionary=True)\n        cursor.execute(\"SELECT * FROM package WHERE id_package = %s\", (package_id,))\n        package = cursor.fetchone()",
-        "detail": "back_end.route.users.package",
-        "documentation": {}
-    },
-    {
-        "label": "package_bp",
-        "kind": 5,
-        "importPath": "back_end.route.users.package",
-        "description": "back_end.route.users.package",
-        "peekOfCode": "package_bp = Blueprint('package_bp', __name__)\n@package_bp.route('/packages', methods=['GET'])\ndef get_all_packages():\n    try:\n        conn = get_db_connection()\n        cursor = conn.cursor(dictionary=True)\n        cursor.execute(\"SELECT * FROM package ORDER BY id_package\")\n        packages = cursor.fetchall()\n        cursor.close()\n        conn.close()",
-        "detail": "back_end.route.users.package",
         "documentation": {}
     },
     {
