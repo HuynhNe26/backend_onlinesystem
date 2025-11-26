@@ -210,6 +210,7 @@ def exam_history():
             SELECT 
                 r.id_result, 
                 e.name_ex AS exam_name,
+                e.total_ques,
                 r.score, 
                 r.total_correct,
                 r.start_time, 

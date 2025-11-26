@@ -13,8 +13,8 @@ from back_end.route.admin.exam import exam_ad
 # -------------------- Users Blueprints --------------------
 from back_end.route.users.auth import users_bp
 from back_end.route.users.exam import exam_bp
-from back_end.route.users.package import package_bp
 from back_end.route.users.profile import profile_bp
+
 app = Flask(__name__)
 frontend_origins = [
     "https://frontend-admin-onlinesystem-eugd.onrender.com",
