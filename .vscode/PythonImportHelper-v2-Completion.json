@@ -736,7 +736,52 @@
         "kind": 2,
         "importPath": "back_end.route.admin.exam",
         "description": "back_end.route.admin.exam",
-        "peekOfCode": "def create_exam():\n    db = cursor = None\n    try:\n        data = request.get_json()\n        required_fields = [ \"id_class\", \"id_diff\", \"total_ques\", \"duration\", \"name_ex\"]\n        for field in required_fields:\n            if field not in data or data[field] in [None, \"\"]:\n                return jsonify({\"success\": False, \"message\": f\"Thiếu {field}\"}), 400\n        db = get_db_connection()\n        cursor = db.cursor()",
+        "peekOfCode": "def create_exam():\n    db = cursor = None\n    try:\n        data = request.get_json()\n        required_fields = [\"id_class\", \"id_diff\", \"total_ques\", \"duration\", \"name_ex\"]\n        for field in required_fields:\n            if field not in data or data[field] in [None, \"\"]:\n                return jsonify({\"success\": False, \"message\": f\"Thiếu {field}\"}), 400\n        db = get_db_connection()\n        cursor = db.cursor()",
+        "detail": "back_end.route.admin.exam",
+        "documentation": {}
+    },
+    {
+        "label": "add_question",
+        "kind": 2,
+        "importPath": "back_end.route.admin.exam",
+        "description": "back_end.route.admin.exam",
+        "peekOfCode": "def add_question():\n    db = cursor = None\n    try:\n        data = request.get_json()\n        if not data:\n            return jsonify({\"success\": False, \"message\": \"Không nhận được dữ liệu\"}), 400\n        # Các trường bắt buộc\n        required_fields = [\"ques_text\", \"ans_a\", \"ans_b\", \"ans_c\", \"ans_d\", \"correct_ans\", \"point\"]\n        for f in required_fields:\n            if f not in data or str(data[f]).strip() == \"\":",
+        "detail": "back_end.route.admin.exam",
+        "documentation": {}
+    },
+    {
+        "label": "add_exam_question",
+        "kind": 2,
+        "importPath": "back_end.route.admin.exam",
+        "description": "back_end.route.admin.exam",
+        "peekOfCode": "def add_exam_question():\n    db = cursor = None\n    try:\n        data = request.get_json()\n        if \"id_ex\" not in data or \"id_ques\" not in data:\n            return jsonify({\"success\": False, \"message\": \"Thiếu id_ex hoặc id_ques\"}), 400\n        db = get_db_connection()\n        cursor = db.cursor()\n        sql = \"INSERT INTO exam_question(id_ex, id_ques) VALUES (%s, %s)\"\n        cursor.execute(sql, (int(data[\"id_ex\"]), int(data[\"id_ques\"])))",
+        "detail": "back_end.route.admin.exam",
+        "documentation": {}
+    },
+    {
+        "label": "get_exams",
+        "kind": 2,
+        "importPath": "back_end.route.admin.exam",
+        "description": "back_end.route.admin.exam",
+        "peekOfCode": "def get_exams():\n    db = cursor = None\n    try:\n        db = get_db_connection()\n        cursor = db.cursor(dictionary=True)\n        sql = \"\"\"\n            SELECT \n                e.id_ex,\n                e.name_ex,\n                e.id_class,",
+        "detail": "back_end.route.admin.exam",
+        "documentation": {}
+    },
+    {
+        "label": "exam_detail",
+        "kind": 2,
+        "importPath": "back_end.route.admin.exam",
+        "description": "back_end.route.admin.exam",
+        "peekOfCode": "def exam_detail():\n    db = cursor = None\n    try:\n        id_ex = request.args.get('id_ex', type=int)\n        if not id_ex:\n            return jsonify({\"success\": False, \"message\": \"Thiếu id_ex\"}), 400\n        db = get_db_connection()\n        try:\n            cursor = db.cursor(dictionary=True)  # mysql.connector\n            use_dict = False",
+        "detail": "back_end.route.admin.exam",
+        "documentation": {}
+    },
+    {
+        "label": "delete_exam",
+        "kind": 2,
+        "importPath": "back_end.route.admin.exam",
+        "description": "back_end.route.admin.exam",
+        "peekOfCode": "def delete_exam():\n    db = cursor = None\n    try:\n        data = request.get_json() or {}\n        id_ex = data.get(\"id_ex\")\n        if not id_ex:\n            return jsonify({\"success\": False, \"message\": \"Thiếu id_ex\"}), 400\n        db = get_db_connection()\n        cursor = db.cursor()\n        db.start_transaction()",
         "detail": "back_end.route.admin.exam",
         "documentation": {}
     },

@@ -216,6 +216,7 @@ def exam_history():
                 r.completed_time,
                 c.id_class,
                 c.class_name
+                e.total_ques
             FROM results r
             JOIN exam e ON e.id_ex = r.id_ex
             JOIN classroom c ON c.id_class = e.id_class
