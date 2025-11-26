@@ -80,7 +80,7 @@ def create_exam():
     db = cursor = None
     try:
         data = request.get_json()
-        required_fields = ["id_department", "id_class", "id_diff", "total_ques", "duration", "name_ex"]
+        required_fields = [ "id_class", "id_diff", "total_ques", "duration", "name_ex"]
         for field in required_fields:
             if field not in data or data[field] in [None, ""]:
                 return jsonify({"success": False, "message": f"Thiếu {field}"}), 400
@@ -90,11 +90,10 @@ def create_exam():
 
         sql = """
         INSERT INTO exam
-        (id_department, id_class, id_diff, total_ques, duration, name_ex, exam_cat)
-        VALUES (%s, %s, %s, %s, %s, %s, 'draft')
+        ( id_class, id_diff, total_ques, duration, name_ex, exam_cat)
+        VALUES (%s, %s, %s, %s, %s, 'draft')
         """
         cursor.execute(sql, (
-            int(data["id_department"]),
             int(data["id_class"]),
             int(data["id_diff"]),
             int(data["total_ques"]),
