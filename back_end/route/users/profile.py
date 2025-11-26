@@ -2,11 +2,18 @@ from flask import Blueprint, request, jsonify
 from back_end.config.db_config import get_db_connection
 import traceback
 import hashlib
+
+# Blueprint
 profile_bp = Blueprint("profile_bp", __name__)
 
+# Helper đóng kết nối
 def _close(cursor, db):
     if cursor: cursor.close()
     if db: db.close()
+
+# Hàm hash mật khẩu (SHA256)
+def hash_password(pw: str) -> str:
+    return hashlib.sha256(pw.encode()).hexdigest()
 
 # =================== Xem thông tin cá nhân ===================
 @profile_bp.route("/users/<int:id_user>", methods=["GET"])
@@ -15,7 +22,10 @@ def get_user(id_user):
     try:
         db = get_db_connection()
         cursor = db.cursor(dictionary=True)
-        cursor.execute("SELECT id_user, fullName, dateOfBirth, email, role, status, gender, avatar, level FROM users WHERE id_user=%s", (id_user,))
+        cursor.execute("""
+            SELECT id_user, fullName, dateOfBirth, email, role, status, gender, avatar, level
+            FROM users WHERE id_user=%s
+        """, (id_user,))
         user = cursor.fetchone()
         if not user:
             return jsonify({"success": False, "message": "Không tìm thấy người dùng"}), 404
@@ -37,8 +47,7 @@ def update_user():
             return jsonify({"success": False, "message": "Thiếu id_user"}), 400
 
         fields = ["fullName", "dateOfBirth", "email", "gender", "avatar", "status", "level"]
-        updates = []
-        values = []
+        updates, values = [], []
         for f in fields:
             if f in data:
                 updates.append(f"{f}=%s")
@@ -82,11 +91,12 @@ def change_password():
         if not user:
             return jsonify({"success": False, "message": "Không tìm thấy người dùng"}), 404
 
-        # So sánh mật khẩu cũ (ở đây demo, chưa mã hóa)
-        if user["password"] != old_pass:
+        # So sánh mật khẩu cũ (hash)
+        if user["password"] != hash_password(old_pass):
             return jsonify({"success": False, "message": "Mật khẩu cũ không đúng"}), 400
 
-        cursor.execute("UPDATE users SET password=%s WHERE id_user=%s", (new_pass, id_user))
+        cursor.execute("UPDATE users SET password=%s WHERE id_user=%s",
+                       (hash_password(new_pass), id_user))
         db.commit()
 
         return jsonify({"success": True, "message": "Đổi mật khẩu thành công"})
