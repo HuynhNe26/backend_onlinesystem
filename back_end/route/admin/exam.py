@@ -243,7 +243,12 @@ def exam_detail():
             return jsonify({"success": False, "message": "Thiếu id_ex"}), 400
 
         db = get_db_connection()
-        cursor = db.cursor(dictionary=True)
+        try:
+            cursor = db.cursor(dictionary=True)  # mysql.connector
+            use_dict = False
+        except TypeError:
+            cursor = db.cursor()  # pymysql
+            use_dict = True
 
         # Thông tin đề
         cursor.execute("""
@@ -272,7 +277,26 @@ def exam_detail():
         """, (id_ex,))
         questions = cursor.fetchall()
 
+        # Nếu dùng pymysql thì convert sang dict
+        if use_dict:
+            if exam:
+                exam = {
+                    "id_ex": exam[0], "name_ex": exam[1], "id_class": exam[2],
+                    "id_diff": exam[3], "total_ques": exam[4], "duration": exam[5],
+                    "exam_cat": exam[6], "start_time": exam[7], "end_time": exam[8],
+                    "class_name": exam[9], "difficulty": exam[10]
+                }
+            questions = [
+                {
+                    "id_ques": row[0], "ques_text": row[1],
+                    "ans_a": row[2], "ans_b": row[3], "ans_c": row[4], "ans_d": row[5],
+                    "correct_ans": row[6], "point": row[7], "explanation": row[8]
+                }
+                for row in questions
+            ]
+
         return jsonify({"success": True, "data": {"exam": exam, "questions": questions}})
+
     except Exception as e:
         import traceback
         print("Lỗi exam_detail:", traceback.format_exc())
