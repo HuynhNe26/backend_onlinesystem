@@ -149,6 +149,30 @@
         "documentation": {}
     },
     {
+        "label": "jsonify",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "request",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "Blueprint",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
         "label": "request",
         "importPath": "flask",
         "description": "flask",
@@ -270,6 +294,63 @@
         "documentation": {}
     },
     {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "timedelta",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "timedelta",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "re",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "re",
+        "description": "re",
+        "detail": "re",
+        "documentation": {}
+    },
+    {
         "label": "get_db_connection",
         "importPath": "back_end.config.db_config",
         "description": "back_end.config.db_config",
@@ -382,38 +463,6 @@
         "documentation": {}
     },
     {
-        "label": "timedelta",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "timedelta",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
         "label": "generate_password_hash",
         "importPath": "werkzeug.security",
         "description": "werkzeug.security",
@@ -427,15 +476,6 @@
         "description": "werkzeug.security",
         "isExtraImport": true,
         "detail": "werkzeug.security",
-        "documentation": {}
-    },
-    {
-        "label": "re",
-        "kind": 6,
-        "isExtraImport": true,
-        "importPath": "re",
-        "description": "re",
-        "detail": "re",
         "documentation": {}
     },
     {
@@ -647,11 +687,11 @@
         "documentation": {}
     },
     {
-        "label": "create_admin",
+        "label": "updateAdmin",
         "kind": 2,
         "importPath": "back_end.route.admin.admin",
         "description": "back_end.route.admin.admin",
-        "peekOfCode": "def create_admin():\n    db = None\n    cursor = None\n    try:\n        data = request.get_json()\n        email = data.get(\"email\")\n        full_name = data.get(\"fullName\")          \n        date_of_birth = data.get(\"dateOfBirth\")\n        password = data.get(\"password\")\n        gender = data.get(\"gender\")",
+        "peekOfCode": "def updateAdmin(id):\n    db = None\n    cursor = None\n    try:\n        data = request.get_json()\n        email = data.get(\"email\")\n        full_name = data.get(\"fullName\")\n        date_of_birth = data.get(\"dateOfBirth\")\n        gender = data.get(\"gender\")\n        print(\"RECEIVED:\", data)",
         "detail": "back_end.route.admin.admin",
         "documentation": {}
     },
@@ -683,11 +723,29 @@
         "documentation": {}
     },
     {
+        "label": "get_difficulties",
+        "kind": 2,
+        "importPath": "back_end.route.admin.exam",
+        "description": "back_end.route.admin.exam",
+        "peekOfCode": "def get_difficulties():\n    db = cursor = None\n    try:\n        db = get_db_connection()\n        cursor = db.cursor(dictionary=True)\n        cursor.execute(\"SELECT id_diff, difficulty FROM difficulty\")  # chọn rõ cột\n        diffs = cursor.fetchall()\n        return jsonify({\"success\": True, \"data\": diffs})\n    except Exception:\n        import traceback",
+        "detail": "back_end.route.admin.exam",
+        "documentation": {}
+    },
+    {
+        "label": "create_exam",
+        "kind": 2,
+        "importPath": "back_end.route.admin.exam",
+        "description": "back_end.route.admin.exam",
+        "peekOfCode": "def create_exam():\n    db = cursor = None\n    try:\n        data = request.get_json()\n        required_fields = [\"id_department\", \"id_class\", \"id_diff\", \"total_ques\", \"duration\", \"name_ex\"]\n        for field in required_fields:\n            if field not in data or data[field] in [None, \"\"]:\n                return jsonify({\"success\": False, \"message\": f\"Thiếu {field}\"}), 400\n        db = get_db_connection()\n        cursor = db.cursor()",
+        "detail": "back_end.route.admin.exam",
+        "documentation": {}
+    },
+    {
         "label": "exam_ad",
         "kind": 5,
         "importPath": "back_end.route.admin.exam",
         "description": "back_end.route.admin.exam",
-        "peekOfCode": "exam_ad = Blueprint('exam_ad', __name__)\ndef _close(cursor, db):\n    if cursor:\n        cursor.close()\n    if db:\n        db.close()\n# Departments\n@exam_ad.route('/departments', methods=['GET'])\ndef get_departments():\n    db = cursor = None",
+        "peekOfCode": "exam_ad = Blueprint('exam_ad', __name__)\ndef _close(cursor, db):\n    if cursor:\n        cursor.close()\n    if db:\n        db.close()\n# -------------------- Departments --------------------\n@exam_ad.route('/departments', methods=['GET'])\ndef get_departments():\n    db = cursor = None",
         "detail": "back_end.route.admin.exam",
         "documentation": {}
     },
@@ -716,6 +774,24 @@
         "description": "back_end.route.admin.login",
         "peekOfCode": "login_bp = Blueprint('login', __name__)\n@login_bp.route('/login', methods=['POST', 'OPTIONS'])\ndef login_admin():\n    if request.method == 'OPTIONS':\n        return '', 204\n    data = request.get_json()\n    email = data.get(\"email\")\n    password = data.get(\"password\")\n    print(f\"Login attempt - Email: {email}\")\n    if not email or not password:",
         "detail": "back_end.route.admin.login",
+        "documentation": {}
+    },
+    {
+        "label": "getUser",
+        "kind": 2,
+        "importPath": "back_end.route.admin.statistic",
+        "description": "back_end.route.admin.statistic",
+        "peekOfCode": "def getUser():\n    db = None\n    cursor = None\n    try:\n        db = get_db_connection()\n        cursor = db.cursor(dictionary=True)\n        cursor.execute('SELECT * FROM users WHERE level = 1')\n        users = cursor.fetchall()\n        if not users:\n            return jsonify({\"msg\": \"Không có dữ liệu người dùng\"}), 404",
+        "detail": "back_end.route.admin.statistic",
+        "documentation": {}
+    },
+    {
+        "label": "statistic",
+        "kind": 5,
+        "importPath": "back_end.route.admin.statistic",
+        "description": "back_end.route.admin.statistic",
+        "peekOfCode": "statistic = Blueprint('statistic', __name__)\nstatistic.route(\"/user\", methods=['GET'])\ndef getUser():\n    db = None\n    cursor = None\n    try:\n        db = get_db_connection()\n        cursor = db.cursor(dictionary=True)\n        cursor.execute('SELECT * FROM users WHERE level = 1')\n        users = cursor.fetchall()",
+        "detail": "back_end.route.admin.statistic",
         "documentation": {}
     },
     {
@@ -957,7 +1033,7 @@
         "kind": 5,
         "importPath": "back_end.app",
         "description": "back_end.app",
-        "peekOfCode": "jwt = JWTManager(app)\n# Users\napp.register_blueprint(users_bp, url_prefix='/api/users')\napp.register_blueprint(exam_bp, url_prefix='/api/exam')\napp.register_blueprint(package_bp, url_prefix='/api')\n# Admin\napp.register_blueprint(login_bp, url_prefix='/api/admin')\napp.register_blueprint(admin_bp, url_prefix='/api/admin')\napp.register_blueprint(users_ad, url_prefix='/api')\napp.register_blueprint(exam_ad, url_prefix='/api/exam')",
+        "peekOfCode": "jwt = JWTManager(app)\n# Users\napp.register_blueprint(users_bp, url_prefix='/api/users')\napp.register_blueprint(exam_bp, url_prefix='/api/exam')\napp.register_blueprint(package_bp, url_prefix='/api')\n# Admin\napp.register_blueprint(login_bp, url_prefix='/api/admin')\napp.register_blueprint(admin_bp, url_prefix='/api/admin')\napp.register_blueprint(users_ad, url_prefix='/api')\napp.register_blueprint(exam_ad, url_prefix='/api/ad_exam')",
         "detail": "back_end.app",
         "documentation": {}
     }

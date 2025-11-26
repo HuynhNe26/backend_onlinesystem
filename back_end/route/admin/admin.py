@@ -2,6 +2,8 @@ from flask import Blueprint, jsonify
 from ...config.db_config import get_db_connection
 from flask import request
 import traceback
+from datetime import datetime
+import re
 
 admin_bp = Blueprint('admin_bp', __name__)
 
@@ -57,68 +59,73 @@ def getAdminDetail(id):
         if db:
             db.close()
 
-@admin_bp.route('/create', methods=['POST'])
-def create_admin():
+@admin_bp.route('/update/<int:id>', methods=['PUT'])
+def updateAdmin(id):
     db = None
     cursor = None
     try:
         data = request.get_json()
-
         email = data.get("email")
-        full_name = data.get("fullName")          
+        full_name = data.get("fullName")
         date_of_birth = data.get("dateOfBirth")
-        password = data.get("password")
         gender = data.get("gender")
-        level_raw = data.get("level")
 
-        if not all([email, full_name, date_of_birth, password, gender, level_raw]):
-            return jsonify({"success": False, "message": "Thiếu dữ liệu bắt buộc"}), 400
+        print("RECEIVED:", data)
+
+        if not all([email, full_name, date_of_birth, gender]):
+            return jsonify({"success": False, "msg": "Thiếu thông tin bắt buộc"}), 400
+
+        email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        if not re.match(email_regex, email):
+            return jsonify({"success": False, "msg": "Email không hợp lệ"}), 400
+        
+        if gender not in ['Nam', 'Nữ']:
+            return jsonify({"success": False, "msg": "Giới tính không hợp lệ"}), 400
 
         try:
-            level = int(level_raw)
-        except:
-            return jsonify({"success": False, "message": "Level không hợp lệ"}), 400
+            if "GMT" in date_of_birth:
+                from datetime import datetime
+                date_of_birth = datetime.strptime(date_of_birth, "%a, %d %b %Y %H:%M:%S %Z").strftime("%Y-%m-%d")
+        except Exception as e:
+            print("Lỗi parse datetime:", e)
+            return jsonify({"success": False, "msg": "Ngày sinh sai định dạng"}), 400
 
         db = get_db_connection()
         cursor = db.cursor(dictionary=True)
 
-        cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
-        existing = cursor.fetchone()
-        if existing:
-            return jsonify({"success": False, "message": "Email đã tồn tại"}), 400
-
-        role = "Quản trị viên" if level == 2 else "Quản trị viên cấp cao"
-
-        status = "Tài khoản mới"
+        cursor.execute("SELECT * FROM users WHERE id_user=%s", (id,))
+        admin = cursor.fetchone()
         
-        query = """
-            INSERT INTO users 
-            (email, fullName, dateOfBirth, password, level, gender, status, role, create_at)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW())
+        if not admin:
+            return jsonify({"success": False, "msg": "Không tìm thấy quản trị viên"}), 404
+
+        cursor.execute("SELECT id_user FROM users WHERE email=%s AND id_user!=%s", (email, id))
+        existing_email = cursor.fetchone()
+        
+        if existing_email:
+            return jsonify({"success": False, "msg": "Email đã được sử dụng bởi tài khoản khác"}), 409
+
+        update_query = """
+            UPDATE users 
+            SET email=%s, fullName=%s, dateOfBirth=%s, gender=%s 
+            WHERE id_user=%s
         """
-        cursor.execute(query, (
-            email,
-            full_name,
-            date_of_birth,
-            password,
-            level,
-            gender,
-            status,
-            role
-        ))
-
+        cursor.execute(update_query, (email, full_name, date_of_birth, gender, id))
         db.commit()
+        
+        cursor.execute("SELECT * FROM users WHERE id_user=%s", (id,))
+        updated_admin = cursor.fetchone()
 
-        return jsonify({"success": True, "message": "Tạo quản trị viên thành công"}), 201
+        return jsonify({"success": True, "msg": "Cập nhật thành công", "data": updated_admin}), 200
 
     except Exception as e:
-        print("Lỗi tạo quản trị viên:", traceback.format_exc())
-        return jsonify({"success": False, "message": "Lỗi server"}), 500
+        if db:
+            db.rollback()
+        print("Lỗi cập nhật dữ liệu:", e)
+        return jsonify({"success": False, "msg": str(e)}), 500
 
     finally:
         if cursor:
             cursor.close()
         if db:
             db.close()
-
-
