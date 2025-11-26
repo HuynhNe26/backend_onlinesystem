@@ -120,25 +120,27 @@ def add_question():
     db = cursor = None
     try:
         data = request.get_json()
-        # Các trường bắt buộc
+        if not data:
+            return jsonify({"success": False, "message": "Không nhận được dữ liệu"}), 400
+
+        # Kiểm tra các trường bắt buộc
         required_fields = ["ques_text", "ans_a", "ans_b", "ans_c", "ans_d", "correct_ans", "point"]
         for f in required_fields:
-            if f not in data or data[f] is None or (isinstance(data[f], str) and not data[f].strip()):
-                return jsonify({"success": False, "message": f"Thiếu hoặc không hợp lệ: {f}"}), 400
+            if f not in data or str(data[f]).strip() == "":
+                return jsonify({"success": False, "message": f"Thiếu {f}"}), 400
 
-        # Convert point sang float
+        # Safe convert point sang float
         try:
             point = float(data["point"])
         except ValueError:
-            return jsonify({"success": False, "message": "Point phải là số hợp lệ"}), 400
+            return jsonify({"success": False, "message": "point phải là số"}), 400
 
         db = get_db_connection()
         cursor = db.cursor()
 
         sql = """
-            INSERT INTO question
-            (ques_text, ans_a, ans_b, ans_c, ans_d, correct_ans, point, explanation) 
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO question(ques_text, ans_a, ans_b, ans_c, ans_d, correct_ans, point, explanation) 
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
         """
         cursor.execute(sql, (
             data["ques_text"].strip(),
@@ -160,12 +162,15 @@ def add_question():
             "id_ques": new_id
         })
 
-    except Exception:
+    except Exception as e:
+        import traceback
         print("Lỗi add_question:", traceback.format_exc())
-        return jsonify({"success": False, "message": "Lỗi server"}), 500
+        return jsonify({"success": False, "message": str(e)}), 500
     finally:
-        _close(cursor, db)
-
+        if cursor:
+            cursor.close()
+        if db:
+            db.close()
 
 # -------------------- Gắn câu hỏi vào đề --------------------
 @exam_ad.route('/add_exam_question', methods=['POST'])
