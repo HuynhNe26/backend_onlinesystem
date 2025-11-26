@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from back_end.config.db_config import get_db_connection
 import traceback
-import hashlib
+from werkzeug.security import generate_password_hash, check_password_hash
 
 # Blueprint
 profile_bp = Blueprint("profile_bp", __name__)
@@ -13,10 +13,6 @@ def _close(cursor, db):
         if db: db.close()
     except Exception:
         pass
-
-# Hàm hash mật khẩu (SHA256)
-def hash_password(pw: str) -> str:
-    return hashlib.sha256(pw.encode()).hexdigest()
 
 # =================== Xem thông tin cá nhân ===================
 @profile_bp.route("/<int:id_user>", methods=["GET"])
@@ -37,11 +33,9 @@ def get_user(id_user):
         # ✅ Chuẩn hóa dateOfBirth về dạng YYYY-MM-DD
         if user.get("dateOfBirth"):
             try:
-                # Nếu là datetime.date hoặc datetime.datetime
                 if hasattr(user["dateOfBirth"], "strftime"):
                     user["dateOfBirth"] = user["dateOfBirth"].strftime("%Y-%m-%d")
                 else:
-                    # Nếu là string thì cắt đúng 10 ký tự đầu
                     user["dateOfBirth"] = str(user["dateOfBirth"])[:10]
             except Exception:
                 pass
@@ -98,7 +92,10 @@ def update_user():
         user = cursor.fetchone()
         if user and user.get("dateOfBirth"):
             try:
-                user["dateOfBirth"] = str(user["dateOfBirth"]).split(" ")[0]
+                if hasattr(user["dateOfBirth"], "strftime"):
+                    user["dateOfBirth"] = user["dateOfBirth"].strftime("%Y-%m-%d")
+                else:
+                    user["dateOfBirth"] = str(user["dateOfBirth"])[:10]
             except Exception:
                 pass
 
@@ -129,12 +126,13 @@ def change_password():
         if not user:
             return jsonify({"success": False, "message": "Không tìm thấy người dùng"}), 404
 
-        # So sánh mật khẩu cũ (hash)
-        if user["password"] != hash_password(old_pass):
+        # ✅ Dùng check_password_hash để so sánh
+        if not check_password_hash(user["password"], old_pass):
             return jsonify({"success": False, "message": "Mật khẩu cũ không đúng"}), 400
 
-        cursor.execute("UPDATE users SET password=%s WHERE id_user=%s",
-                       (hash_password(new_pass), id_user))
+        # ✅ Hash mật khẩu mới bằng generate_password_hash
+        new_hashed = generate_password_hash(new_pass)
+        cursor.execute("UPDATE users SET password=%s WHERE id_user=%s", (new_hashed, id_user))
         db.commit()
 
         return jsonify({"success": True, "message": "Đổi mật khẩu thành công"})
