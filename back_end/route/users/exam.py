@@ -207,11 +207,18 @@ def exam_history():
 
     try:
         cursor.execute("""
-            SELECT r.id_result, e.name_ex AS exam_name,
-                   r.score, r.total_correct,
-                   r.start_time, r.completed_time
+            SELECT 
+                r.id_result, 
+                e.name_ex AS exam_name,
+                r.score, 
+                r.total_correct,
+                r.start_time, 
+                r.completed_time,
+                c.id_class,
+                c.class_name
             FROM results r
             JOIN exam e ON e.id_ex = r.id_ex
+            JOIN classroom c ON c.id_class = e.id_class
             WHERE r.id_user = %s
             ORDER BY r.completed_time DESC
         """, (user_id,))
