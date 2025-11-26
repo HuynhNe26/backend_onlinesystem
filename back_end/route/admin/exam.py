@@ -196,3 +196,44 @@ def add_exam_question():
         return jsonify({"success": False, "message": "Lỗi server"}), 500
     finally:
         _close(cursor, db)
+# -------------------- Quản lý đề thi --------------------
+@exam_ad.route('/manage_exams', methods=['GET'])
+def get_exams():
+    db = cursor = None
+    try:
+        db = get_db_connection()
+        cursor = db.cursor(dictionary=True)
+
+        # Truy vấn tất cả đề thi
+        sql = """
+            SELECT 
+                e.id_ex,
+                e.name_ex,
+                e.id_class,
+                e.id_diff,
+                e.total_ques,
+                e.duration,
+                e.exam_cat,
+                e.start_time,
+                e.end_time,
+                c.class_name,
+                d.difficulty
+            FROM exams e
+            LEFT JOIN classroom c ON e.id_class = c.id_class
+            LEFT JOIN difficulty d ON e.id_diff = d.id_diff
+            ORDER BY e.id_ex DESC
+        """
+        cursor.execute(sql)
+        exams = cursor.fetchall()
+
+        return jsonify({"success": True, "data": exams})
+
+    except Exception as e:
+        import traceback
+        print("Lỗi get_exams:", traceback.format_exc())
+        return jsonify({"success": False, "message": "Lỗi server: " + str(e)}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if db:
+            db.close()
