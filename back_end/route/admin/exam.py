@@ -139,7 +139,7 @@ def add_question():
         cursor = db.cursor()
 
         sql = """
-            INSERT INTO question(ques_text, ans_a, ans_b, ans_c, ans_d, correct_ans, point, explanation) 
+            INSERT INTO questions(ques_text, ans_a, ans_b, ans_c, ans_d, correct_ans, point, explanation) 
             VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
         """
         cursor.execute(sql, (
