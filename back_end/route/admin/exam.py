@@ -120,10 +120,10 @@ def add_question():
     db = cursor = None
     try:
         data = request.get_json()
-
         fields = ["ques_text", "ans_a", "ans_b", "ans_c", "ans_d", "correct_ans", "point"]
+
         for f in fields:
-            if f not in data or data[f] == "":
+            if f not in data or data[f] is None or (isinstance(data[f], str) and data[f].strip() == ""):
                 return jsonify({"success": False, "message": f"Thiếu {f}"}), 400
 
         db = get_db_connection()
@@ -139,8 +139,8 @@ def add_question():
             data["ans_b"],
             data["ans_c"],
             data["ans_d"],
-            data["correct_ans"],
-            float(data["point"]),
+            str(data["correct_ans"]),             # đảm bảo string
+            float(data["point"]),                 # đảm bảo float
             data.get("explanation", "")
         ))
 
@@ -158,6 +158,7 @@ def add_question():
         return jsonify({"success": False, "message": "Lỗi server"}), 500
     finally:
         _close(cursor, db)
+
 @exam_ad.route('/add_exam_question', methods=['POST'])
 def add_exam_question():
     db = cursor = None
