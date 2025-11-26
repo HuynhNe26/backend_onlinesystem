@@ -120,7 +120,6 @@ def add_question():
     db = cursor = None
     try:
         data = request.get_json()
-
         # Các trường bắt buộc
         required_fields = ["ques_text", "ans_a", "ans_b", "ans_c", "ans_d", "correct_ans", "point"]
         for f in required_fields:
