@@ -988,7 +988,7 @@
         "kind": 2,
         "importPath": "back_end.route.users.exam",
         "description": "back_end.route.users.exam",
-        "peekOfCode": "def exam_history():\n    user_id = get_current_user_id()\n    conn = get_db_connection()\n    cursor = conn.cursor(dictionary=True)\n    try:\n        cursor.execute(\"\"\"\n            SELECT \n                r.id_result, \n                e.name_ex AS exam_name,\n                r.score, ",
+        "peekOfCode": "def exam_history():\n    user_id = get_current_user_id()\n    conn = get_db_connection()\n    cursor = conn.cursor(dictionary=True)\n    try:\n        cursor.execute(\"\"\"\n            SELECT \n                r.id_result, \n                e.name_ex AS exam_name,\n                e.total_ques,",
         "detail": "back_end.route.users.exam",
         "documentation": {}
     },
