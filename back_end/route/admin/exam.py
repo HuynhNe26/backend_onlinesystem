@@ -120,28 +120,36 @@ def add_question():
     db = cursor = None
     try:
         data = request.get_json()
-        fields = ["ques_text", "ans_a", "ans_b", "ans_c", "ans_d", "correct_ans", "point"]
 
-        for f in fields:
-            if f not in data or data[f] is None or (isinstance(data[f], str) and data[f].strip() == ""):
-                return jsonify({"success": False, "message": f"Thiếu {f}"}), 400
+        # Các trường bắt buộc
+        required_fields = ["ques_text", "ans_a", "ans_b", "ans_c", "ans_d", "correct_ans", "point"]
+        for f in required_fields:
+            if f not in data or data[f] is None or (isinstance(data[f], str) and not data[f].strip()):
+                return jsonify({"success": False, "message": f"Thiếu hoặc không hợp lệ: {f}"}), 400
+
+        # Convert point sang float
+        try:
+            point = float(data["point"])
+        except ValueError:
+            return jsonify({"success": False, "message": "Point phải là số hợp lệ"}), 400
 
         db = get_db_connection()
         cursor = db.cursor()
 
         sql = """
-            INSERT INTO question(ques_text, ans_a, ans_b, ans_c, ans_d, correct_ans, point, explanation) 
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
+            INSERT INTO question
+            (ques_text, ans_a, ans_b, ans_c, ans_d, correct_ans, point, explanation) 
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         """
         cursor.execute(sql, (
-            data["ques_text"],
-            data["ans_a"],
-            data["ans_b"],
-            data["ans_c"],
-            data["ans_d"],
-            str(data["correct_ans"]),             # đảm bảo string
-            float(data["point"]),                 # đảm bảo float
-            data.get("explanation", "")
+            data["ques_text"].strip(),
+            data["ans_a"].strip(),
+            data["ans_b"].strip(),
+            data["ans_c"].strip(),
+            data["ans_d"].strip(),
+            data["correct_ans"].strip(),
+            point,
+            data.get("explanation", "").strip()
         ))
 
         db.commit()
@@ -154,11 +162,13 @@ def add_question():
         })
 
     except Exception:
-        print("ERR:", traceback.format_exc())
+        print("Lỗi add_question:", traceback.format_exc())
         return jsonify({"success": False, "message": "Lỗi server"}), 500
     finally:
         _close(cursor, db)
 
+
+# -------------------- Gắn câu hỏi vào đề --------------------
 @exam_ad.route('/add_exam_question', methods=['POST'])
 def add_exam_question():
     db = cursor = None
@@ -175,12 +185,10 @@ def add_exam_question():
         cursor.execute(sql, (int(data["id_ex"]), int(data["id_ques"])))
         db.commit()
 
-        return jsonify({"success": True, "message": "Thêm câu hỏi vào đề thành công"})
+        return jsonify({"success": True, "message": "Gắn câu hỏi vào đề thành công"})
 
     except Exception:
-        print("ERR:", traceback.format_exc())
+        print("Lỗi add_exam_question:", traceback.format_exc())
         return jsonify({"success": False, "message": "Lỗi server"}), 500
     finally:
         _close(cursor, db)
-
-
