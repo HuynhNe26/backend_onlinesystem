@@ -80,20 +80,27 @@ def create_exam():
     db = cursor = None
     try:
         data = request.get_json()
-        required_fields = [ "id_class", "id_diff", "total_ques", "duration", "name_ex"]
+
+        # Kiểm tra trường bắt buộc
+        required_fields = ["id_class", "id_diff", "total_ques", "duration", "name_ex"]
         for field in required_fields:
             if field not in data or data[field] in [None, ""]:
                 return jsonify({"success": False, "message": f"Thiếu {field}"}), 400
 
+        # Kiểm tra danh sách câu hỏi
+        if "questions" not in data or not isinstance(data["questions"], list):
+            return jsonify({"success": False, "message": "Thiếu danh sách câu hỏi"}), 400
+
         db = get_db_connection()
         cursor = db.cursor()
 
-        sql = """
-        INSERT INTO exam
-        ( id_class, id_diff, total_ques, duration, name_ex, exam_cat)
-        VALUES (%s, %s, %s, %s, %s, 'draft')
+        # 1️⃣ INSERT exam
+        sql_exam = """
+            INSERT INTO exam
+            (id_class, id_diff, total_ques, duration, name_ex, exam_cat)
+            VALUES (%s, %s, %s, %s, %s, 'draft')
         """
-        cursor.execute(sql, (
+        cursor.execute(sql_exam, (
             int(data["id_class"]),
             int(data["id_diff"]),
             int(data["total_ques"]),
@@ -101,9 +108,26 @@ def create_exam():
             data["name_ex"]
         ))
         db.commit()
-        return jsonify({"success": True, "message": "Tạo đề thành công"})
+
+        new_exam_id = cursor.lastrowid   # Lấy id_ex mới tạo
+
+        # 2️⃣ INSERT vào exam_question
+        sql_eq = """INSERT INTO exam_question (id_ex, id_ques) VALUES (%s, %s)"""
+
+        for q_id in data["questions"]:
+            cursor.execute(sql_eq, (new_exam_id, int(q_id)))
+
+        db.commit()
+
+        return jsonify({
+            "success": True,
+            "message": "Tạo đề + thêm câu hỏi thành công",
+            "id_exam": new_exam_id
+        })
+
     except Exception:
         print("Lỗi tạo exam:", traceback.format_exc())
         return jsonify({"success": False, "message": "Lỗi server"}), 500
     finally:
         _close(cursor, db)
+
