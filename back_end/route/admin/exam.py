@@ -234,5 +234,51 @@ def get_exams():
 
     finally:
         _close(cursor, db)
+@exam_ad.route('/exam_detail', methods=['GET'])
+def exam_detail():
+    db = cursor = None
+    try:
+        id_ex = request.args.get('id_ex', type=int)
+        if not id_ex:
+            return jsonify({"success": False, "message": "Thiếu id_ex"}), 400
+
+        db = get_db_connection()
+        cursor = db.cursor(dictionary=True)
+
+        # Thông tin đề
+        cursor.execute("""
+            SELECT 
+                e.id_ex, e.name_ex, e.id_class, e.id_diff, e.total_ques, e.duration,
+                e.exam_cat, e.start_time, e.end_time,
+                c.class_name, d.difficulty
+            FROM exam e
+            LEFT JOIN classroom c ON e.id_class = c.id_class
+            LEFT JOIN difficulty d ON e.id_diff = d.id_diff
+            WHERE e.id_ex = %s
+        """, (id_ex,))
+        exam = cursor.fetchone()
+        if not exam:
+            return jsonify({"success": False, "message": "Không tìm thấy đề"}), 404
+
+        # Danh sách câu hỏi trong đề
+        cursor.execute("""
+            SELECT 
+                q.id_ques, q.ques_text, q.ans_a, q.ans_b, q.ans_c, q.ans_d,
+                q.correct_ans, q.point, q.explanation
+            FROM exam_question eq
+            JOIN questions q ON eq.id_ques = q.id_ques
+            WHERE eq.id_ex = %s
+            ORDER BY q.id_ques ASC
+        """, (id_ex,))
+        questions = cursor.fetchall()
+
+        return jsonify({"success": True, "data": {"exam": exam, "questions": questions}})
+    except Exception as e:
+        import traceback
+        print("Lỗi exam_detail:", traceback.format_exc())
+        return jsonify({"success": False, "message": "Lỗi server: " + str(e)}), 500
+    finally:
+        if cursor: cursor.close()
+        if db: db.close()
 
 
