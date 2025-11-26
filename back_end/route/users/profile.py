@@ -51,6 +51,12 @@ def update_user():
         id_user = data.get("id_user")
         if not id_user:
             return jsonify({"success": False, "message": "Thiếu id_user"}), 400
+        if "dateOfBirth" in data and data["dateOfBirth"]:
+            try:
+                dob = str(data["dateOfBirth"]).split(" ")[0]  # lấy phần YYYY-MM-DD
+                data["dateOfBirth"] = dob
+            except Exception:
+                pass
 
         fields = ["fullName", "dateOfBirth", "email", "gender", "avatar", "status", "level"]
         updates, values = [], []
