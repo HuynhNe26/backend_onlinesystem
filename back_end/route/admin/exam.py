@@ -202,9 +202,15 @@ def get_exams():
     db = cursor = None
     try:
         db = get_db_connection()
-        cursor = db.cursor(dictionary=True)
+        # Kiểm tra loại connector
+        try:
+            cursor = db.cursor(dictionary=True)  # mysql.connector
+        except TypeError:
+            cursor = db.cursor()  # pymysql
+            use_dict = True
+        else:
+            use_dict = False
 
-        # Truy vấn tất cả đề thi
         sql = """
             SELECT 
                 e.id_ex,
@@ -213,11 +219,11 @@ def get_exams():
                 e.id_diff,
                 e.total_ques,
                 e.duration,
-                e.exam_cat,
+                IFNULL(e.exam_cat,'') as exam_cat,
                 e.start_time,
                 e.end_time,
-                c.class_name,
-                d.difficulty
+                IFNULL(c.class_name,'') as class_name,
+                IFNULL(d.difficulty,'') as difficulty
             FROM exams e
             LEFT JOIN classroom c ON e.id_class = c.id_class
             LEFT JOIN difficulty d ON e.id_diff = d.id_diff
@@ -225,6 +231,25 @@ def get_exams():
         """
         cursor.execute(sql)
         exams = cursor.fetchall()
+
+        # Nếu dùng pymysql và không dictionary, convert sang dict
+        if use_dict:
+            exams = [
+                {
+                    "id_ex": row[0],
+                    "name_ex": row[1],
+                    "id_class": row[2],
+                    "id_diff": row[3],
+                    "total_ques": row[4],
+                    "duration": row[5],
+                    "exam_cat": row[6],
+                    "start_time": row[7],
+                    "end_time": row[8],
+                    "class_name": row[9],
+                    "difficulty": row[10]
+                }
+                for row in exams
+            ]
 
         return jsonify({"success": True, "data": exams})
 
