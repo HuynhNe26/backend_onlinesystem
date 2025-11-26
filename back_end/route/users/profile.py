@@ -8,8 +8,11 @@ profile_bp = Blueprint("profile_bp", __name__)
 
 # Helper đóng kết nối
 def _close(cursor, db):
-    if cursor: cursor.close()
-    if db: db.close()
+    try:
+        if cursor: cursor.close()
+        if db: db.close()
+    except Exception:
+        pass
 
 # Hàm hash mật khẩu (SHA256)
 def hash_password(pw: str) -> str:
@@ -21,17 +24,20 @@ def get_user(id_user):
     db = cursor = None
     try:
         db = get_db_connection()
+        # Nếu driver không hỗ trợ dictionary=True thì bỏ đi
         cursor = db.cursor(dictionary=True)
         cursor.execute("""
             SELECT id_user, fullName, dateOfBirth, email, role, status, gender, avatar, level
             FROM users WHERE id_user=%s
         """, (id_user,))
         user = cursor.fetchone()
+
         if not user:
             return jsonify({"success": False, "message": "Không tìm thấy người dùng"}), 404
+
         return jsonify({"success": True, "data": user})
     except Exception as e:
-        print("Lỗi get_user:", traceback.format_exc())
+        print("❌ Lỗi get_user:", traceback.format_exc())
         return jsonify({"success": False, "message": str(e)}), 500
     finally:
         _close(cursor, db)
@@ -41,7 +47,7 @@ def get_user(id_user):
 def update_user():
     db = cursor = None
     try:
-        data = request.get_json() or {}
+        data = request.get_json(silent=True) or {}
         id_user = data.get("id_user")
         if not id_user:
             return jsonify({"success": False, "message": "Thiếu id_user"}), 400
@@ -49,7 +55,7 @@ def update_user():
         fields = ["fullName", "dateOfBirth", "email", "gender", "avatar", "status", "level"]
         updates, values = [], []
         for f in fields:
-            if f in data:
+            if f in data and data[f] is not None:
                 updates.append(f"{f}=%s")
                 values.append(data[f])
 
@@ -66,7 +72,7 @@ def update_user():
 
         return jsonify({"success": True, "message": "Cập nhật thông tin thành công"})
     except Exception as e:
-        print("Lỗi update_user:", traceback.format_exc())
+        print("❌ Lỗi update_user:", traceback.format_exc())
         return jsonify({"success": False, "message": str(e)}), 500
     finally:
         _close(cursor, db)
@@ -76,7 +82,7 @@ def update_user():
 def change_password():
     db = cursor = None
     try:
-        data = request.get_json() or {}
+        data = request.get_json(silent=True) or {}
         id_user = data.get("id_user")
         old_pass = data.get("old_password")
         new_pass = data.get("new_password")
@@ -101,7 +107,7 @@ def change_password():
 
         return jsonify({"success": True, "message": "Đổi mật khẩu thành công"})
     except Exception as e:
-        print("Lỗi change_password:", traceback.format_exc())
+        print("❌ Lỗi change_password:", traceback.format_exc())
         return jsonify({"success": False, "message": str(e)}), 500
     finally:
         _close(cursor, db)
