@@ -19,7 +19,7 @@ def hash_password(pw: str) -> str:
     return hashlib.sha256(pw.encode()).hexdigest()
 
 # =================== Xem thông tin cá nhân ===================
-@profile_bp.route("/users/<int:id_user>", methods=["GET"])
+@profile_bp.route("/<int:id_user>", methods=["GET"])
 def get_user(id_user):
     db = cursor = None
     try:
@@ -43,7 +43,7 @@ def get_user(id_user):
         _close(cursor, db)
 
 # =================== Chỉnh sửa thông tin cá nhân ===================
-@profile_bp.route("/users/update", methods=["PUT"])
+@profile_bp.route("/update", methods=["PUT"])
 def update_user():
     db = cursor = None
     try:
@@ -78,7 +78,7 @@ def update_user():
         _close(cursor, db)
 
 # =================== Đổi mật khẩu ===================
-@profile_bp.route("/users/change_password", methods=["PUT"])
+@profile_bp.route("/change_password", methods=["PUT"])
 def change_password():
     db = cursor = None
     try:
