@@ -503,14 +503,6 @@
         "documentation": {}
     },
     {
-        "label": "package_bp",
-        "importPath": "back_end.route.users.package",
-        "description": "back_end.route.users.package",
-        "isExtraImport": true,
-        "detail": "back_end.route.users.package",
-        "documentation": {}
-    },
-    {
         "label": "bin_dir",
         "kind": 5,
         "importPath": ".venv.Scripts.activate_this",
@@ -1001,7 +993,7 @@
         "kind": 5,
         "importPath": "back_end.app",
         "description": "back_end.app",
-        "peekOfCode": "app.config[\"JWT_SECRET_KEY\"] = os.environ.get(\"JWT_SECRET_KEY\", \"online_testing@123\")\napp.config[\"JWT_ACCESS_TOKEN_EXPIRES\"] = timedelta(days=1)\njwt = JWTManager(app)\n# Users\napp.register_blueprint(users_bp, url_prefix='/api/users')\napp.register_blueprint(exam_bp, url_prefix='/api/exam')\napp.register_blueprint(package_bp, url_prefix='/api')\n# Admin\napp.register_blueprint(login_bp, url_prefix='/api/admin')\napp.register_blueprint(admin_bp, url_prefix='/api/admin')",
+        "peekOfCode": "app.config[\"JWT_SECRET_KEY\"] = os.environ.get(\"JWT_SECRET_KEY\", \"online_testing@123\")\napp.config[\"JWT_ACCESS_TOKEN_EXPIRES\"] = timedelta(days=1)\njwt = JWTManager(app)\n# Users\napp.register_blueprint(users_bp, url_prefix='/api/users')\napp.register_blueprint(exam_bp, url_prefix='/api/exam')\n# Admin\napp.register_blueprint(login_bp, url_prefix='/api/admin')\napp.register_blueprint(admin_bp, url_prefix='/api/admin')\napp.register_blueprint(users_ad, url_prefix='/api')",
         "detail": "back_end.app",
         "documentation": {}
     },
@@ -1010,7 +1002,7 @@
         "kind": 5,
         "importPath": "back_end.app",
         "description": "back_end.app",
-        "peekOfCode": "app.config[\"JWT_ACCESS_TOKEN_EXPIRES\"] = timedelta(days=1)\njwt = JWTManager(app)\n# Users\napp.register_blueprint(users_bp, url_prefix='/api/users')\napp.register_blueprint(exam_bp, url_prefix='/api/exam')\napp.register_blueprint(package_bp, url_prefix='/api')\n# Admin\napp.register_blueprint(login_bp, url_prefix='/api/admin')\napp.register_blueprint(admin_bp, url_prefix='/api/admin')\napp.register_blueprint(users_ad, url_prefix='/api')",
+        "peekOfCode": "app.config[\"JWT_ACCESS_TOKEN_EXPIRES\"] = timedelta(days=1)\njwt = JWTManager(app)\n# Users\napp.register_blueprint(users_bp, url_prefix='/api/users')\napp.register_blueprint(exam_bp, url_prefix='/api/exam')\n# Admin\napp.register_blueprint(login_bp, url_prefix='/api/admin')\napp.register_blueprint(admin_bp, url_prefix='/api/admin')\napp.register_blueprint(users_ad, url_prefix='/api')\napp.register_blueprint(exam_ad, url_prefix='/api/ad_exam')",
         "detail": "back_end.app",
         "documentation": {}
     },
@@ -1019,7 +1011,7 @@
         "kind": 5,
         "importPath": "back_end.app",
         "description": "back_end.app",
-        "peekOfCode": "jwt = JWTManager(app)\n# Users\napp.register_blueprint(users_bp, url_prefix='/api/users')\napp.register_blueprint(exam_bp, url_prefix='/api/exam')\napp.register_blueprint(package_bp, url_prefix='/api')\n# Admin\napp.register_blueprint(login_bp, url_prefix='/api/admin')\napp.register_blueprint(admin_bp, url_prefix='/api/admin')\napp.register_blueprint(users_ad, url_prefix='/api')\napp.register_blueprint(exam_ad, url_prefix='/api/ad_exam')",
+        "peekOfCode": "jwt = JWTManager(app)\n# Users\napp.register_blueprint(users_bp, url_prefix='/api/users')\napp.register_blueprint(exam_bp, url_prefix='/api/exam')\n# Admin\napp.register_blueprint(login_bp, url_prefix='/api/admin')\napp.register_blueprint(admin_bp, url_prefix='/api/admin')\napp.register_blueprint(users_ad, url_prefix='/api')\napp.register_blueprint(exam_ad, url_prefix='/api/ad_exam')\n# -------------------- Run App --------------------",
         "detail": "back_end.app",
         "documentation": {}
     }
