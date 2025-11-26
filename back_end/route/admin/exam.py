@@ -202,14 +202,7 @@ def get_exams():
     db = cursor = None
     try:
         db = get_db_connection()
-        # Kiểm tra loại connector
-        try:
-            cursor = db.cursor(dictionary=True)  # mysql.connector
-        except TypeError:
-            cursor = db.cursor()  # pymysql
-            use_dict = True
-        else:
-            use_dict = False
+        cursor = db.cursor(dictionary=True)
 
         sql = """
             SELECT 
@@ -232,33 +225,14 @@ def get_exams():
         cursor.execute(sql)
         exams = cursor.fetchall()
 
-        # Nếu dùng pymysql và không dictionary, convert sang dict
-        if use_dict:
-            exams = [
-                {
-                    "id_ex": row[0],
-                    "name_ex": row[1],
-                    "id_class": row[2],
-                    "id_diff": row[3],
-                    "total_ques": row[4],
-                    "duration": row[5],
-                    "exam_cat": row[6],
-                    "start_time": row[7],
-                    "end_time": row[8],
-                    "class_name": row[9],
-                    "difficulty": row[10]
-                }
-                for row in exams
-            ]
-
         return jsonify({"success": True, "data": exams})
 
     except Exception as e:
         import traceback
         print("Lỗi get_exams:", traceback.format_exc())
         return jsonify({"success": False, "message": "Lỗi server: " + str(e)}), 500
+
     finally:
-        if cursor:
-            cursor.close()
-        if db:
-            db.close()
+        _close(cursor, db)
+
+
