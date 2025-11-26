@@ -24,7 +24,6 @@ def get_user(id_user):
     db = cursor = None
     try:
         db = get_db_connection()
-        # Nếu driver không hỗ trợ dictionary=True thì bỏ đi
         cursor = db.cursor(dictionary=True)
         cursor.execute("""
             SELECT id_user, fullName, dateOfBirth, email, role, status, gender, avatar, level
@@ -34,6 +33,18 @@ def get_user(id_user):
 
         if not user:
             return jsonify({"success": False, "message": "Không tìm thấy người dùng"}), 404
+
+        # ✅ Chuẩn hóa dateOfBirth về dạng YYYY-MM-DD
+        if user.get("dateOfBirth"):
+            try:
+                # Nếu là datetime.date hoặc datetime.datetime
+                if hasattr(user["dateOfBirth"], "strftime"):
+                    user["dateOfBirth"] = user["dateOfBirth"].strftime("%Y-%m-%d")
+                else:
+                    # Nếu là string thì cắt đúng 10 ký tự đầu
+                    user["dateOfBirth"] = str(user["dateOfBirth"])[:10]
+            except Exception:
+                pass
 
         return jsonify({"success": True, "data": user})
     except Exception as e:
@@ -51,9 +62,11 @@ def update_user():
         id_user = data.get("id_user")
         if not id_user:
             return jsonify({"success": False, "message": "Thiếu id_user"}), 400
+
+        # Chuẩn hóa dateOfBirth
         if "dateOfBirth" in data and data["dateOfBirth"]:
             try:
-                dob = str(data["dateOfBirth"]).split(" ")[0]  # lấy phần YYYY-MM-DD
+                dob = str(data["dateOfBirth"]).split(" ")[0]
                 data["dateOfBirth"] = dob
             except Exception:
                 pass
@@ -76,7 +89,20 @@ def update_user():
         cursor.execute(sql, tuple(values))
         db.commit()
 
-        return jsonify({"success": True, "message": "Cập nhật thông tin thành công"})
+        # Trả lại thông tin mới
+        cursor = db.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT id_user, fullName, dateOfBirth, email, role, status, gender, avatar, level
+            FROM users WHERE id_user=%s
+        """, (id_user,))
+        user = cursor.fetchone()
+        if user and user.get("dateOfBirth"):
+            try:
+                user["dateOfBirth"] = str(user["dateOfBirth"]).split(" ")[0]
+            except Exception:
+                pass
+
+        return jsonify({"success": True, "message": "Cập nhật thông tin thành công", "data": user})
     except Exception as e:
         print("❌ Lỗi update_user:", traceback.format_exc())
         return jsonify({"success": False, "message": str(e)}), 500
