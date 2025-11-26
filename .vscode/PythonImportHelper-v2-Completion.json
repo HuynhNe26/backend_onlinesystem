@@ -736,7 +736,7 @@
         "kind": 2,
         "importPath": "back_end.route.admin.exam",
         "description": "back_end.route.admin.exam",
-        "peekOfCode": "def create_exam():\n    db = cursor = None\n    try:\n        data = request.get_json()\n        required_fields = [\"id_department\", \"id_class\", \"id_diff\", \"total_ques\", \"duration\", \"name_ex\"]\n        for field in required_fields:\n            if field not in data or data[field] in [None, \"\"]:\n                return jsonify({\"success\": False, \"message\": f\"Thiếu {field}\"}), 400\n        db = get_db_connection()\n        cursor = db.cursor()",
+        "peekOfCode": "def create_exam():\n    db = cursor = None\n    try:\n        data = request.get_json()\n        required_fields = [ \"id_class\", \"id_diff\", \"total_ques\", \"duration\", \"name_ex\"]\n        for field in required_fields:\n            if field not in data or data[field] in [None, \"\"]:\n                return jsonify({\"success\": False, \"message\": f\"Thiếu {field}\"}), 400\n        db = get_db_connection()\n        cursor = db.cursor()",
         "detail": "back_end.route.admin.exam",
         "documentation": {}
     },
